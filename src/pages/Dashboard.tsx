@@ -1,4 +1,6 @@
 import React from 'react'
+import { UsersIcon, CurrencyDollarIcon, ShoppingBagIcon, } from '@heroicons/react/24/outline'
+import StatsCard from '../components/StatsCard'
 
 export default function Dashboard() {
   return (
@@ -10,59 +12,43 @@ export default function Dashboard() {
         </button>
       </div>
 
-      {/* Stats Cards */}
+      {/* Stats Cards - Now using reusable component */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white p-6 rounded-lg shadow-sm border">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Total Users</p>
-              <p className="text-3xl font-bold text-gray-900">1,234</p>
-            </div>
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-              <span className="text-blue-600 text-xl">👥</span>
-            </div>
-          </div>
-          <p className="text-sm text-green-600 mt-2">+12% from last month</p>
-        </div>
-
-        <div className="bg-white p-6 rounded-lg shadow-sm border">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Revenue</p>
-              <p className="text-3xl font-bold text-gray-900">$12,345</p>
-            </div>
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-              <span className="text-green-600 text-xl">💰</span>
-            </div>
-          </div>
-          <p className="text-sm text-green-600 mt-2">+8% from last month</p>
-        </div>
-
-        <div className="bg-white p-6 rounded-lg shadow-sm border">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Orders</p>
-              <p className="text-3xl font-bold text-gray-900">856</p>
-            </div>
-            <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
-              <span className="text-yellow-600 text-xl">📦</span>
-            </div>
-          </div>
-          <p className="text-sm text-red-600 mt-2">-3% from last month</p>
-        </div>
-
-        <div className="bg-white p-6 rounded-lg shadow-sm border">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Growth</p>
-              <p className="text-3xl font-bold text-gray-900">23.5%</p>
-            </div>
-            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-              <span className="text-purple-600 text-xl">📈</span>
-            </div>
-          </div>
-          <p className="text-sm text-green-600 mt-2">+5% from last month</p>
-        </div>
+        <StatsCard
+          title="Total Users"
+          value="1,234"
+          icon={<UsersIcon className="w-6 h-6" />}
+          trend={{ value: "+12% from last month", type: "increase" }}
+          iconBgColor="bg-blue-100"
+          iconTextColor="text-blue-600"
+        />
+        
+        <StatsCard
+          title="Revenue"
+          value="$12,345"
+          icon={<CurrencyDollarIcon className="w-6 h-6" />}
+          trend={{ value: "+8% from last month", type: "increase" }}
+          iconBgColor="bg-green-100"
+          iconTextColor="text-green-600"
+        />
+        
+        <StatsCard
+          title="Orders"
+          value="856"
+          icon={<ShoppingBagIcon className="w-6 h-6" />}
+          trend={{ value: "-3% from last month", type: "decrease" }}
+          iconBgColor="bg-yellow-100"
+          iconTextColor="text-yellow-600"
+        />
+        
+        <StatsCard 
+          title="Growth" 
+          value="23.5%" 
+          icon="🚀"
+          trend={{ value: "+5% from last month", type: "increase" }}
+          iconBgColor="bg-purple-100"
+          iconTextColor="text-purple-600"
+        />
       </div>
 
       {/* Recent Activity */}
