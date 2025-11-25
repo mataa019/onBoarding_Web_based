@@ -17,8 +17,8 @@ export default function Dashboard() {
         <StatsCard
           title="Total Users"
           value="1,234"
-          icon={<UsersIcon className="w-6 h-6" />}
-          trend={{ value: "+12% from last month", type: "increase" }}
+          //icon={<UsersIcon className="w-6 h-6" />}
+         // trend={{ value: "+12% from last month", type: "increase" }}
           iconBgColor="bg-blue-100"
           iconTextColor="text-blue-600"
         />
@@ -26,8 +26,8 @@ export default function Dashboard() {
         <StatsCard
           title="Revenue"
           value="$12,345"
-          icon={<CurrencyDollarIcon className="w-6 h-6" />}
-          trend={{ value: "+8% from last month", type: "increase" }}
+          //icon={<CurrencyDollarIcon className="w-6 h-6" />}
+         // trend={{ value: "+8% from last month", type: "increase" }}
           iconBgColor="bg-green-100"
           iconTextColor="text-green-600"
         />
@@ -35,8 +35,8 @@ export default function Dashboard() {
         <StatsCard
           title="Orders"
           value="856"
-          icon={<ShoppingBagIcon className="w-6 h-6" />}
-          trend={{ value: "-3% from last month", type: "decrease" }}
+          //icon={<ShoppingBagIcon className="w-6 h-6" />}
+          //trend={{ value: "-3% from last month", type: "decrease" }}
           iconBgColor="bg-yellow-100"
           iconTextColor="text-yellow-600"
         />
@@ -44,8 +44,8 @@ export default function Dashboard() {
         <StatsCard 
           title="Growth" 
           value="23.5%" 
-          icon="🚀"
-          trend={{ value: "+5% from last month", type: "increase" }}
+         // icon="🚀"
+         // trend={{ value: "+5% from last month", type: "increase" }}
           iconBgColor="bg-purple-100"
           iconTextColor="text-purple-600"
         />
