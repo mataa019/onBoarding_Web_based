@@ -3,8 +3,8 @@ import TextField from '../../components/TextField'
 export default function Login() {
   return (
     <div 
-      className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-center bg-no-repeat"
-      style={{ backgroundImage: 'url(/loginbg.png)', backgroundSize: '120%' }}
+      className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-10 bg-no-repeat"
+      style={{ backgroundImage: 'url(/loginbg.png)', backgroundSize: '120%', backgroundPosition: 'center top' }}
     >
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         {/* Logo Section */}

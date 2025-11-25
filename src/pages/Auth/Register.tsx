@@ -1,7 +1,26 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import TextField from '../../components/TextField'
 
+const slides = [
+  {
+    image: '/slide1.png',
+    title: 'Start your journey with us',
+    description: 'Join thousands of teams using OnboardFlow to streamline project onboarding.'
+  },
+  {
+    image: '/slide2.png',
+    title: 'Collaborate seamlessly',
+    description: 'Work together with your team in real-time and boost productivity.'
+  },
+  {
+    image: '/slide3.png',
+    title: 'Track your progress',
+    description: 'Monitor your projects and stay on top of every milestone.'
+  }
+]
+
 function Register() {
+  const [currentSlide, setCurrentSlide] = useState(0)
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -18,33 +37,77 @@ function Register() {
     console.log('Register:', formData)
   }
 
+  // Auto-advance slides
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length)
+    }, 5000)
+    return () => clearInterval(timer)
+  }, [])
+
   return (
     <div className="min-h-screen flex">
-      {/* Left Side - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-blue-600 p-10 flex-col justify-between">
-        <div className="flex items-center space-x-2">
-          <div className="w-9 h-9 bg-white rounded-lg flex items-center justify-center">
-            <span className="text-blue-600 font-semibold text-lg">O</span>
+      {/* Left Side - Branding with Slideshow */}
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
+        {/* Slide Images */}
+        {slides.map((slide, index) => (
+          <div
+            key={index}
+            className={`absolute inset-0 transition-opacity duration-1000 ${
+              index === currentSlide ? 'opacity-100' : 'opacity-0'
+            }`}
+          >
+            <img
+              src={slide.image}
+              alt={slide.title}
+              className="w-full h-full object-cover"
+            />
+            {/* Overlay */}
+            <div className="absolute inset-0 bg-blue-600/70" />
           </div>
-          <span className="text-lg font-semibold text-white">OnboardFlow</span>
-        </div>
-        
-        <div>
-          <h1 className="text-3xl font-semibold text-white mb-3">
-            Start your journey with us
-          </h1>
-          <p className="text-blue-100 leading-relaxed">
-            Join thousands of teams using OnboardFlow to streamline project onboarding.
-          </p>
-        </div>
+        ))}
 
-        <div className="flex items-center space-x-3">
-          <div className="flex -space-x-2">
-            <div className="w-8 h-8 rounded-full bg-blue-400 border-2 border-blue-600"></div>
-            <div className="w-8 h-8 rounded-full bg-blue-300 border-2 border-blue-600"></div>
-            <div className="w-8 h-8 rounded-full bg-blue-200 border-2 border-blue-600"></div>
+        {/* Content overlay */}
+        <div className="relative z-10 p-10 flex flex-col justify-between w-full">
+          <div className="flex items-center space-x-2">
+            <div className="w-9 h-9 bg-white rounded-lg flex items-center justify-center">
+              <span className="text-blue-600 font-semibold text-lg">O</span>
+            </div>
+            <span className="text-lg font-semibold text-white">OnboardFlow</span>
           </div>
-          <p className="text-blue-100 text-sm">Trusted by 850+ teams</p>
+          
+          <div>
+            <h1 className="text-3xl font-semibold text-white mb-3">
+              {slides[currentSlide].title}
+            </h1>
+            <p className="text-blue-100 leading-relaxed">
+              {slides[currentSlide].description}
+            </p>
+
+            {/* Slide indicators */}
+            <div className="flex space-x-2 mt-6">
+              {slides.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentSlide(index)}
+                  className={`h-2 rounded-full transition-all duration-300 ${
+                    index === currentSlide 
+                      ? 'w-8 bg-white' 
+                      : 'w-2 bg-white/50 hover:bg-white/70'
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-3">
+            <div className="flex -space-x-2">
+              <div className="w-8 h-8 rounded-full bg-blue-400 border-2 border-white/30"></div>
+              <div className="w-8 h-8 rounded-full bg-blue-300 border-2 border-white/30"></div>
+              <div className="w-8 h-8 rounded-full bg-blue-200 border-2 border-white/30"></div>
+            </div>
+            <p className="text-blue-100 text-sm">Trusted by 850+ teams</p>
+          </div>
         </div>
       </div>
 
