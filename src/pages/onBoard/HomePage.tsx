@@ -58,13 +58,6 @@ export default function HomePage() {
     }
   ]
 
-  const stats = [
-    { label: 'Projects Onboarded', value: '2,400+' },
-    { label: 'Active Teams', value: '850+' },
-    { label: 'GitHub Repos', value: '12,000+' },
-    { label: 'Uptime', value: '99.9%' }
-  ]
-
   // Auto-advance slideshow
   useEffect(() => {
     const timer = setInterval(() => {
@@ -178,18 +171,73 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Stats Bar */}
-      <section className="bg-white border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {stats.map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="text-2xl md:text-3xl font-semibold text-gray-900">
-                  {stat.value}
+      {/* About Section */}
+      <section id="about" className="bg-white border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div>
+              <h2 className="text-3xl font-semibold text-gray-900 mb-4">
+                About OnboardFlow
+              </h2>
+              <p className="text-gray-600 mb-4 leading-relaxed">
+                OnboardFlow is a modern project onboarding platform designed to help development teams 
+                streamline their workflow. We make it easy to connect GitHub repositories, set up 
+                automated processes, and collaborate effectively.
+              </p>
+              <p className="text-gray-600 mb-6 leading-relaxed">
+                Our mission is to eliminate the friction in project setup and team onboarding, 
+                allowing developers to focus on what they do best — building great software.
+              </p>
+              <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <div className="text-2xl font-semibold text-gray-900">2,400+</div>
+                  <div className="text-sm text-gray-500">Projects Onboarded</div>
                 </div>
-                <div className="text-sm text-gray-500 mt-1">{stat.label}</div>
+                <div>
+                  <div className="text-2xl font-semibold text-gray-900">850+</div>
+                  <div className="text-sm text-gray-500">Active Teams</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-semibold text-gray-900">12,000+</div>
+                  <div className="text-sm text-gray-500">GitHub Repos</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-semibold text-gray-900">99.9%</div>
+                  <div className="text-sm text-gray-500">Uptime</div>
+                </div>
               </div>
-            ))}
+            </div>
+            <div className="bg-gray-100 rounded-xl p-8">
+              <div className="space-y-4">
+                <div className="flex items-start space-x-3">
+                  <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <CodeBracketIcon className="w-4 h-4 text-blue-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-gray-900">Developer First</h4>
+                    <p className="text-sm text-gray-500">Built by developers, for developers.</p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <UsersIcon className="w-4 h-4 text-green-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-gray-900">Team Focused</h4>
+                    <p className="text-sm text-gray-500">Collaboration tools that actually work.</p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <CogIcon className="w-4 h-4 text-purple-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-gray-900">Automation Ready</h4>
+                    <p className="text-sm text-gray-500">Automate repetitive onboarding tasks.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
