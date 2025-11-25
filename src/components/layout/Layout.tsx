@@ -25,7 +25,7 @@ export default function Layout({ children }: LayoutProps) {
         {/* Header */}
         <header className="bg-white border-b border-gray-200 px-6 py-4">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
+            <h1 className="text-2xl font-semibold text-gray-900"></h1>
             <div className="flex items-center space-x-4">
               {/* You can add header actions here like search, notifications, user menu */}
               <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
