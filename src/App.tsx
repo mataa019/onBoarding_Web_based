@@ -1,22 +1,26 @@
 import React from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { Layout } from './components/layout'
-import Dashboard from './pages/Dashboard'
 import Login from './pages/Auth/Login'
+import Register from './pages/Auth/Register'
+import Dashboard from './pages/Dashboard'
 
 function App() {
   return (
     <Router>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Login/>} />
-          <Route path="/Dashboard " element={<div>Analytics Page Coming Soon...</div>} />
-          <Route path="/documents" element={<div>Documents Page Coming Soon...</div>} />
-          <Route path="/projects" element={<div>Projects Page Coming Soon...</div>} />
-          <Route path="/notifications" element={<div>Notifications Page Coming Soon...</div>} />
-          <Route path="/settings" element={<div>Settings Page Coming Soon...</div>} />
-        </Routes>
-      </Layout>
+      <Routes>
+        {/* Public routes - No Layout */}
+        <Route path="/" element={<Login />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+
+        {/* Protected routes - With Layout (Sidebar + Header) */}
+        <Route path="/dashboard" element={<Layout><Dashboard /></Layout>} />
+        <Route path="/documents" element={<Layout><div>Documents Page Coming Soon...</div></Layout>} />
+        <Route path="/projects" element={<Layout><div>Projects Page Coming Soon...</div></Layout>} />
+        <Route path="/notifications" element={<Layout><div>Notifications Page Coming Soon...</div></Layout>} />
+        <Route path="/settings" element={<Layout><div>Settings Page Coming Soon...</div></Layout>} />
+      </Routes>
     </Router>
   )
 }

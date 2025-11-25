@@ -19,7 +19,7 @@ interface SidebarItem {
 }
 
 const navigation: SidebarItem[] = [
-  { name: 'Dashboard', href: '/', icon: HomeIcon, current: true },
+  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
   { name: 'Analytics', href: '/analytics', icon: ChartBarIcon },
   { name: 'Users', href: '/users', icon: UsersIcon },
   { name: 'Documents', href: '/documents', icon: DocumentTextIcon },
