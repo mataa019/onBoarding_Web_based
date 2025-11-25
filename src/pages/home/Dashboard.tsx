@@ -1,6 +1,6 @@
 import React from 'react'
 import { UsersIcon, CurrencyDollarIcon, ShoppingBagIcon, } from '@heroicons/react/24/outline'
-import StatsCard from '../components/StatsCard'
+import StatsCard from '../../components/StatsCard'
 
 export default function Dashboard() {
   return (
