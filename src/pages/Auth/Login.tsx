@@ -2,29 +2,54 @@ import TextField from '../../components/TextField'
 
 export default function Login() {
   return (
-    <div 
-      className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-10 bg-no-repeat"
-      style={{ backgroundImage: 'url(/loginbg.png)', backgroundSize: '120%', backgroundPosition: 'center top' }}
-    >
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        {/* Logo Section */}
-        <div className="flex justify-center">
-          <div className="w-16 h-16 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg">
-            <span className="text-white font-bold text-2xl">O</span>
-          </div>
-        </div>
-        
-        <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-white">
-          Sign in to your account
-        </h2>
-        <p className="mt-2 text-center text-sm text-gray-200">
-          Welcome back! Please enter your credentials to access your dashboard.
-        </p>
-      </div>
+    <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-10 bg-blue-600 relative overflow-hidden">
+      {/* Triangle Shapes Background */}
+      <div 
+        className="absolute -top-20 -left-20 w-96 h-96 bg-blue-500 opacity-50"
+        style={{ clipPath: 'polygon(0 0, 100% 0, 0 100%)' }}
+      />
+      <div 
+        className="absolute top-1/4 right-0 w-80 h-80 bg-blue-700 opacity-40"
+        style={{ clipPath: 'polygon(100% 0, 100% 100%, 0 100%)' }}
+      />
+      <div 
+        className="absolute bottom-0 left-1/4 w-72 h-72 bg-blue-400 opacity-30"
+        style={{ clipPath: 'polygon(50% 0, 100% 100%, 0 100%)' }}
+      />
+      <div 
+        className="absolute -bottom-10 -right-10 w-64 h-64 bg-blue-800 opacity-40"
+        style={{ clipPath: 'polygon(0 0, 100% 50%, 0 100%)' }}
+      />
+      <div 
+        className="absolute top-1/2 left-10 w-40 h-40 bg-white opacity-10"
+        style={{ clipPath: 'polygon(50% 0, 100% 100%, 0 100%)' }}
+      />
+      <div 
+        className="absolute top-20 right-1/4 w-32 h-32 bg-blue-300 opacity-20"
+        style={{ clipPath: 'polygon(0 0, 100% 0, 50% 100%)' }}
+      />
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow-lg sm:rounded-lg sm:px-10">
-          <form className="space-y-6" action="#" method="POST">
+      {/* Content */}
+      <div className="relative z-10">
+        <div className="sm:mx-auto sm:w-full sm:max-w-md">
+          {/* Logo Section */}
+          <div className="flex justify-center">
+            <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center shadow-lg">
+              <span className="text-blue-600 font-bold text-2xl">O</span>
+            </div>
+          </div>
+          
+          <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-white">
+            Sign in to your account
+          </h2>
+          <p className="mt-2 text-center text-sm text-blue-100">
+            Welcome back! Please enter your credentials to access your dashboard.
+          </p>
+        </div>
+
+        <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+          <div className="bg-white py-8 px-4 shadow-lg sm:rounded-lg sm:px-10">
+            <form className="space-y-6" action="#" method="POST">
             {/* Email Field */}
             <TextField
               label="Email address"
@@ -90,6 +115,7 @@ export default function Login() {
 
           </form>
         </div>
+      </div>
       </div>
     </div>
   )
