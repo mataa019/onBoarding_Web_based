@@ -3,13 +3,14 @@ import { Layout } from './components/layout'
 import Login from './pages/Auth/Login'
 import Register from './pages/Auth/Register'
 import Dashboard from './pages/home/Dashboard'
+import HomePage from './pages/onBoard/HomePage'
 
 function App() {
   return (
     <Router>
       <Routes>
         {/* Public routes - No Layout */}
-        <Route path="/" element={<Login />} />
+        <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
