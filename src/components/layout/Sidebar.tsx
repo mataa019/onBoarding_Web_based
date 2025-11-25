@@ -53,6 +53,7 @@ export default function Sidebar({ isCollapsed = false, onToggleCollapse }: Sideb
             <span className="text-lg font-semibold text-gray-900">onBoarding App</span>
           </div>
         )}
+
         {isCollapsed && (
           <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mx-auto">
             <span className="text-white font-bold text-sm">O</span>
@@ -112,7 +113,7 @@ export default function Sidebar({ isCollapsed = false, onToggleCollapse }: Sideb
           {!isCollapsed && (
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-gray-900 truncate">John Mataa</p>
-              <p className="text-xs text-gray-500 truncate">john@example.com</p>
+              <p className="text-xs text-gray-500 truncate">johnmataa@gmail.com</p>
             </div>
           )}
         </div>
