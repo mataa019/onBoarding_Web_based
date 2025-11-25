@@ -1,4 +1,3 @@
-import React from 'react'
 import TextField from '../../components/TextField'
 
 export default function Login() {

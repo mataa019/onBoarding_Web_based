@@ -1,5 +1,4 @@
-import React from 'react'
-import { ArrowRightIcon, CodeBracketIcon, CloudArrowUpIcon, CogIcon, ChartBarIcon, UsersIcon, DevicePhoneIcon } from '@heroicons/react/24/outline'
+import { ArrowRightIcon, CodeBracketIcon, CloudArrowUpIcon, CogIcon, ChartBarIcon, UsersIcon, DeviceTabletIcon } from '@heroicons/react/24/outline'
 
 export default function HomePage() {
   const features = [
@@ -36,7 +35,7 @@ export default function HomePage() {
     {
       name: 'Mobile Ready',
       description: 'Access your projects and monitor progress from anywhere with our mobile app.',
-      icon: DevicePhoneIcon,
+      icon: DeviceTabletIcon,
       color: 'from-pink-500 to-pink-700'
     }
   ]
@@ -204,7 +203,7 @@ export default function HomePage() {
                   <div className="text-xs">Get it on</div>
                   <div className="text-sm font-bold">Google Play</div>
                 </div>
-              </div>
+              </button>
             </div>
           </div>
         </div>
