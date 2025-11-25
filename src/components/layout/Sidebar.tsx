@@ -48,14 +48,14 @@ export default function Sidebar({ isCollapsed = false, onToggleCollapse }: Sideb
         {!isCollapsed && (
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">D</span>
+              <span className="text-white font-bold text-sm">O</span>
             </div>
-            <span className="text-lg font-semibold text-gray-900">Dashboard</span>
+            <span className="text-lg font-semibold text-gray-900">onBoarding App</span>
           </div>
         )}
         {isCollapsed && (
           <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mx-auto">
-            <span className="text-white font-bold text-sm">D</span>
+            <span className="text-white font-bold text-sm">O</span>
           </div>
         )}
         
