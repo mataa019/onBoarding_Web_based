@@ -106,7 +106,6 @@ export default function Login() {
                 Sign in
               </button>
             </div>
-
             {/* Sign Up Link */}
             <div className="text-center">
               <span className="text-sm text-gray-600">
