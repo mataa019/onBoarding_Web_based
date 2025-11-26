@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react'
 import { PlusIcon, XMarkIcon, PhotoIcon } from '@heroicons/react/24/outline'
-import ProjectCard, { Project } from '../../components/ProjectCard'
+import ProjectCard, { type Project } from '../../components/ProjectCard'
 
 export function Project() {
   const [projects, setProjects] = useState<Project[]>([])

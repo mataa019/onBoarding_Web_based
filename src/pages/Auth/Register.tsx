@@ -22,7 +22,8 @@ const slides = [
 function Register() {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [formData, setFormData] = useState({
-    fullName: '',
+    firstName: '',
+    lastName: '',
     email: '',
     password: '',
     confirmPassword: ''

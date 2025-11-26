@@ -7,7 +7,7 @@ import {
   ArrowDownTrayIcon
 } from '@heroicons/react/24/outline'
 import { SearchInput, SelectFilter } from '../../components/FormComponents'
-import { Modal, FileUpload, EmptyState, UploadedFile } from '../../components/UIComponents'
+import { Modal, FileUpload, EmptyState, type UploadedFile } from '../../components/UIComponents'
 
 interface Document {
   id: string
