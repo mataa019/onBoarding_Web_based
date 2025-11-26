@@ -1,7 +1,7 @@
 import {
   HomeIcon,
   ChartBarIcon,
-  UsersIcon,
+  UserCircleIcon,
   CogIcon,
   BellIcon,
   DocumentTextIcon,
@@ -19,10 +19,10 @@ interface SidebarItem {
 
 const navigation: SidebarItem[] = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-  { name: 'Analytics', href: '/analytics', icon: ChartBarIcon },
-  { name: 'Users', href: '/users', icon: UsersIcon },
-  { name: 'Documents', href: '/documents', icon: DocumentTextIcon },
+  { name: 'Portfolio', href: '/portfolio', icon: UserCircleIcon },
   { name: 'Projects', href: '/projects', icon: FolderIcon },
+  { name: 'Documents', href: '/documents', icon: DocumentTextIcon },
+  { name: 'Analytics', href: '/analytics', icon: ChartBarIcon },
   { name: 'Settings', href: '/settings', icon: CogIcon },
 ]
 
