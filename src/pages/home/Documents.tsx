@@ -315,236 +315,178 @@ export function Document() {
       </div>
 
       {/* Upload Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div 
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-            onClick={closeModal}
-          />
-          
-          <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between p-6 border-b border-gray-100">
-              <h2 className="text-xl font-semibold text-gray-900">Upload Document</h2>
-              <button
-                onClick={closeModal}
-                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <XMarkIcon className="w-5 h-5" />
-              </button>
-            </div>
-
-            <form onSubmit={handleSubmit} className="p-6 space-y-5">
-              {/* File Upload */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Document File *
-                </label>
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                />
-                {uploadedFile ? (
-                  <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg border border-blue-200">
-                    <div className="flex items-center">
-                      <DocumentIcon className="w-8 h-8 text-blue-600 mr-3" />
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">{uploadedFile.fileName}</p>
-                        <p className="text-xs text-gray-500">{uploadedFile.fileSize}</p>
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setUploadedFile(null)
-                        if (fileInputRef.current) fileInputRef.current.value = ''
-                      }}
-                      className="p-1 text-gray-400 hover:text-red-600 transition-colors"
-                    >
-                      <XMarkIcon className="w-5 h-5" />
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="w-full p-8 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors"
-                  >
-                    <DocumentIcon className="w-10 h-10 text-gray-400 mx-auto mb-2" />
-                    <p className="text-sm text-gray-600">Click to upload a document</p>
-                    <p className="text-xs text-gray-400 mt-1">PDF, DOC, DOCX, JPG, PNG (max 10MB)</p>
-                  </button>
-                )}
-              </div>
-
-              {/* Document Name */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Document Name *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                  placeholder="e.g., National Registration Card"
-                />
-              </div>
-
-              {/* Category */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Category *
-                </label>
-                <select
-                  required
-                  value={formData.category}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value, type: '' })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                >
-                  {Object.keys(documentTypes).map(cat => (
-                    <option key={cat} value={cat}>{cat}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Document Type */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Document Type *
-                </label>
-                <select
-                  required
-                  value={formData.type}
-                  onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                >
-                  <option value="">Select type...</option>
-                  {documentTypes[formData.category]?.map(type => (
-                    <option key={type} value={type}>{type}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Expiry Date */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Expiry Date (if applicable)
-                </label>
-                <input
-                  type="date"
-                  value={formData.expiryDate}
-                  onChange={(e) => setFormData({ ...formData, expiryDate: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                />
-              </div>
-
-              {/* Buttons */}
-              <div className="flex items-center justify-end space-x-3 pt-4">
-                <button
-                  type="button"
-                  onClick={closeModal}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={!uploadedFile}
-                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Upload Document
-                </button>
-              </div>
-            </form>
+      <Modal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        title="Upload Document"
+        maxWidth="lg"
+      >
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {/* File Upload */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Document File *
+            </label>
+            <FileUpload
+              accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+              uploadedFile={uploadedFile}
+              onFileSelect={setUploadedFile}
+              onFileRemove={() => setUploadedFile(null)}
+              variant="document"
+              helpText="PDF, DOC, DOCX, JPG, PNG (max 10MB)"
+            />
           </div>
-        </div>
-      )}
+
+          {/* Document Name */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Document Name *
+            </label>
+            <input
+              type="text"
+              required
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+              placeholder="e.g., National Registration Card"
+            />
+          </div>
+
+          {/* Category */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Category *
+            </label>
+            <select
+              required
+              value={formData.category}
+              onChange={(e) => setFormData({ ...formData, category: e.target.value, type: '' })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+            >
+              {Object.keys(documentTypes).map(cat => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Document Type */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Document Type *
+            </label>
+            <select
+              required
+              value={formData.type}
+              onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+            >
+              <option value="">Select type...</option>
+              {documentTypes[formData.category]?.map(type => (
+                <option key={type} value={type}>{type}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Expiry Date */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Expiry Date (if applicable)
+            </label>
+            <input
+              type="date"
+              value={formData.expiryDate}
+              onChange={(e) => setFormData({ ...formData, expiryDate: e.target.value })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+            />
+          </div>
+
+          {/* Buttons */}
+          <div className="flex items-center justify-end space-x-3 pt-4">
+            <button
+              type="button"
+              onClick={closeModal}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={!uploadedFile}
+              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Upload Document
+            </button>
+          </div>
+        </form>
+      </Modal>
 
       {/* View Document Modal */}
-      {viewDocument && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div 
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-            onClick={() => setViewDocument(null)}
-          />
-          
-          <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
-            <div className="flex items-center justify-between p-6 border-b border-gray-100">
-              <div>
-                <h2 className="text-xl font-semibold text-gray-900">{viewDocument.name}</h2>
-                <p className="text-sm text-gray-500">{viewDocument.type}</p>
-              </div>
-              <button
-                onClick={() => setViewDocument(null)}
-                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <XMarkIcon className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="p-6">
-              {viewDocument.file ? (
-                viewDocument.fileName.endsWith('.pdf') ? (
-                  <iframe
-                    src={viewDocument.file}
-                    className="w-full h-96 rounded-lg border border-gray-200"
-                    title={viewDocument.name}
-                  />
-                ) : (
-                  <img
-                    src={viewDocument.file}
-                    alt={viewDocument.name}
-                    className="w-full max-h-96 object-contain rounded-lg"
-                  />
-                )
+      <Modal
+        isOpen={!!viewDocument}
+        onClose={() => setViewDocument(null)}
+        title={viewDocument?.name || ''}
+        subtitle={viewDocument?.type}
+        maxWidth="2xl"
+      >
+        {viewDocument && (
+          <>
+            {viewDocument.file ? (
+              viewDocument.fileName.endsWith('.pdf') ? (
+                <iframe
+                  src={viewDocument.file}
+                  className="w-full h-96 rounded-lg border border-gray-200"
+                  title={viewDocument.name}
+                />
               ) : (
-                <div className="flex flex-col items-center justify-center py-16 bg-gray-50 rounded-lg">
-                  <DocumentIcon className="w-16 h-16 text-gray-300 mb-4" />
-                  <p className="text-gray-500">Preview not available</p>
-                </div>
-              )}
-
-              <div className="mt-6 grid grid-cols-2 gap-4">
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <p className="text-xs text-gray-500 mb-1">Category</p>
-                  <p className="text-sm font-medium text-gray-900">{viewDocument.category}</p>
-                </div>
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <p className="text-xs text-gray-500 mb-1">File Size</p>
-                  <p className="text-sm font-medium text-gray-900">{viewDocument.fileSize}</p>
-                </div>
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <p className="text-xs text-gray-500 mb-1">Uploaded</p>
-                  <p className="text-sm font-medium text-gray-900">{formatDate(viewDocument.uploadedAt)}</p>
-                </div>
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <p className="text-xs text-gray-500 mb-1">Expiry Date</p>
-                  <p className={`text-sm font-medium ${
-                    isExpired(viewDocument.expiryDate) ? 'text-red-600' : 'text-gray-900'
-                  }`}>
-                    {viewDocument.expiryDate ? formatDate(viewDocument.expiryDate) : 'N/A'}
-                  </p>
-                </div>
+                <img
+                  src={viewDocument.file}
+                  alt={viewDocument.name}
+                  className="w-full max-h-96 object-contain rounded-lg"
+                />
+              )
+            ) : (
+              <div className="flex flex-col items-center justify-center py-16 bg-gray-50 rounded-lg">
+                <DocumentIcon className="w-16 h-16 text-gray-300 mb-4" />
+                <p className="text-gray-500">Preview not available</p>
               </div>
+            )}
 
-              <div className="mt-6 flex justify-end">
-                <a
-                  href={viewDocument.file}
-                  download={viewDocument.fileName}
-                  className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  <ArrowDownTrayIcon className="w-4 h-4 mr-2" />
-                  Download
-                </a>
+            <div className="mt-6 grid grid-cols-2 gap-4">
+              <div className="bg-gray-50 rounded-lg p-4">
+                <p className="text-xs text-gray-500 mb-1">Category</p>
+                <p className="text-sm font-medium text-gray-900">{viewDocument.category}</p>
+              </div>
+              <div className="bg-gray-50 rounded-lg p-4">
+                <p className="text-xs text-gray-500 mb-1">File Size</p>
+                <p className="text-sm font-medium text-gray-900">{viewDocument.fileSize}</p>
+              </div>
+              <div className="bg-gray-50 rounded-lg p-4">
+                <p className="text-xs text-gray-500 mb-1">Uploaded</p>
+                <p className="text-sm font-medium text-gray-900">{formatDate(viewDocument.uploadedAt)}</p>
+              </div>
+              <div className="bg-gray-50 rounded-lg p-4">
+                <p className="text-xs text-gray-500 mb-1">Expiry Date</p>
+                <p className={`text-sm font-medium ${
+                  isExpired(viewDocument.expiryDate) ? 'text-red-600' : 'text-gray-900'
+                }`}>
+                  {viewDocument.expiryDate ? formatDate(viewDocument.expiryDate) : 'N/A'}
+                </p>
               </div>
             </div>
-          </div>
-        </div>
-      )}
+
+            <div className="mt-6 flex justify-end">
+              <a
+                href={viewDocument.file}
+                download={viewDocument.fileName}
+                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <ArrowDownTrayIcon className="w-4 h-4 mr-2" />
+                Download
+              </a>
+            </div>
+          </>
+        )}
+      </Modal>
     </div>
   )
 }
