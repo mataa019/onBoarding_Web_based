@@ -130,14 +130,22 @@ function Register() {
 
           <form onSubmit={handleSubmit} className="space-y-3">
             <TextField
-              label="Full Name"
-              name="fullName"
+              label="First Name"
+              name="firstName"
               type="text"
-              placeholder="John Doe"
-              value={formData.fullName}
+              placeholder="John"
+              value={formData.firstName}
               onChange={handleChange}
             />
-
+              
+              <TextField
+              label="Last Name"
+              name="lastName"
+              type="text"
+              placeholder="Mulenga"
+              value={formData.lastName}
+              onChange={handleChange}
+            />
             <TextField
               label="Email Address"
               name="email"
