@@ -1,12 +1,12 @@
 import { useState } from 'react'
-import { LinkIcon, TrashIcon, PencilIcon, ShareIcon } from '@heroicons/react/24/outline'
+import { LinkIcon, TrashIcon, PencilIcon, ShareIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
 
 export interface Project {
   id: string
   name: string
   description: string
   githubUrl: string
-  imageUrl: string
+  images: string[] // Array of up to 4 mockup images
   tags: string[]
   createdAt: Date
 }
@@ -24,6 +24,20 @@ const generateShareableLink = (projectId: string) => {
 
 export default function ProjectCard({ project, onEdit, onDelete }: ProjectCardProps) {
   const [copiedId, setCopiedId] = useState<string | null>(null)
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
+
+  const images = project.images.filter(Boolean)
+  const hasMultipleImages = images.length > 1
+
+  const nextImage = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setCurrentImageIndex((prev) => (prev + 1) % images.length)
+  }
+
+  const prevImage = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length)
+  }
 
   const copyShareLink = (projectId: string) => {
     const link = generateShareableLink(projectId)
@@ -34,14 +48,49 @@ export default function ProjectCard({ project, onEdit, onDelete }: ProjectCardPr
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
-      {/* Project Image */}
-      <div className="relative h-48 bg-gray-100">
-        {project.imageUrl ? (
-          <img
-            src={project.imageUrl}
-            alt={project.name}
-            className="w-full h-full object-cover"
-          />
+      {/* Project Images Carousel */}
+      <div className="relative h-48 bg-gray-100 group">
+        {images.length > 0 ? (
+          <>
+            <img
+              src={images[currentImageIndex]}
+              alt={`${project.name} - Image ${currentImageIndex + 1}`}
+              className="w-full h-full object-cover transition-opacity duration-300"
+            />
+            {/* Navigation Arrows */}
+            {hasMultipleImages && (
+              <>
+                <button
+                  onClick={prevImage}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 p-1.5 bg-black/50 hover:bg-black/70 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <ChevronLeftIcon className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={nextImage}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 bg-black/50 hover:bg-black/70 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <ChevronRightIcon className="w-4 h-4" />
+                </button>
+              </>
+            )}
+            {/* Image Indicators */}
+            {hasMultipleImages && (
+              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex space-x-1.5">
+                {images.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={(e) => { e.stopPropagation(); setCurrentImageIndex(index) }}
+                    className={`w-2 h-2 rounded-full transition-all ${
+                      index === currentImageIndex
+                        ? 'bg-white w-4'
+                        : 'bg-white/50 hover:bg-white/70'
+                    }`}
+                  />
+                ))}
+              </div>
+            )}
+          </>
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-500 to-blue-600">
             <span className="text-4xl font-bold text-white">{project.name.charAt(0)}</span>

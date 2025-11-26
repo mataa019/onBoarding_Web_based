@@ -9,7 +9,12 @@ export function Project() {
       name: 'E-Commerce Platform',
       description: 'A full-stack e-commerce solution with React, Node.js, and MongoDB',
       githubUrl: 'https://github.com/username/ecommerce',
-      imageUrl: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400',
+      images: [
+        'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400',
+        'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=400',
+        'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400',
+        'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400'
+      ],
       tags: ['React', 'Node.js', 'MongoDB'],
       createdAt: new Date()
     },
@@ -18,7 +23,10 @@ export function Project() {
       name: 'Task Management App',
       description: 'A productivity app for managing tasks and projects',
       githubUrl: 'https://github.com/username/taskapp',
-      imageUrl: 'https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=400',
+      images: [
+        'https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=400',
+        'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=400'
+      ],
       tags: ['TypeScript', 'React', 'Tailwind'],
       createdAt: new Date()
     }
@@ -30,7 +38,10 @@ export function Project() {
     name: '',
     description: '',
     githubUrl: '',
-    imageUrl: '',
+    image1: '',
+    image2: '',
+    image3: '',
+    image4: '',
     tags: ''
   })
 
@@ -41,12 +52,15 @@ export function Project() {
         name: project.name,
         description: project.description,
         githubUrl: project.githubUrl,
-        imageUrl: project.imageUrl,
+        image1: project.images[0] || '',
+        image2: project.images[1] || '',
+        image3: project.images[2] || '',
+        image4: project.images[3] || '',
         tags: project.tags.join(', ')
       })
     } else {
       setEditingProject(null)
-      setFormData({ name: '', description: '', githubUrl: '', imageUrl: '', tags: '' })
+      setFormData({ name: '', description: '', githubUrl: '', image1: '', image2: '', image3: '', image4: '', tags: '' })
     }
     setIsModalOpen(true)
   }
@@ -54,17 +68,18 @@ export function Project() {
   const closeModal = () => {
     setIsModalOpen(false)
     setEditingProject(null)
-    setFormData({ name: '', description: '', githubUrl: '', imageUrl: '', tags: '' })
+    setFormData({ name: '', description: '', githubUrl: '', image1: '', image2: '', image3: '', image4: '', tags: '' })
   }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     const tagsArray = formData.tags.split(',').map(tag => tag.trim()).filter(Boolean)
+    const imagesArray = [formData.image1, formData.image2, formData.image3, formData.image4].filter(Boolean)
 
     if (editingProject) {
       setProjects(projects.map(p =>
         p.id === editingProject.id
-          ? { ...p, ...formData, tags: tagsArray }
+          ? { ...p, name: formData.name, description: formData.description, githubUrl: formData.githubUrl, images: imagesArray, tags: tagsArray }
           : p
       ))
     } else {
@@ -73,7 +88,7 @@ export function Project() {
         name: formData.name,
         description: formData.description,
         githubUrl: formData.githubUrl,
-        imageUrl: formData.imageUrl,
+        images: imagesArray,
         tags: tagsArray,
         createdAt: new Date()
       }
@@ -205,19 +220,50 @@ export function Project() {
                 />
               </div>
 
-              {/* Image URL */}
+              {/* Project Mockup Images */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Project Image URL
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Project Mockup Images (up to 4)
                 </label>
-                <input
-                  type="url"
-                  value={formData.imageUrl}
-                  onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                  placeholder="https://example.com/image.png"
-                />
-                <p className="text-xs text-gray-500 mt-1">Leave empty to use a generated placeholder</p>
+                <div className="space-y-3">
+                  <div>
+                    <input
+                      type="url"
+                      value={formData.image1}
+                      onChange={(e) => setFormData({ ...formData, image1: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                      placeholder="Image 1 URL (main image)"
+                    />
+                  </div>
+                  <div>
+                    <input
+                      type="url"
+                      value={formData.image2}
+                      onChange={(e) => setFormData({ ...formData, image2: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                      placeholder="Image 2 URL"
+                    />
+                  </div>
+                  <div>
+                    <input
+                      type="url"
+                      value={formData.image3}
+                      onChange={(e) => setFormData({ ...formData, image3: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                      placeholder="Image 3 URL"
+                    />
+                  </div>
+                  <div>
+                    <input
+                      type="url"
+                      value={formData.image4}
+                      onChange={(e) => setFormData({ ...formData, image4: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                      placeholder="Image 4 URL"
+                    />
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500 mt-2">Add up to 4 mockup images. Leave empty to use a generated placeholder.</p>
               </div>
 
               {/* Tags */}
