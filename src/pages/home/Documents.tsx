@@ -1,14 +1,16 @@
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import { 
   PlusIcon, 
-  XMarkIcon, 
   DocumentIcon, 
   TrashIcon, 
   EyeIcon,
-  ArrowDownTrayIcon,
-  MagnifyingGlassIcon,
-  FunnelIcon
+  ArrowDownTrayIcon
 } from '@heroicons/react/24/outline'
+import SearchInput from '../../components/SearchInput'
+import SelectFilter from '../../components/SelectFilter'
+import Modal from '../../components/Modal'
+import FileUpload, { UploadedFile } from '../../components/FileUpload'
+import EmptyState from '../../components/EmptyState'
 
 interface Document {
   id: string
@@ -87,31 +89,7 @@ export function Document() {
     category: 'Identification',
     expiryDate: ''
   })
-  const [uploadedFile, setUploadedFile] = useState<{ file: string; fileName: string; fileSize: string } | null>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
-
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setUploadedFile({
-          file: reader.result as string,
-          fileName: file.name,
-          fileSize: formatFileSize(file.size)
-        })
-      }
-      reader.readAsDataURL(file)
-    }
-  }
-
-  const formatFileSize = (bytes: number): string => {
-    if (bytes === 0) return '0 Bytes'
-    const k = 1024
-    const sizes = ['Bytes', 'KB', 'MB', 'GB']
-    const i = Math.floor(Math.log(bytes) / Math.log(k))
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i]
-  }
+  const [uploadedFile, setUploadedFile] = useState<UploadedFile | null>(null)
 
   const openModal = () => {
     setFormData({ name: '', type: '', category: 'Identification', expiryDate: '' })
@@ -199,55 +177,34 @@ export function Document() {
       {/* Filters & Search */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-6">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          {/* Search */}
-          <div className="relative flex-1 max-w-md">
-            <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search documents..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-            />
-          </div>
-
-          {/* Category Filter */}
-          <div className="flex items-center space-x-2">
-            <FunnelIcon className="w-5 h-5 text-gray-400" />
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-            >
-              {documentCategories.map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
-            </select>
-          </div>
+          <SearchInput
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder="Search documents..."
+            className="flex-1 max-w-md"
+          />
+          <SelectFilter
+            value={selectedCategory}
+            onChange={setSelectedCategory}
+            options={documentCategories}
+          />
         </div>
       </div>
 
       {/* Documents Table */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         {filteredDocuments.length === 0 ? (
-          <div className="text-center py-16">
-            <DocumentIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No documents found</h3>
-            <p className="text-gray-500 mb-4">
-              {searchQuery || selectedCategory !== 'All Documents' 
+          <EmptyState
+            icon={<DocumentIcon className="w-16 h-16 text-gray-300" />}
+            title="No documents found"
+            description={
+              searchQuery || selectedCategory !== 'All Documents' 
                 ? 'Try adjusting your search or filter' 
-                : 'Get started by uploading your first document'}
-            </p>
-            {!searchQuery && selectedCategory === 'All Documents' && (
-              <button
-                onClick={openModal}
-                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700"
-              >
-                <PlusIcon className="w-5 h-5 mr-2" />
-                Upload Document
-              </button>
-            )}
-          </div>
+                : 'Get started by uploading your first document'
+            }
+            actionLabel={!searchQuery && selectedCategory === 'All Documents' ? 'Upload Document' : undefined}
+            onAction={!searchQuery && selectedCategory === 'All Documents' ? openModal : undefined}
+          />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">

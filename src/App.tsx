@@ -18,7 +18,7 @@ function App() {
 
         {/* Protected routes - With Layout (Sidebar + Header) */}
         <Route path="/dashboard" element={<Layout><Dashboard /></Layout>} />
-        <Route path="/documents" element={<Layout><div>Documents Page Coming Soon...</div></Layout>} />
+        <Route path="/documents" element={<Layout><Document /></Layout>} />
         <Route path="/projects" element={<Layout><Project /></Layout>} />
         <Route path="/notifications" element={<Layout><div>Notifications Page Coming Soon...</div></Layout>} />
         <Route path="/settings" element={<Layout><Settings /></Layout>} />
