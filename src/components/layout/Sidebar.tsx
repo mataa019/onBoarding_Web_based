@@ -22,7 +22,6 @@ const navigation: SidebarItem[] = [
   { name: 'Portfolio', href: '/portfolio', icon: UserCircleIcon },
   { name: 'Projects', href: '/projects', icon: FolderIcon },
   { name: 'Documents', href: '/documents', icon: DocumentTextIcon },
-  { name: 'Analytics', href: '/analytics', icon: ChartBarIcon },
   { name: 'Settings', href: '/settings', icon: CogIcon },
 ]
 
