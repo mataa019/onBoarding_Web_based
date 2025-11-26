@@ -1,36 +1,9 @@
-import { useState } from 'react'
-import { PlusIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { useState, useRef } from 'react'
+import { PlusIcon, XMarkIcon, PhotoIcon } from '@heroicons/react/24/outline'
 import ProjectCard, { Project } from '../../components/ProjectCard'
 
 export function Project() {
-  const [projects, setProjects] = useState<Project[]>([
-    {
-      id: '1',
-      name: 'E-Commerce Platform',
-      description: 'A full-stack e-commerce solution with React, Node.js, and MongoDB',
-      githubUrl: 'https://github.com/username/ecommerce',
-      images: [
-        'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400',
-        'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=400',
-        'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400',
-        'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400'
-      ],
-      tags: ['React', 'Node.js', 'MongoDB'],
-      createdAt: new Date()
-    },
-    {
-      id: '2',
-      name: 'Task Management App',
-      description: 'A productivity app for managing tasks and projects',
-      githubUrl: 'https://github.com/username/taskapp',
-      images: [
-        'https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=400',
-        'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=400'
-      ],
-      tags: ['TypeScript', 'React', 'Tailwind'],
-      createdAt: new Date()
-    }
-  ])
+  const [projects, setProjects] = useState<Project[]>([])
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingProject, setEditingProject] = useState<Project | null>(null)
@@ -38,12 +11,32 @@ export function Project() {
     name: '',
     description: '',
     githubUrl: '',
-    image1: '',
-    image2: '',
-    image3: '',
-    image4: '',
     tags: ''
   })
+  const [images, setImages] = useState<string[]>(['', '', '', ''])
+  const fileInputRefs = [useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null)]
+
+  const handleImageUpload = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        const newImages = [...images]
+        newImages[index] = reader.result as string
+        setImages(newImages)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const removeImage = (index: number) => {
+    const newImages = [...images]
+    newImages[index] = ''
+    setImages(newImages)
+    if (fileInputRefs[index].current) {
+      fileInputRefs[index].current.value = ''
+    }
+  }
 
   const openModal = (project?: Project) => {
     if (project) {
@@ -52,15 +45,18 @@ export function Project() {
         name: project.name,
         description: project.description,
         githubUrl: project.githubUrl,
-        image1: project.images[0] || '',
-        image2: project.images[1] || '',
-        image3: project.images[2] || '',
-        image4: project.images[3] || '',
         tags: project.tags.join(', ')
       })
+      setImages([
+        project.images[0] || '',
+        project.images[1] || '',
+        project.images[2] || '',
+        project.images[3] || ''
+      ])
     } else {
       setEditingProject(null)
-      setFormData({ name: '', description: '', githubUrl: '', image1: '', image2: '', image3: '', image4: '', tags: '' })
+      setFormData({ name: '', description: '', githubUrl: '', tags: '' })
+      setImages(['', '', '', ''])
     }
     setIsModalOpen(true)
   }
@@ -68,13 +64,14 @@ export function Project() {
   const closeModal = () => {
     setIsModalOpen(false)
     setEditingProject(null)
-    setFormData({ name: '', description: '', githubUrl: '', image1: '', image2: '', image3: '', image4: '', tags: '' })
+    setFormData({ name: '', description: '', githubUrl: '', tags: '' })
+    setImages(['', '', '', ''])
   }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     const tagsArray = formData.tags.split(',').map(tag => tag.trim()).filter(Boolean)
-    const imagesArray = [formData.image1, formData.image2, formData.image3, formData.image4].filter(Boolean)
+    const imagesArray = images.filter(Boolean)
 
     if (editingProject) {
       setProjects(projects.map(p =>
@@ -225,45 +222,52 @@ export function Project() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Project Mockup Images (up to 4)
                 </label>
-                <div className="space-y-3">
-                  <div>
-                    <input
-                      type="url"
-                      value={formData.image1}
-                      onChange={(e) => setFormData({ ...formData, image1: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                      placeholder="Image 1 URL (main image)"
-                    />
-                  </div>
-                  <div>
-                    <input
-                      type="url"
-                      value={formData.image2}
-                      onChange={(e) => setFormData({ ...formData, image2: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                      placeholder="Image 2 URL"
-                    />
-                  </div>
-                  <div>
-                    <input
-                      type="url"
-                      value={formData.image3}
-                      onChange={(e) => setFormData({ ...formData, image3: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                      placeholder="Image 3 URL"
-                    />
-                  </div>
-                  <div>
-                    <input
-                      type="url"
-                      value={formData.image4}
-                      onChange={(e) => setFormData({ ...formData, image4: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                      placeholder="Image 4 URL"
-                    />
-                  </div>
+                <div className="grid grid-cols-2 gap-3">
+                  {[0, 1, 2, 3].map((index) => (
+                    <div key={index} className="relative">
+                      <input
+                        type="file"
+                        ref={fileInputRefs[index]}
+                        accept="image/*"
+                        onChange={(e) => handleImageUpload(index, e)}
+                        className="hidden"
+                      />
+                      {images[index] ? (
+                        <div className="relative aspect-video rounded-lg overflow-hidden border border-gray-200">
+                          <img
+                            src={images[index]}
+                            alt={`Mockup ${index + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeImage(index)}
+                            className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                          >
+                            <XMarkIcon className="w-3 h-3" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => fileInputRefs[index].current?.click()}
+                            className="absolute bottom-1 right-1 p-1 bg-black/50 text-white rounded text-xs hover:bg-black/70 transition-colors"
+                          >
+                            Change
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => fileInputRefs[index].current?.click()}
+                          className="w-full aspect-video border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center hover:border-blue-500 hover:bg-blue-50 transition-colors"
+                        >
+                          <PhotoIcon className="w-6 h-6 text-gray-400" />
+                          <span className="text-xs text-gray-500 mt-1">Image {index + 1}</span>
+                        </button>
+                      )}
+                    </div>
+                  ))}
                 </div>
-                <p className="text-xs text-gray-500 mt-2">Add up to 4 mockup images. Leave empty to use a generated placeholder.</p>
+                <p className="text-xs text-gray-500 mt-2">Click to upload mockup images for your project.</p>
               </div>
 
               {/* Tags */}
