@@ -10,7 +10,7 @@ function App() {
     <Router>
       <Routes>
         {/* Public routes - No Layout */}
-        <Route path="/" element={<HomePage />} />
+        <Route path="/" element={<Dashboard />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
