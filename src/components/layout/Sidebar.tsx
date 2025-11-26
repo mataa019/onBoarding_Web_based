@@ -23,7 +23,6 @@ const navigation: SidebarItem[] = [
   { name: 'Users', href: '/users', icon: UsersIcon },
   { name: 'Documents', href: '/documents', icon: DocumentTextIcon },
   { name: 'Projects', href: '/projects', icon: FolderIcon },
-  { name: 'Notifications', href: '/notifications', icon: BellIcon },
   { name: 'Settings', href: '/settings', icon: CogIcon },
 ]
 
