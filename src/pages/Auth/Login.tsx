@@ -16,6 +16,13 @@ export default function Login() {
   const LoginSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setError('')
+
+    // Validate fields before sending request
+    if (!email.trim() || !password.trim()) {
+      setError('Please provide your login details')
+      return
+    }
+
     setIsLoading(true)
 
     try {
@@ -124,7 +131,7 @@ export default function Login() {
               <div>
                 <button
                   type="submit"
-                  disabled={isLoading || !email.trim() || !password.trim()}
+                  disabled={isLoading}
                   className="flex w-full justify-center items-center rounded-lg border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isLoading ? (
