@@ -1,5 +1,5 @@
-import { LoginRequest, LoginResponse } from './types'
 import { getStoredToken, setStoredToken, removeStoredToken, makeRequest } from './helpers'
+import type { LoginRequest, LoginResponse } from './types'
 
 // ApiService Class
 export class ApiService {
@@ -25,7 +25,6 @@ export class ApiService {
       method: 'POST',
       body: JSON.stringify(credentials),
     })
-
     // Store token after successful login
     setStoredToken(response.accessToken)
     this.accessToken = response.accessToken

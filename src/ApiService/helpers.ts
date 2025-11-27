@@ -1,4 +1,4 @@
-import { ApiError } from './types'
+import type { ApiError } from "./types"
 
 // Token management
 export const getStoredToken = (): string | null => {
@@ -19,14 +19,16 @@ export const makeRequest = async <T>(
   options: RequestInit = {},
   accessToken: string | null = null
 ): Promise<T> => {
-  const headers: HeadersInit = {
+  const initialHeaders: HeadersInit = {
     'Content-Type': 'application/json',
     ...options.headers,
   }
 
+  const headers = new Headers(initialHeaders)
+
   // Add Authorization header if token exists
   if (accessToken) {
-    headers['Authorization'] = `Bearer ${accessToken}`
+    headers.set('Authorization', `Bearer ${accessToken}`)
   }
 
   try {
