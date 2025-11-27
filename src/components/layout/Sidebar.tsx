@@ -30,10 +30,6 @@ function classNames(...classes: (string | boolean | undefined)[]) {
   return classes.filter(Boolean).join(' ')
 }
 
-function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(' ')
-}
-
 interface SidebarProps {
   isCollapsed?: boolean
   onToggleCollapse?: () => void
@@ -91,18 +87,11 @@ export default function Sidebar({ isCollapsed = false, onToggleCollapse }: Sideb
             )}
             title={isCollapsed ? item.name : undefined}
           >
-            {({ isActive }) => (
-              <>
-                <item.icon
-                  className={classNames(
-                    isActive ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-600',
-                    'flex-shrink-0 w-5 h-5',
-                    isCollapsed ? '' : 'mr-3'
-                  )}
-                />
-                {!isCollapsed && <span>{item.name}</span>}
-              </>
-            )}
+            <item.icon
+              className="flex-shrink-0 w-5 h-5 text-gray-400 group-hover:text-gray-600"
+              style={isCollapsed ? {} : { marginRight: '0.75rem' }}
+            />
+            {!isCollapsed && <span>{item.name}</span>}
           </NavLink>
         ))}
       </nav>

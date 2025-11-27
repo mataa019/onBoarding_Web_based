@@ -6,7 +6,7 @@ interface ProtectedRouteProps {
 }
 
 export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const { isLoading, api } = useAuth()
+  const { isLoading, user, api } = useAuth()
 
   // Show loading while checking authentication
   if (isLoading) {
@@ -21,7 +21,7 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   }
 
   // Redirect to login if not authenticated
-  if (!api.isAuthenticated()) {
+  if (!api.isAuthenticated() || !user) {
     return <Navigate to="/login" replace />
   }
 

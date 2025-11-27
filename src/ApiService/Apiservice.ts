@@ -1,5 +1,17 @@
 import { getStoredToken, setStoredToken, removeStoredToken, makeRequest } from './helpers'
-import type { LoginRequest, LoginResponse, User, RegisterRequest } from './types'
+import type { 
+  LoginRequest, 
+  LoginResponse, 
+  User, 
+  RegisterRequest,
+  Project,
+  ProjectImage,
+  CreateProjectRequest,
+  UpdateProjectRequest,
+  ProjectsResponse,
+  ProjectResponse,
+  UploadImagesResponse
+} from './types'
 
 // ApiService Class
 export class ApiService {
@@ -82,5 +94,65 @@ export class ApiService {
 
   isAuthenticated(): boolean {
     return this.accessToken !== null
+  }
+
+  // ==========================================
+  // 📁 PROJECTS
+  // ==========================================
+
+  async getProjects(): Promise<Project[]> {
+    const response = await this.request<ProjectsResponse>('/projects')
+    return response.projects
+  }
+
+  async getProject(id: string): Promise<Project> {
+    const response = await this.request<ProjectResponse>(`/projects/${id}`)
+    return response.project
+  }
+
+  async createProject(data: CreateProjectRequest): Promise<Project> {
+    const response = await this.request<ProjectResponse>('/projects', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+    return response.project
+  }
+
+  async updateProject(id: string, data: UpdateProjectRequest): Promise<Project> {
+    const response = await this.request<ProjectResponse>(`/projects/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    })
+    return response.project
+  }
+
+  async deleteProject(id: string): Promise<void> {
+    await this.request(`/projects/${id}`, {
+      method: 'DELETE',
+    })
+  }
+
+  async uploadProjectImages(projectId: string, files: File[]): Promise<ProjectImage[]> {
+    const formData = new FormData()
+    files.forEach((file, index) => {
+      formData.append('images', file)
+      formData.append(`order_${index}`, index.toString())
+    })
+
+    const response = await this.request<UploadImagesResponse>(`/projects/${projectId}/images`, {
+      method: 'POST',
+      body: formData,
+      // Don't set Content-Type header - browser will set it with boundary for FormData
+      headers: {
+        ...(this.accessToken && { Authorization: `Bearer ${this.accessToken}` }),
+      },
+    })
+    return response.images
+  }
+
+  async deleteProjectImage(projectId: string, imageId: string): Promise<void> {
+    await this.request(`/projects/${projectId}/images/${imageId}`, {
+      method: 'DELETE',
+    })
   }
 }
