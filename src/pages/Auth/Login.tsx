@@ -2,13 +2,12 @@ import { useState, FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import TextField from '../../components/TextField'
 import { TriangleBackground } from '../../components/backgrounds'
-import { ApiService } from '../../ApiService/Apiservice'
+import { useAuth } from '../../context/AuthContext'
 import type { ApiError } from '../../ApiService/types'
-
-const api = new ApiService()
 
 export default function Login() {
   const navigate = useNavigate()
+  const { api, setUser } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -22,6 +21,10 @@ export default function Login() {
     try {
       const response = await api.login({ email, password })
       console.log('Login successful:', response.message)
+      
+      // Fetch user data after login
+      const userData = await api.getCurrentUser()
+      setUser(userData)
       
       // Redirect to dashboard after successful login
       navigate('/dashboard')

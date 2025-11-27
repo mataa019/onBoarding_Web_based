@@ -1,12 +1,12 @@
 import { getStoredToken, setStoredToken, removeStoredToken, makeRequest } from './helpers'
-import type { LoginRequest, LoginResponse } from './types'
+import type { LoginRequest, LoginResponse, User, RegisterRequest } from './types'
 
 // ApiService Class
 export class ApiService {
   private baseURL: string
   private accessToken: string | null
 
-  constructor(baseURL: string = 'http://localhost:3000') {
+  constructor(baseURL: string = import.meta.env.VITE_API_URL || 'http://localhost:3000') {
     this.baseURL = baseURL
     this.accessToken = getStoredToken()
   }
@@ -32,9 +32,48 @@ export class ApiService {
     return response
   }
 
+  async register(data: RegisterRequest): Promise<LoginResponse> {
+    const response = await this.request<LoginResponse>('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+
+    // Store token after successful registration
+    setStoredToken(response.accessToken)
+    this.accessToken = response.accessToken
+
+    return response
+  }
+
   async logout(): Promise<void> {
-    removeStoredToken()
-    this.accessToken = null
+    try {
+      await this.request('/auth/logout', {
+        method: 'POST',
+      })
+    } catch (error) {
+      console.error('Logout error:', error)
+    } finally {
+      removeStoredToken()
+      this.accessToken = null
+    }
+  }
+
+  async getCurrentUser(): Promise<User> {
+    return this.request<User>('/auth/me')
+  }
+
+  async forgotPassword(email: string): Promise<{ message: string }> {
+    return this.request('/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    })
+  }
+
+  async resetPassword(token: string, newPassword: string): Promise<{ message: string }> {
+    return this.request('/auth/reset-password', {
+      method: 'POST',
+      body: JSON.stringify({ token, newPassword }),
+    })
   }
 
   getToken(): string | null {
