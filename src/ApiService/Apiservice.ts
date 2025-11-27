@@ -6,7 +6,7 @@ export class ApiService {
   private baseURL: string
   private accessToken: string | null
 
-  constructor(baseURL: string = import.meta.env.VITE_API_URL || 'http://localhost:3000') {
+  constructor(baseURL: string = import.meta.env.VITE_API_URL || 'http://10.36.60.64:3000') {
     this.baseURL = baseURL
     this.accessToken = getStoredToken()
   }
