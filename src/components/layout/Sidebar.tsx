@@ -1,3 +1,4 @@
+import { NavLink } from 'react-router-dom'
 import {
   HomeIcon,
   ChartBarIcon,
@@ -24,6 +25,10 @@ const navigation: SidebarItem[] = [
   { name: 'Documents', href: '/documents', icon: DocumentTextIcon },
   { name: 'Settings', href: '/settings', icon: CogIcon },
 ]
+
+function classNames(...classes: (string | boolean | undefined)[]) {
+  return classes.filter(Boolean).join(' ')
+}
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
@@ -74,11 +79,11 @@ export default function Sidebar({ isCollapsed = false, onToggleCollapse }: Sideb
       {/* Navigation */}
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
         {navigation.map((item) => (
-          <a
+          <NavLink
             key={item.name}
-            href={item.href}
-            className={classNames(
-              item.current
+            to={item.href}
+            className={({ isActive }) => classNames(
+              isActive
                 ? 'bg-blue-50 border-r-2 border-blue-600 text-blue-700'
                 : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900',
               'group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200',
@@ -86,15 +91,19 @@ export default function Sidebar({ isCollapsed = false, onToggleCollapse }: Sideb
             )}
             title={isCollapsed ? item.name : undefined}
           >
-            <item.icon
-              className={classNames(
-                item.current ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-600',
-                'flex-shrink-0 w-5 h-5',
-                isCollapsed ? '' : 'mr-3'
-              )}
-            />
-            {!isCollapsed && <span>{item.name}</span>}
-          </a>
+            {({ isActive }) => (
+              <>
+                <item.icon
+                  className={classNames(
+                    isActive ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-600',
+                    'flex-shrink-0 w-5 h-5',
+                    isCollapsed ? '' : 'mr-3'
+                  )}
+                />
+                {!isCollapsed && <span>{item.name}</span>}
+              </>
+            )}
+          </NavLink>
         ))}
       </nav>
 
