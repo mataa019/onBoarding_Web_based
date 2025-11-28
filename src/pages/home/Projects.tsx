@@ -1,12 +1,19 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { PlusIcon, XMarkIcon, PhotoIcon } from '@heroicons/react/24/outline'
-import ProjectCard, { type Project } from '../../components/ProjectCard'
+import ProjectCard, { type Project as ProjectCardType } from '../../components/ProjectCard'
+import { useAuth } from '../../context/AuthContext'
+import { cloudinaryService } from '../../utils/cloudinary'
+import type { Project as ApiProject } from '../../ApiService/types'
 
 export function Project() {
-  const [projects, setProjects] = useState<Project[]>([])
+  const { api } = useAuth()
+  const [projects, setProjects] = useState<ProjectCardType[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
+  const [error, setError] = useState('')
 
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [editingProject, setEditingProject] = useState<Project | null>(null)
+  const [editingProject, setEditingProject] = useState<ProjectCardType | null>(null)
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -14,11 +21,46 @@ export function Project() {
     tags: ''
   })
   const [images, setImages] = useState<string[]>(['', '', '', ''])
+  const [imageFiles, setImageFiles] = useState<(File | null)[]>([null, null, null, null])
   const fileInputRefs = [useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null)]
+
+  // Fetch projects on mount
+  useEffect(() => {
+    fetchProjects()
+  }, [])
+
+  const fetchProjects = async () => {
+    setIsLoading(true)
+    try {
+      const data = await api.getProjects()
+      // Transform API Project to ProjectCard Project (images: ProjectImage[] -> string[])
+      const transformedProjects: ProjectCardType[] = data.map(project => ({
+        id: project.id,
+        name: project.name,
+        description: project.description,
+        githubUrl: project.githubUrl,
+        images: project.images.map(img => img.url),
+        tags: project.tags.map(tag => tag.name),
+        createdAt: new Date(project.createdAt)
+      }))
+      setProjects(transformedProjects)
+    } catch (err) {
+      console.error('Failed to fetch projects:', err)
+      setError('Failed to load projects')
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const handleImageUpload = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
+      // Store File object for Cloudinary upload
+      const newImageFiles = [...imageFiles]
+      newImageFiles[index] = file
+      setImageFiles(newImageFiles)
+
+      // Show preview
       const reader = new FileReader()
       reader.onloadend = () => {
         const newImages = [...images]
@@ -33,12 +75,17 @@ export function Project() {
     const newImages = [...images]
     newImages[index] = ''
     setImages(newImages)
+
+    const newImageFiles = [...imageFiles]
+    newImageFiles[index] = null
+    setImageFiles(newImageFiles)
+
     if (fileInputRefs[index].current) {
       fileInputRefs[index].current.value = ''
     }
   }
 
-  const openModal = (project?: Project) => {
+  const openModal = (project?: ProjectCardType) => {
     if (project) {
       setEditingProject(project)
       setFormData({
@@ -66,37 +113,73 @@ export function Project() {
     setEditingProject(null)
     setFormData({ name: '', description: '', githubUrl: '', tags: '' })
     setImages(['', '', '', ''])
+    setImageFiles([null, null, null, null])
+    setError('')
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    const tagsArray = formData.tags.split(',').map(tag => tag.trim()).filter(Boolean)
-    const imagesArray = images.filter(Boolean)
+    setError('')
+    setIsUploading(true)
 
-    if (editingProject) {
-      setProjects(projects.map(p =>
-        p.id === editingProject.id
-          ? { ...p, name: formData.name, description: formData.description, githubUrl: formData.githubUrl, images: imagesArray, tags: tagsArray }
-          : p
-      ))
-    } else {
-      const newProject: Project = {
-        id: Date.now().toString(),
-        name: formData.name,
-        description: formData.description,
-        githubUrl: formData.githubUrl,
-        images: imagesArray,
-        tags: tagsArray,
-        createdAt: new Date()
+    try {
+      // 1. Upload new images to Cloudinary
+      const filesToUpload = imageFiles.filter((file): file is File => file !== null)
+      let imageUrls: string[] = []
+
+      if (filesToUpload.length > 0) {
+        imageUrls = await cloudinaryService.uploadMultipleImages(filesToUpload, 'projects')
       }
-      setProjects([...projects, newProject])
+
+      // 2. Prepare tags
+      const tagsArray = formData.tags.split(',').map(tag => tag.trim()).filter(Boolean)
+
+      // 3. Create or update project
+      if (editingProject) {
+        // Keep existing images that weren't replaced
+        const existingImages = images
+          .map((img, idx) => (imageFiles[idx] === null && img.startsWith('http') ? img : null))
+          .filter((img): img is string => img !== null)
+
+        const allImageUrls = [...existingImages, ...imageUrls]
+
+        await api.updateProject(editingProject.id, {
+          name: formData.name,
+          description: formData.description,
+          githubUrl: formData.githubUrl,
+          tags: tagsArray,
+          imageUrls: allImageUrls
+        })
+      } else {
+        await api.createProject({
+          name: formData.name,
+          description: formData.description,
+          githubUrl: formData.githubUrl,
+          tags: tagsArray,
+          imageUrls: imageUrls
+        })
+      }
+
+      // 4. Refresh projects list
+      await fetchProjects()
+      closeModal()
+    } catch (err) {
+      console.error('Failed to save project:', err)
+      setError(err instanceof Error ? err.message : 'Failed to save project')
+    } finally {
+      setIsUploading(false)
     }
-    closeModal()
   }
 
-  const deleteProject = (id: string) => {
+  const deleteProject = async (id: string) => {
     if (confirm('Are you sure you want to delete this project?')) {
-      setProjects(projects.filter(p => p.id !== id))
+      try {
+        await api.deleteProject(id)
+        await fetchProjects()
+      } catch (err) {
+        console.error('Failed to delete project:', err)
+        setError('Failed to delete project')
+      }
     }
   }
 
@@ -117,8 +200,14 @@ export function Project() {
         </button>
       </div>
 
-      {/* Projects Grid */}
-      {projects.length === 0 ? (
+      {/* Loading State */}
+      {isLoading ? (
+        <div className="text-center py-16">
+          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading projects...</p>
+        </div>
+      ) : /* Projects Grid */
+      projects.length === 0 ? (
         <div className="text-center py-16 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
           <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <PlusIcon className="w-8 h-8 text-gray-400" />
@@ -172,6 +261,13 @@ export function Project() {
 
             {/* Form */}
             <form onSubmit={handleSubmit} className="p-6 space-y-5">
+              {/* Error Message */}
+              {error && (
+                <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
+                  {error}
+                </div>
+              )}
+
               {/* Project Name */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -289,15 +385,27 @@ export function Project() {
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                  disabled={isUploading}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+                  disabled={isUploading}
+                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
                 >
-                  {editingProject ? 'Save Changes' : 'Add Project'}
+                  {isUploading ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                      </svg>
+                      Uploading...
+                    </>
+                  ) : (
+                    editingProject ? 'Save Changes' : 'Add Project'
+                  )}
                 </button>
               </div>
             </form>
