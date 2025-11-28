@@ -30,9 +30,12 @@ function Register() {
     password: '',
     confirmPassword: ''
   })
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false)
 
   const navigate = useNavigate()
-  const { api, setUser } = useAuth()
+  const { api } = useAuth()
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -40,12 +43,15 @@ function Register() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setError('')
 
     // Basic validation
     if (formData.password !== formData.confirmPassword) {
-      alert('Passwords do not match')
+      setError('Passwords do not match')
       return
     }
+
+    setIsLoading(true)
 
     try {
       const payload = {
@@ -58,14 +64,19 @@ function Register() {
       // Call register API
       await api.register(payload)
 
-      // Registration successful — redirect user to login so they can sign in
-      // (keeps behavior consistent for backends that require email verification)
-      alert('Registration successful. Please sign in with your new account.')
-      navigate('/login')
+      // Show success dialog
+      setShowSuccessDialog(true)
     } catch (err) {
       console.error('Register failed', err)
-      alert(err instanceof Error ? err.message : 'Registration failed')
+      setError(err instanceof Error ? err.message : 'Registration failed')
+    } finally {
+      setIsLoading(false)
     }
+  }
+
+  const handleSuccessDialogClose = () => {
+    setShowSuccessDialog(false)
+    navigate('/login')
   }
 
   // Auto-advance slides
