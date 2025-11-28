@@ -58,15 +58,10 @@ function Register() {
       // Call register API
       await api.register(payload)
 
-      // Some backends don't return a token on register — explicitly login to obtain a session
-      await api.login({ email: formData.email, password: formData.password })
-
-      // Fetch the current user and set into context
-      const user = await api.getCurrentUser()
-      setUser(user)
-
-      // Navigate to dashboard after successful login
-      navigate('/dashboard')
+      // Registration successful — redirect user to login so they can sign in
+      // (keeps behavior consistent for backends that require email verification)
+      alert('Registration successful. Please sign in with your new account.')
+      navigate('/login')
     } catch (err) {
       console.error('Register failed', err)
       alert(err instanceof Error ? err.message : 'Registration failed')
