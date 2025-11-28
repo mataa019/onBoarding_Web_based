@@ -3,7 +3,6 @@ import { PlusIcon, XMarkIcon, PhotoIcon } from '@heroicons/react/24/outline'
 import ProjectCard, { type Project as ProjectCardType } from '../../components/ProjectCard'
 import { useAuth } from '../../context/AuthContext'
 import { cloudinaryService } from '../../utils/cloudinary'
-import type { Project as ApiProject } from '../../ApiService/types'
 
 export function Project() {
   const { api } = useAuth()
@@ -94,6 +93,7 @@ export function Project() {
         githubUrl: project.githubUrl,
         tags: project.tags.join(', ')
       })
+      // Load existing images for preview
       setImages([
         project.images[0] || '',
         project.images[1] || '',

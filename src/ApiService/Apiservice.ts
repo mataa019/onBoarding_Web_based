@@ -114,7 +114,7 @@ export class ApiService {
     })
     return response.project
   }
-
+  
   async updateProject(id: string, data: UpdateProjectRequest): Promise<Project> {
     const response = await this.request<ProjectResponse>(`/projects/${id}`, {
       method: 'PATCH',
