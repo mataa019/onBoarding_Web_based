@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import TextField from '../../components/TextField'
+import { useAuth } from '../../context/AuthContext'
 
 const slides = [
   {
@@ -29,13 +31,46 @@ function Register() {
     confirmPassword: ''
   })
 
+  const navigate = useNavigate()
+  const { api, setUser } = useAuth()
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('Register:', formData)
+
+    // Basic validation
+    if (formData.password !== formData.confirmPassword) {
+      alert('Passwords do not match')
+      return
+    }
+
+    try {
+      const payload = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        password: formData.password,
+      }
+
+      // Call register API
+      await api.register(payload)
+
+      // Some backends don't return a token on register — explicitly login to obtain a session
+      await api.login({ email: formData.email, password: formData.password })
+
+      // Fetch the current user and set into context
+      const user = await api.getCurrentUser()
+      setUser(user)
+
+      // Navigate to dashboard after successful login
+      navigate('/dashboard')
+    } catch (err) {
+      console.error('Register failed', err)
+      alert(err instanceof Error ? err.message : 'Registration failed')
+    }
   }
 
   // Auto-advance slides
