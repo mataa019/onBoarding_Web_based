@@ -88,8 +88,10 @@ export default function Sidebar({ isCollapsed = false, onToggleCollapse }: Sideb
             title={isCollapsed ? item.name : undefined}
           >
             <item.icon
-              className="flex-shrink-0 w-5 h-5 text-gray-400 group-hover:text-gray-600"
-              style={isCollapsed ? {} : { marginRight: '0.75rem' }}
+              className={classNames(
+                'flex-shrink-0 w-5 h-5 text-gray-400 group-hover:text-gray-600',
+                isCollapsed ? '' : 'mr-3'
+              )}
             />
             {!isCollapsed && <span>{item.name}</span>}
           </NavLink>

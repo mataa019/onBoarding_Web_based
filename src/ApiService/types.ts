@@ -62,6 +62,7 @@ export interface CreateProjectRequest {
   description: string
   githubUrl: string
   tags: string[]
+  imageUrls?: string[]  // URLs from Cloudinary/S3/etc
 }
 
 export interface UpdateProjectRequest {
@@ -69,6 +70,7 @@ export interface UpdateProjectRequest {
   description?: string
   githubUrl?: string
   tags?: string[]
+  imageUrls?: string[]  // URLs from Cloudinary/S3/etc
 }
 
 export interface ProjectsResponse {
