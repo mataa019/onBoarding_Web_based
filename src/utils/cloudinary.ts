@@ -99,9 +99,14 @@ class CloudinaryService {
    * Upload multiple images to Cloudinary
    * @param files - Array of image files to upload
    * @param folder - Optional folder name in Cloudinary
+   * @param allowPartialSuccess - If true, returns successful uploads even if some fail
    * @returns Promise with array of uploaded image URLs
    */
-  async uploadMultipleImages(files: File[], folder?: string): Promise<string[]> {
+  async uploadMultipleImages(
+    files: File[], 
+    folder?: string,
+    allowPartialSuccess: boolean = false
+  ): Promise<string[]> {
     if (files.length === 0) {
       return []
     }
@@ -109,11 +114,36 @@ class CloudinaryService {
     // Upload all images in parallel
     const uploadPromises = files.map(file => this.uploadImage(file, folder))
     
-    try {
-      return await Promise.all(uploadPromises)
-    } catch (error) {
-      throw new Error('One or more images failed to upload')
+    const results = await Promise.allSettled(uploadPromises)
+    
+    const successfulUrls: string[] = []
+    const failedUploads: { index: number; fileName: string; error: string }[] = []
+    
+    results.forEach((result, index) => {
+      if (result.status === 'fulfilled') {
+        successfulUrls.push(result.value)
+      } else {
+        failedUploads.push({
+          index: index + 1,
+          fileName: files[index].name,
+          error: result.reason?.message || 'Unknown error'
+        })
+      }
+    })
+    
+    if (failedUploads.length > 0) {
+      const failedNames = failedUploads.map(f => f.fileName).join(', ')
+      const errorMessage = `Failed to upload ${failedUploads.length} image(s): ${failedNames}`
+      
+      if (!allowPartialSuccess || successfulUrls.length === 0) {
+        throw new Error(errorMessage)
+      }
+      
+      // Log warning but continue with successful uploads
+      console.warn(errorMessage)
     }
+    
+    return successfulUrls
   }
 
   /**

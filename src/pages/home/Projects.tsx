@@ -123,12 +123,26 @@ export function Project() {
     setIsUploading(true)
 
     try {
+      // Check if Cloudinary is configured
+      if (!cloudinaryService.isConfigured()) {
+        setError('Image upload service is not configured. Please contact administrator.')
+        setIsUploading(false)
+        return
+      }
+
       // 1. Upload new images to Cloudinary
       const filesToUpload = imageFiles.filter((file): file is File => file !== null)
       let imageUrls: string[] = []
 
       if (filesToUpload.length > 0) {
-        imageUrls = await cloudinaryService.uploadMultipleImages(filesToUpload, 'projects')
+        try {
+          imageUrls = await cloudinaryService.uploadMultipleImages(filesToUpload, 'projects', true)
+        } catch (uploadError) {
+          const message = uploadError instanceof Error ? uploadError.message : 'Failed to upload images'
+          setError(message)
+          setIsUploading(false)
+          return
+        }
       }
 
       // 2. Prepare tags
