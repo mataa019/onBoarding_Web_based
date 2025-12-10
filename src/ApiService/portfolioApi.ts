@@ -1,109 +1,152 @@
 // services/portfolioApi.ts
+import { getStoredToken, makeRequest } from './helpers'
 import type { Portfolio, Experience, Education, Skill, Reference } from './types'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+class PortfolioApiService {
+  private baseURL: string
+  private accessToken: string | null
 
-const getHeaders = (token: string) => ({
-  'Content-Type': 'application/json',
-  Authorization: `Bearer ${token}`,
-})
+  constructor(baseURL: string = import.meta.env.VITE_API_URL || 'http://10.36.60.64:3000') {
+    this.baseURL = baseURL
+    this.accessToken = getStoredToken()
+  }
 
-export const portfolioApi = {
-  // Portfolio
-  get: (token: string): Promise<{ portfolio: Portfolio }> =>
-    fetch(`${API_URL}/portfolio`, { headers: getHeaders(token) }).then(res => res.json()),
+  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+    const url = `${this.baseURL}${endpoint}`
+    return makeRequest<T>(url, options, this.accessToken)
+  }
 
-  getByUsername: (username: string): Promise<{ portfolio: Portfolio }> =>
-    fetch(`${API_URL}/portfolio/${username}`).then(res => res.json()),
+  // Refresh token from storage (call after login)
+  refreshToken(): void {
+    this.accessToken = getStoredToken()
+  }
 
-  update: (token: string, data: Partial<Portfolio>): Promise<{ portfolio: Portfolio }> =>
-    fetch(`${API_URL}/portfolio`, {
+  // ==========================================
+  // 👤 PORTFOLIO
+  // ==========================================
+
+  async get(): Promise<Portfolio> {
+    const response = await this.request<{ portfolio: Portfolio }>('/portfolio')
+    return response.portfolio
+  }
+
+  async getByUsername(username: string): Promise<Portfolio> {
+    const response = await this.request<{ portfolio: Portfolio }>(`/portfolio/${username}`)
+    return response.portfolio
+  }
+
+  async update(data: Partial<Portfolio>): Promise<Portfolio> {
+    const response = await this.request<{ portfolio: Portfolio }>('/portfolio', {
       method: 'PATCH',
-      headers: getHeaders(token),
       body: JSON.stringify(data),
-    }).then(res => res.json()),
+    })
+    return response.portfolio
+  }
 
-  // Experiences
-  addExperience: (token: string, data: Omit<Experience, 'id'>): Promise<{ experience: Experience }> =>
-    fetch(`${API_URL}/portfolio/experiences`, {
+  // ==========================================
+  // 💼 EXPERIENCES
+  // ==========================================
+
+  async addExperience(data: Omit<Experience, 'id'>): Promise<Experience> {
+    const response = await this.request<{ experience: Experience }>('/portfolio/experiences', {
       method: 'POST',
-      headers: getHeaders(token),
       body: JSON.stringify(data),
-    }).then(res => res.json()),
+    })
+    return response.experience
+  }
 
-  updateExperience: (token: string, id: string, data: Partial<Experience>): Promise<{ experience: Experience }> =>
-    fetch(`${API_URL}/portfolio/experiences/${id}`, {
+  async updateExperience(id: string, data: Partial<Experience>): Promise<Experience> {
+    const response = await this.request<{ experience: Experience }>(`/portfolio/experiences/${id}`, {
       method: 'PATCH',
-      headers: getHeaders(token),
       body: JSON.stringify(data),
-    }).then(res => res.json()),
+    })
+    return response.experience
+  }
 
-  deleteExperience: (token: string, id: string): Promise<{ message: string }> =>
-    fetch(`${API_URL}/portfolio/experiences/${id}`, {
+  async deleteExperience(id: string): Promise<void> {
+    await this.request(`/portfolio/experiences/${id}`, {
       method: 'DELETE',
-      headers: getHeaders(token),
-    }).then(res => res.json()),
+    })
+  }
 
-  // Education
-  addEducation: (token: string, data: Omit<Education, 'id'>): Promise<{ education: Education }> =>
-    fetch(`${API_URL}/portfolio/education`, {
+  // ==========================================
+  // 🎓 EDUCATION
+  // ==========================================
+
+  async addEducation(data: Omit<Education, 'id'>): Promise<Education> {
+    const response = await this.request<{ education: Education }>('/portfolio/education', {
       method: 'POST',
-      headers: getHeaders(token),
       body: JSON.stringify(data),
-    }).then(res => res.json()),
+    })
+    return response.education
+  }
 
-  updateEducation: (token: string, id: string, data: Partial<Education>): Promise<{ education: Education }> =>
-    fetch(`${API_URL}/portfolio/education/${id}`, {
+  async updateEducation(id: string, data: Partial<Education>): Promise<Education> {
+    const response = await this.request<{ education: Education }>(`/portfolio/education/${id}`, {
       method: 'PATCH',
-      headers: getHeaders(token),
       body: JSON.stringify(data),
-    }).then(res => res.json()),
+    })
+    return response.education
+  }
 
-  deleteEducation: (token: string, id: string): Promise<{ message: string }> =>
-    fetch(`${API_URL}/portfolio/education/${id}`, {
+  async deleteEducation(id: string): Promise<void> {
+    await this.request(`/portfolio/education/${id}`, {
       method: 'DELETE',
-      headers: getHeaders(token),
-    }).then(res => res.json()),
+    })
+  }
 
-  // Skills
-  addSkill: (token: string, data: Omit<Skill, 'id'>): Promise<{ skill: Skill }> =>
-    fetch(`${API_URL}/portfolio/skills`, {
+  // ==========================================
+  // 🛠️ SKILLS
+  // ==========================================
+
+  async addSkill(data: Omit<Skill, 'id'>): Promise<Skill> {
+    const response = await this.request<{ skill: Skill }>('/portfolio/skills', {
       method: 'POST',
-      headers: getHeaders(token),
       body: JSON.stringify(data),
-    }).then(res => res.json()),
+    })
+    return response.skill
+  }
 
-  updateSkill: (token: string, id: string, data: Partial<Skill>): Promise<{ skill: Skill }> =>
-    fetch(`${API_URL}/portfolio/skills/${id}`, {
+  async updateSkill(id: string, data: Partial<Skill>): Promise<Skill> {
+    const response = await this.request<{ skill: Skill }>(`/portfolio/skills/${id}`, {
       method: 'PATCH',
-      headers: getHeaders(token),
       body: JSON.stringify(data),
-    }).then(res => res.json()),
+    })
+    return response.skill
+  }
 
-  deleteSkill: (token: string, id: string): Promise<{ message: string }> =>
-    fetch(`${API_URL}/portfolio/skills/${id}`, {
+  async deleteSkill(id: string): Promise<void> {
+    await this.request(`/portfolio/skills/${id}`, {
       method: 'DELETE',
-      headers: getHeaders(token),
-    }).then(res => res.json()),
+    })
+  }
 
-  // References
-  addReference: (token: string, data: Omit<Reference, 'id'>): Promise<{ reference: Reference }> =>
-    fetch(`${API_URL}/portfolio/references`, {
+  // ==========================================
+  // 📋 REFERENCES
+  // ==========================================
+
+  async addReference(data: Omit<Reference, 'id'>): Promise<Reference> {
+    const response = await this.request<{ reference: Reference }>('/portfolio/references', {
       method: 'POST',
-      headers: getHeaders(token),
       body: JSON.stringify(data),
-    }).then(res => res.json()),
+    })
+    return response.reference
+  }
 
-  updateReference: (token: string, id: string, data: Partial<Reference>): Promise<{ reference: Reference }> =>
-    fetch(`${API_URL}/portfolio/references/${id}`, {
+  async updateReference(id: string, data: Partial<Reference>): Promise<Reference> {
+    const response = await this.request<{ reference: Reference }>(`/portfolio/references/${id}`, {
       method: 'PATCH',
-      headers: getHeaders(token),
       body: JSON.stringify(data),
-    }).then(res => res.json()),
+    })
+    return response.reference
+  }
 
-  deleteReference: (token: string, id: string): Promise<{ message: string }> =>
-    fetch(`${API_URL}/portfolio/references/${id}`, {
+  async deleteReference(id: string): Promise<void> {
+    await this.request(`/portfolio/references/${id}`, {
       method: 'DELETE',
-      headers: getHeaders(token),
-    }).then(res => res.json()),
+    })
+  }
 }
+
+// Export singleton instance
+export const portfolioApi = new PortfolioApiService()
