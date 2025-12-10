@@ -113,6 +113,18 @@ export function Portfolio() {
 
   // Edit states
   const [newSkill, setNewSkill] = useState({ name: '', level: 'Intermediate' as Skill['level'] })
+  
+  // Reference modal states
+  const [showReferenceModal, setShowReferenceModal] = useState(false)
+  const [editingReference, setEditingReference] = useState<Reference | null>(null)
+  const [referenceForm, setReferenceForm] = useState<ReferenceFormData>({
+    name: '',
+    position: '',
+    company: '',
+    email: '',
+    phone: '',
+    relationship: ''
+  })
 
   // Fetch portfolio on mount
   useEffect(() => {
@@ -141,7 +153,8 @@ export function Portfolio() {
         linkedinUrl: data.linkedinUrl || '',
         experiences: data.experiences || [],
         education: data.education || [],
-        skills: data.skills || []
+        skills: data.skills || [],
+        references: data.references || []
       })
     } catch (err) {
       console.error('Failed to fetch portfolio:', err)
@@ -161,7 +174,8 @@ export function Portfolio() {
           linkedinUrl: '',
           experiences: [],
           education: [],
-          skills: []
+          skills: [],
+          references: []
         })
         setError('')
       } else {
@@ -296,6 +310,87 @@ export function Portfolio() {
     } catch (err) {
       console.error('Failed to remove education:', err)
       setError('Failed to remove education')
+    }
+  }
+
+  // Reference CRUD
+  const openAddReference = () => {
+    setEditingReference(null)
+    setReferenceForm({
+      name: '',
+      position: '',
+      company: '',
+      email: '',
+      phone: '',
+      relationship: ''
+    })
+    setShowReferenceModal(true)
+  }
+
+  const openEditReference = (ref: Reference) => {
+    setEditingReference(ref)
+    setReferenceForm({
+      name: ref.name,
+      position: ref.position,
+      company: ref.company,
+      email: ref.email,
+      phone: ref.phone || '',
+      relationship: ref.relationship
+    })
+    setShowReferenceModal(true)
+  }
+
+  const handleSaveReference = async () => {
+    try {
+      if (editingReference) {
+        // Update existing reference
+        const updated = await portfolioApi.updateReference(editingReference.id, {
+          name: referenceForm.name,
+          position: referenceForm.position,
+          company: referenceForm.company,
+          email: referenceForm.email,
+          phone: referenceForm.phone || undefined,
+          relationship: referenceForm.relationship
+        })
+        setPortfolio({
+          ...portfolio,
+          references: portfolio.references.map((r: Reference) => 
+            r.id === editingReference.id ? updated : r
+          )
+        })
+      } else {
+        // Add new reference
+        const newRef = await portfolioApi.addReference({
+          name: referenceForm.name,
+          position: referenceForm.position,
+          company: referenceForm.company,
+          email: referenceForm.email,
+          phone: referenceForm.phone || undefined,
+          relationship: referenceForm.relationship
+        })
+        setPortfolio({
+          ...portfolio,
+          references: [...portfolio.references, newRef]
+        })
+      }
+      setShowReferenceModal(false)
+      setEditingReference(null)
+    } catch (err) {
+      console.error('Failed to save reference:', err)
+      setError('Failed to save reference')
+    }
+  }
+
+  const removeReference = async (id: string) => {
+    try {
+      await portfolioApi.deleteReference(id)
+      setPortfolio({
+        ...portfolio,
+        references: portfolio.references.filter((r: Reference) => r.id !== id)
+      })
+    } catch (err) {
+      console.error('Failed to remove reference:', err)
+      setError('Failed to remove reference')
     }
   }
 
@@ -699,6 +794,76 @@ export function Portfolio() {
           </div>
         </div>
 
+        {/* References Section */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+              <UserCircleIcon className="w-5 h-5 mr-2 text-blue-600" />
+              References
+            </h3>
+            {isEditing && (
+              <button 
+                onClick={openAddReference}
+                className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center"
+              >
+                <PlusIcon className="w-4 h-4 mr-1" />
+                Add Reference
+              </button>
+            )}
+          </div>
+          <div className="space-y-4">
+            {portfolio.references.length === 0 ? (
+              <p className="text-gray-500 text-center py-4">No references added yet.</p>
+            ) : (
+              portfolio.references.map((ref: Reference, index: number) => (
+                <div key={ref.id} className={`${index !== portfolio.references.length - 1 ? 'border-b border-gray-100 pb-4' : ''}`}>
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-start space-x-4">
+                      <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                        <UserCircleIcon className="w-6 h-6 text-gray-500" />
+                      </div>
+                      <div>
+                        <h4 className="font-medium text-gray-900">{ref.name}</h4>
+                        <p className="text-gray-600">{ref.position} at {ref.company}</p>
+                        <p className="text-sm text-gray-500 mt-1">{ref.relationship}</p>
+                        <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
+                          {ref.email && (
+                            <a href={`mailto:${ref.email}`} className="flex items-center hover:text-blue-600">
+                              <EnvelopeIcon className="w-4 h-4 mr-1" />
+                              {ref.email}
+                            </a>
+                          )}
+                          {ref.phone && (
+                            <span className="flex items-center">
+                              📞 {ref.phone}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    {isEditing && (
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => openEditReference(ref)}
+                          className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg"
+                        >
+                          <PencilIcon className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => removeReference(ref.id)}
+                          className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
+                        >
+                          <TrashIcon className="w-4 h-4" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
         {/* Projects Section Link */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
           <div className="flex items-center justify-between">
@@ -872,6 +1037,104 @@ export function Portfolio() {
                 X (Twitter)
               </button>
             </div>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Reference Add/Edit Modal */}
+      <Modal
+        isOpen={showReferenceModal}
+        onClose={() => {
+          setShowReferenceModal(false)
+          setEditingReference(null)
+        }}
+        title={editingReference ? 'Edit Reference' : 'Add Reference'}
+        maxWidth="md"
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
+            <input
+              type="text"
+              value={referenceForm.name}
+              onChange={(e) => setReferenceForm({ ...referenceForm, name: e.target.value })}
+              placeholder="Jane Smith"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Position *</label>
+            <input
+              type="text"
+              value={referenceForm.position}
+              onChange={(e) => setReferenceForm({ ...referenceForm, position: e.target.value })}
+              placeholder="CEO"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Company *</label>
+            <input
+              type="text"
+              value={referenceForm.company}
+              onChange={(e) => setReferenceForm({ ...referenceForm, company: e.target.value })}
+              placeholder="Tech Corp"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+            <input
+              type="email"
+              value={referenceForm.email}
+              onChange={(e) => setReferenceForm({ ...referenceForm, email: e.target.value })}
+              placeholder="jane@techcorp.com"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+            <input
+              type="tel"
+              value={referenceForm.phone}
+              onChange={(e) => setReferenceForm({ ...referenceForm, phone: e.target.value })}
+              placeholder="+1234567890"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Relationship *</label>
+            <input
+              type="text"
+              value={referenceForm.relationship}
+              onChange={(e) => setReferenceForm({ ...referenceForm, relationship: e.target.value })}
+              placeholder="Former Manager"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+            />
+          </div>
+
+          <div className="flex justify-end space-x-3 pt-4 border-t border-gray-100">
+            <button
+              onClick={() => {
+                setShowReferenceModal(false)
+                setEditingReference(null)
+              }}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSaveReference}
+              disabled={!referenceForm.name || !referenceForm.position || !referenceForm.company || !referenceForm.email || !referenceForm.relationship}
+              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {editingReference ? 'Update' : 'Add'} Reference
+            </button>
           </div>
         </div>
       </Modal>
