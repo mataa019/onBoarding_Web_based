@@ -20,7 +20,7 @@ import {
 import { Modal } from '../../components/UIComponents'
 import { portfolioApi } from '../../ApiService/portfolioApi'
 import { cloudinaryService } from '../../utils/cloudinary'
-import type { Portfolio as PortfolioType, Experience, Education, Skill } from '../../ApiService/types'
+import type { Experience, Education, Skill } from '../../ApiService/types'
 
 // LinkedIn icon component
 const LinkedInIcon = ({ className }: { className?: string }) => (
@@ -295,37 +295,44 @@ export function Portfolio() {
   }
 
   const copyShareLink = () => {
-    const shareUrl = `${window.location.origin}/portfolio/johnmataa`
+    const shareUrl = `${window.location.origin}/portfolio/${portfolio.firstName.toLowerCase()}${portfolio.lastName.toLowerCase()}`
     navigator.clipboard.writeText(shareUrl)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
 
-  const addSkill = () => {
-    if (newSkill.name.trim()) {
-      setPortfolio({
-        ...portfolio,
-        skills: [...portfolio.skills, { id: Date.now().toString(), ...newSkill }]
-      })
-      setNewSkill({ name: '', level: 'Intermediate' })
-    }
-  }
-
-  const removeSkill = (id: string) => {
-    setPortfolio({
-      ...portfolio,
-      skills: portfolio.skills.filter(s => s.id !== id)
-    })
-  }
-
-  const formatDate = (dateStr: string) => {
+  const formatDate = (dateStr: string | null) => {
     if (!dateStr) return 'Present'
     const date = new Date(dateStr)
     return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
   }
 
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading portfolio...</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Error Banner */}
+      {error && (
+        <div className="bg-red-50 border-b border-red-200 px-4 py-3">
+          <div className="max-w-5xl mx-auto flex items-center justify-between">
+            <p className="text-red-700 text-sm">{error}</p>
+            <button onClick={() => setError('')} className="text-red-500 hover:text-red-700">
+              <XMarkIcon className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Action Bar */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
@@ -346,8 +353,9 @@ export function Portfolio() {
               Share
             </button>
             <button
-              onClick={() => setIsEditing(!isEditing)}
-              className={`inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+              onClick={() => isEditing ? handleSaveChanges() : setIsEditing(true)}
+              disabled={isSaving}
+              className={`inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-colors disabled:opacity-50 ${
                 isEditing
                   ? 'bg-green-600 text-white hover:bg-green-700'
                   : 'bg-blue-600 text-white hover:bg-blue-700'
@@ -514,16 +522,6 @@ export function Portfolio() {
             </h3>
             {isEditing && (
               <button
-                onClick={() => setEditingExperience({
-                  id: Date.now().toString(),
-                  title: '',
-                  company: '',
-                  location: '',
-                  startDate: '',
-                  endDate: '',
-                  current: false,
-                  description: ''
-                })}
                 className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center"
               >
                 <PlusIcon className="w-4 h-4 mr-1" />
@@ -532,7 +530,7 @@ export function Portfolio() {
             )}
           </div>
           <div className="space-y-6">
-            {portfolio.experiences.map((exp, index) => (
+            {portfolio.experiences.map((exp: Experience, index: number) => (
               <div key={exp.id} className={`${index !== portfolio.experiences.length - 1 ? 'border-b border-gray-100 pb-6' : ''}`}>
                 <div className="flex items-start justify-between">
                   <div className="flex items-start space-x-4">
@@ -550,10 +548,7 @@ export function Portfolio() {
                   </div>
                   {isEditing && (
                     <button
-                      onClick={() => setPortfolio({
-                        ...portfolio,
-                        experiences: portfolio.experiences.filter(e => e.id !== exp.id)
-                      })}
+                      onClick={() => removeExperience(exp.id)}
                       className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
                     >
                       <TrashIcon className="w-4 h-4" />
@@ -580,7 +575,7 @@ export function Portfolio() {
             )}
           </div>
           <div className="space-y-6">
-            {portfolio.education.map((edu, index) => (
+            {portfolio.education.map((edu: Education, index: number) => (
               <div key={edu.id} className={`${index !== portfolio.education.length - 1 ? 'border-b border-gray-100 pb-6' : ''}`}>
                 <div className="flex items-start justify-between">
                   <div className="flex items-start space-x-4">
@@ -596,10 +591,7 @@ export function Portfolio() {
                   </div>
                   {isEditing && (
                     <button
-                      onClick={() => setPortfolio({
-                        ...portfolio,
-                        education: portfolio.education.filter(e => e.id !== edu.id)
-                      })}
+                      onClick={() => removeEducation(edu.id)}
                       className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
                     >
                       <TrashIcon className="w-4 h-4" />
@@ -648,7 +640,7 @@ export function Portfolio() {
           )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {portfolio.skills.map((skill) => (
+            {portfolio.skills.map((skill: Skill) => (
               <div key={skill.id} className="flex items-center justify-between">
                 <div className="flex-1">
                   <div className="flex items-center justify-between mb-1">
