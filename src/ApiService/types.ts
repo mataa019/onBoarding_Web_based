@@ -142,6 +142,9 @@ export interface PortfolioUser {
   lastName: string
   email: string
   phone: string | null
+  gender: string | null
+  country: string | null
+  city: string | null
   avatar: string | null
 }
 

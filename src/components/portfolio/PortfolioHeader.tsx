@@ -3,7 +3,8 @@ import {
   ArrowUpTrayIcon,
   MapPinIcon,
   EnvelopeIcon,
-  GlobeAltIcon
+  GlobeAltIcon,
+  PhoneIcon
 } from '@heroicons/react/24/outline'
 import { cloudinaryService } from '../../utils/cloudinary'
 import type { Portfolio } from '../../ApiService/types'
@@ -149,13 +150,19 @@ export function PortfolioHeader({
                   placeholder="Location"
                 />
               ) : (
-                location || 'No location'
+                location || (user.city && user.country ? `${user.city}, ${user.country}` : user.country || 'No location')
               )}
             </span>
             <span className="flex items-center">
               <EnvelopeIcon className="w-4 h-4 mr-1" />
               {user.email}
             </span>
+            {user.phone && (
+              <span className="flex items-center">
+                <PhoneIcon className="w-4 h-4 mr-1" />
+                {user.phone}
+              </span>
+            )}
             {(website || isEditing) && (
               <span className="flex items-center">
                 <GlobeAltIcon className="w-4 h-4 mr-1" />
