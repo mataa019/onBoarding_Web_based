@@ -118,6 +118,16 @@ export interface Skill {
   level: 'Beginner' | 'Intermediate' | 'Advanced' | 'Expert'
 }
 
+export interface Reference {
+  id: string
+  name: string
+  title: string
+  company: string
+  email: string
+  phone?: string
+  relationship: string
+}
+
 export interface Portfolio {
   id: string
   userId: string
@@ -135,6 +145,7 @@ export interface Portfolio {
   experiences: Experience[]
   education: Education[]
   skills: Skill[]
+  references: Reference[]
   createdAt: string
   updatedAt: string
 }
