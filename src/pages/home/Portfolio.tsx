@@ -40,6 +40,10 @@ const defaultPortfolio: PortfolioType = {
     lastName: '',
     email: '',
     phone: null,
+    gender: null,
+    dateOfBirth: null,
+    country: null,
+    city: null,
     avatar: null
   },
   experiences: [],

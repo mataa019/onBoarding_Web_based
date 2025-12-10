@@ -143,6 +143,7 @@ export interface PortfolioUser {
   email: string
   phone: string | null
   gender: string | null
+  dateOfBirth: string | null
   country: string | null
   city: string | null
   avatar: string | null
