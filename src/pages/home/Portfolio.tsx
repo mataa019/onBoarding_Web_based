@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   UserCircleIcon,
   BriefcaseIcon,
@@ -13,12 +13,14 @@ import {
   GlobeAltIcon,
   MapPinIcon,
   EnvelopeIcon,
-  PhoneIcon,
   PlusIcon,
   TrashIcon,
   XMarkIcon
 } from '@heroicons/react/24/outline'
 import { Modal } from '../../components/UIComponents'
+import { portfolioApi } from '../../ApiService/portfolioApi'
+import { cloudinaryService } from '../../utils/cloudinary'
+import type { Portfolio as PortfolioType, Experience, Education, Skill } from '../../ApiService/types'
 
 // LinkedIn icon component
 const LinkedInIcon = ({ className }: { className?: string }) => (
@@ -27,35 +29,8 @@ const LinkedInIcon = ({ className }: { className?: string }) => (
   </svg>
 )
 
-interface Experience {
-  id: string
-  title: string
-  company: string
-  location: string
-  startDate: string
-  endDate: string
-  current: boolean
-  description: string
-}
-
-interface Education {
-  id: string
-  school: string
-  degree: string
-  field: string
-  startYear: string
-  endYear: string
-  description: string
-}
-
-interface Skill {
-  id: string
-  name: string
-  level: 'Beginner' | 'Intermediate' | 'Advanced' | 'Expert'
-}
-
-interface PortfolioData {
-  // Basic Info
+// Local interface for form state (matches API types but with non-null strings for form handling)
+interface PortfolioFormData {
   firstName: string
   lastName: string
   headline: string
@@ -67,7 +42,6 @@ interface PortfolioData {
   phone: string
   website: string
   linkedinUrl: string
-  // Professional
   experiences: Experience[]
   education: Education[]
   skills: Skill[]
@@ -90,6 +64,12 @@ const skillLevelWidth = {
 }
 
 export function Portfolio() {
+  // Loading and error states
+  const [isLoading, setIsLoading] = useState(true)
+  const [isSaving, setIsSaving] = useState(false)
+  const [error, setError] = useState('')
+
+  // UI states
   const [isEditing, setIsEditing] = useState(false)
   const [showLinkedInModal, setShowLinkedInModal] = useState(false)
   const [showShareModal, setShowShareModal] = useState(false)
@@ -97,87 +77,190 @@ export function Portfolio() {
   const [linkedinUrl, setLinkedinUrl] = useState('')
   const [copied, setCopied] = useState(false)
 
-  const [portfolio, setPortfolio] = useState<PortfolioData>({
-    firstName: 'John',
-    lastName: 'Mataa',
-    headline: 'Full-Stack Developer | React & Node.js Specialist',
-    summary: 'Passionate software developer with 5+ years of experience building web applications. I specialize in React, TypeScript, and Node.js. I love creating elegant solutions to complex problems and am always eager to learn new technologies.',
+  // Portfolio data
+  const [portfolio, setPortfolio] = useState<PortfolioFormData>({
+    firstName: '',
+    lastName: '',
+    headline: '',
+    summary: '',
     avatar: '',
     coverImage: '',
-    location: 'Lusaka, Zambia',
-    email: 'john.mataa@example.com',
-    phone: '+260 97 1234567',
-    website: 'https://johnmataa.dev',
-    linkedinUrl: 'https://linkedin.com/in/johnmataa',
-    experiences: [
-      {
-        id: '1',
-        title: 'Senior Software Developer',
-        company: 'Tech Solutions Ltd',
-        location: 'Lusaka, Zambia',
-        startDate: '2022-01',
-        endDate: '',
-        current: true,
-        description: 'Leading frontend development team, building scalable React applications with TypeScript. Implemented CI/CD pipelines and mentored junior developers.'
-      },
-      {
-        id: '2',
-        title: 'Software Developer',
-        company: 'Digital Innovations',
-        location: 'Lusaka, Zambia',
-        startDate: '2019-06',
-        endDate: '2021-12',
-        current: false,
-        description: 'Developed and maintained multiple web applications using React, Node.js, and PostgreSQL. Collaborated with cross-functional teams to deliver projects on time.'
-      }
-    ],
-    education: [
-      {
-        id: '1',
-        school: 'University of Zambia',
-        degree: 'Bachelor of Science',
-        field: 'Computer Science',
-        startYear: '2015',
-        endYear: '2019',
-        description: 'Graduated with honors. Focus on software engineering and data structures.'
-      }
-    ],
-    skills: [
-      { id: '1', name: 'React', level: 'Expert' },
-      { id: '2', name: 'TypeScript', level: 'Advanced' },
-      { id: '3', name: 'Node.js', level: 'Advanced' },
-      { id: '4', name: 'Python', level: 'Intermediate' },
-      { id: '5', name: 'PostgreSQL', level: 'Advanced' },
-      { id: '6', name: 'Docker', level: 'Intermediate' },
-      { id: '7', name: 'AWS', level: 'Intermediate' },
-      { id: '8', name: 'Git', level: 'Expert' }
-    ]
+    location: '',
+    email: '',
+    phone: '',
+    website: '',
+    linkedinUrl: '',
+    experiences: [],
+    education: [],
+    skills: []
   })
 
   // Edit states
-  const [editingExperience, setEditingExperience] = useState<Experience | null>(null)
-  const [editingEducation, setEditingEducation] = useState<Education | null>(null)
   const [newSkill, setNewSkill] = useState({ name: '', level: 'Intermediate' as Skill['level'] })
 
-  const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setPortfolio({ ...portfolio, avatar: reader.result as string })
-      }
-      reader.readAsDataURL(file)
+  // Fetch portfolio on mount
+  useEffect(() => {
+    fetchPortfolio()
+  }, [])
+
+  const fetchPortfolio = async () => {
+    setIsLoading(true)
+    setError('')
+    try {
+      const data = await portfolioApi.get()
+      // Transform API response to form data (handle nulls)
+      setPortfolio({
+        firstName: data.firstName || '',
+        lastName: data.lastName || '',
+        headline: data.headline || '',
+        summary: data.summary || '',
+        avatar: data.avatar || '',
+        coverImage: data.coverImage || '',
+        location: data.location || '',
+        email: data.email || '',
+        phone: data.phone || '',
+        website: data.website || '',
+        linkedinUrl: data.linkedinUrl || '',
+        experiences: data.experiences || [],
+        education: data.education || [],
+        skills: data.skills || []
+      })
+    } catch (err) {
+      console.error('Failed to fetch portfolio:', err)
+      setError('Failed to load portfolio. Please try again.')
+    } finally {
+      setIsLoading(false)
     }
   }
 
-  const handleCoverUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Save all portfolio changes
+  const handleSaveChanges = async () => {
+    setIsSaving(true)
+    setError('')
+    try {
+      await portfolioApi.update({
+        firstName: portfolio.firstName,
+        lastName: portfolio.lastName,
+        headline: portfolio.headline,
+        summary: portfolio.summary,
+        avatar: portfolio.avatar || null,
+        coverImage: portfolio.coverImage || null,
+        location: portfolio.location,
+        email: portfolio.email,
+        phone: portfolio.phone || null,
+        website: portfolio.website || null,
+        linkedinUrl: portfolio.linkedinUrl || null
+      })
+      setIsEditing(false)
+    } catch (err) {
+      console.error('Failed to save portfolio:', err)
+      setError('Failed to save changes. Please try again.')
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  // Image uploads with Cloudinary
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setPortfolio({ ...portfolio, coverImage: reader.result as string })
+      try {
+        // Show preview immediately
+        const reader = new FileReader()
+        reader.onloadend = () => {
+          setPortfolio({ ...portfolio, avatar: reader.result as string })
+        }
+        reader.readAsDataURL(file)
+
+        // Upload to Cloudinary
+        const url = await cloudinaryService.uploadImage(file, 'avatars')
+        setPortfolio(prev => ({ ...prev, avatar: url }))
+      } catch (err) {
+        console.error('Failed to upload avatar:', err)
+        setError('Failed to upload image')
       }
-      reader.readAsDataURL(file)
+    }
+  }
+
+  const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      try {
+        // Show preview immediately
+        const reader = new FileReader()
+        reader.onloadend = () => {
+          setPortfolio({ ...portfolio, coverImage: reader.result as string })
+        }
+        reader.readAsDataURL(file)
+
+        // Upload to Cloudinary
+        const url = await cloudinaryService.uploadImage(file, 'covers')
+        setPortfolio(prev => ({ ...prev, coverImage: url }))
+      } catch (err) {
+        console.error('Failed to upload cover:', err)
+        setError('Failed to upload image')
+      }
+    }
+  }
+
+  // Skills CRUD
+  const addSkill = async () => {
+    if (newSkill.name.trim()) {
+      try {
+        const skill = await portfolioApi.addSkill({
+          name: newSkill.name,
+          level: newSkill.level
+        })
+        setPortfolio({
+          ...portfolio,
+          skills: [...portfolio.skills, skill]
+        })
+        setNewSkill({ name: '', level: 'Intermediate' })
+      } catch (err) {
+        console.error('Failed to add skill:', err)
+        setError('Failed to add skill')
+      }
+    }
+  }
+
+  const removeSkill = async (id: string) => {
+    try {
+      await portfolioApi.deleteSkill(id)
+      setPortfolio({
+        ...portfolio,
+        skills: portfolio.skills.filter((s: Skill) => s.id !== id)
+      })
+    } catch (err) {
+      console.error('Failed to remove skill:', err)
+      setError('Failed to remove skill')
+    }
+  }
+
+  // Experience CRUD
+  const removeExperience = async (id: string) => {
+    try {
+      await portfolioApi.deleteExperience(id)
+      setPortfolio({
+        ...portfolio,
+        experiences: portfolio.experiences.filter((e: Experience) => e.id !== id)
+      })
+    } catch (err) {
+      console.error('Failed to remove experience:', err)
+      setError('Failed to remove experience')
+    }
+  }
+
+  // Education CRUD
+  const removeEducation = async (id: string) => {
+    try {
+      await portfolioApi.deleteEducation(id)
+      setPortfolio({
+        ...portfolio,
+        education: portfolio.education.filter((e: Education) => e.id !== id)
+      })
+    } catch (err) {
+      console.error('Failed to remove education:', err)
+      setError('Failed to remove education')
     }
   }
 
