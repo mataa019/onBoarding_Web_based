@@ -157,6 +157,11 @@ export function PortfolioHeader({
               <EnvelopeIcon className="w-4 h-4 mr-1" />
               {user.email}
             </span>
+            {user.gender && (
+              <span className="flex items-center text-gray-500">
+                {user.gender}
+              </span>
+            )}
             {user.phone && (
               <span className="flex items-center">
                 <PhoneIcon className="w-4 h-4 mr-1" />
