@@ -3,18 +3,16 @@ import { UserCircleIcon } from '@heroicons/react/24/outline'
 interface AboutSectionProps {
   summary: string
   isEditing: boolean
-  onUpdate: (value: string) => void
+  onUpdate: (summary: string) => void
 }
 
 export function AboutSection({ summary, isEditing, onUpdate }: AboutSectionProps) {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-          <UserCircleIcon className="w-5 h-5 mr-2 text-blue-600" />
-          About
-        </h3>
-      </div>
+      <h3 className="text-lg font-semibold text-gray-900 flex items-center mb-4">
+        <UserCircleIcon className="w-5 h-5 mr-2 text-blue-600" />
+        About
+      </h3>
       {isEditing ? (
         <textarea
           rows={4}

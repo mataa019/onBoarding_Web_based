@@ -1,66 +1,90 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   PencilIcon,
   ShareIcon,
   CheckCircleIcon,
-  XMarkIcon
+  XMarkIcon,
+  LinkIcon,
+  ClipboardIcon,
+  ClipboardDocumentCheckIcon
 } from '@heroicons/react/24/outline'
-import { usePortfolio } from '../../hooks/usePortfolio'
+import { portfolioApi } from '../../ApiService/portfolioApi'
+import type { Portfolio as PortfolioType } from '../../ApiService/types'
 import {
   PortfolioHeader,
   AboutSection,
   ExperienceSection,
   EducationSection,
   SkillsSection,
-  ReferencesSection,
-  ProjectsLink,
-  ReferenceModal,
-  LinkedInModal,
-  ShareModal,
-  LinkedInIcon
+  ReferencesSection
 } from '../../components/portfolio'
 
 export function Portfolio() {
-  // Custom hook handles all state and API logic
-  const {
-    portfolio,
-    isLoading,
-    isSaving,
-    error,
-    isEditing,
-    newSkill,
-    showReferenceModal,
-    editingReference,
-    referenceForm,
-    setError,
-    setIsEditing,
-    setNewSkill,
-    setReferenceForm,
-    updateField,
-    savePortfolio,
-    uploadAvatar,
-    uploadCover,
-    addSkill,
-    removeSkill,
-    removeExperience,
-    removeEducation,
-    openAddReference,
-    openEditReference,
-    saveReference,
-    removeReference,
-    closeReferenceModal
-  } = usePortfolio()
-
-  // Local modal states
-  const [showLinkedInModal, setShowLinkedInModal] = useState(false)
+  const [portfolio, setPortfolio] = useState<PortfolioType | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [isSaving, setIsSaving] = useState(false)
+  const [error, setError] = useState('')
+  const [isEditing, setIsEditing] = useState(false)
   const [showShareModal, setShowShareModal] = useState(false)
+  const [copied, setCopied] = useState(false)
 
-  // Handle LinkedIn import
-  const handleLinkedInImport = (linkedinUrl: string) => {
-    updateField('linkedinUrl', linkedinUrl)
+  // Load portfolio on mount
+  useEffect(() => {
+    loadPortfolio()
+  }, [])
+
+  const loadPortfolio = async () => {
+    try {
+      setIsLoading(true)
+      const data = await portfolioApi.get()
+      setPortfolio(data)
+    } catch (err) {
+      setError('Failed to load portfolio')
+      console.error(err)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
-  // Loading state
+  const savePortfolio = async () => {
+    if (!portfolio) return
+    setIsSaving(true)
+    try {
+      await portfolioApi.update({
+        firstName: portfolio.user.firstName,
+        lastName: portfolio.user.lastName,
+        headline: portfolio.headline,
+        summary: portfolio.summary,
+        location: portfolio.location,
+        website: portfolio.website,
+        linkedinUrl: portfolio.linkedinUrl,
+        githubUrl: portfolio.githubUrl
+      })
+      setIsEditing(false)
+    } catch (err) {
+      setError('Failed to save portfolio')
+      console.error(err)
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  const updateField = (field: string, value: string) => {
+    if (!portfolio) return
+    if (field === 'firstName' || field === 'lastName') {
+      setPortfolio({ ...portfolio, user: { ...portfolio.user, [field]: value } })
+    } else {
+      setPortfolio({ ...portfolio, [field]: value })
+    }
+  }
+
+  const copyShareLink = () => {
+    const link = portfolio?.shareableLink || `${window.location.origin}/portfolio/${portfolio?.username}`
+    navigator.clipboard.writeText(link)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -68,6 +92,14 @@ export function Portfolio() {
           <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">Loading portfolio...</p>
         </div>
+      </div>
+    )
+  }
+
+  if (!portfolio) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <p className="text-gray-600">No portfolio found</p>
       </div>
     )
   }
@@ -91,13 +123,6 @@ export function Portfolio() {
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
           <h1 className="text-lg font-semibold text-gray-900">My Portfolio</h1>
           <div className="flex items-center space-x-3">
-            <button
-              onClick={() => setShowLinkedInModal(true)}
-              className="inline-flex items-center px-3 py-2 text-sm font-medium text-blue-700 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
-            >
-              <LinkedInIcon className="w-4 h-4 mr-2" />
-              Import from LinkedIn
-            </button>
             <button
               onClick={() => setShowShareModal(true)}
               className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
@@ -136,70 +161,92 @@ export function Portfolio() {
           portfolio={portfolio}
           isEditing={isEditing}
           onUpdateField={updateField}
-          onAvatarUpload={uploadAvatar}
-          onCoverUpload={uploadCover}
+          onAvatarChange={(url) => setPortfolio({ ...portfolio, avatarUrl: url })}
+          onCoverChange={(url) => setPortfolio({ ...portfolio, coverImageUrl: url })}
         />
 
         <AboutSection
-          summary={portfolio.summary}
+          summary={portfolio.summary || ''}
           isEditing={isEditing}
-          onUpdate={(value) => updateField('summary', value)}
+          onUpdate={(value) => setPortfolio({ ...portfolio, summary: value })}
         />
 
         <ExperienceSection
           experiences={portfolio.experiences}
           isEditing={isEditing}
-          onRemove={removeExperience}
+          onUpdate={(experiences) => setPortfolio({ ...portfolio, experiences })}
         />
 
         <EducationSection
           education={portfolio.education}
           isEditing={isEditing}
-          onRemove={removeEducation}
+          onUpdate={(education) => setPortfolio({ ...portfolio, education })}
         />
 
         <SkillsSection
           skills={portfolio.skills}
           isEditing={isEditing}
-          newSkill={newSkill}
-          onNewSkillChange={setNewSkill}
-          onAdd={addSkill}
-          onRemove={removeSkill}
+          onUpdate={(skills) => setPortfolio({ ...portfolio, skills })}
         />
 
         <ReferencesSection
           references={portfolio.references}
           isEditing={isEditing}
-          onAdd={openAddReference}
-          onEdit={openEditReference}
-          onRemove={removeReference}
+          onUpdate={(references) => setPortfolio({ ...portfolio, references })}
         />
 
-        <ProjectsLink />
+        {/* Projects Link */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                <LinkIcon className="w-5 h-5 text-blue-600" />
+              </div>
+              <div>
+                <h3 className="font-medium text-gray-900">Projects</h3>
+                <p className="text-sm text-gray-500">View all your projects</p>
+              </div>
+            </div>
+            <a href="/projects" className="text-blue-600 hover:text-blue-700 font-medium text-sm">
+              View Projects →
+            </a>
+          </div>
+        </div>
       </div>
 
-      {/* Modals */}
-      <ReferenceModal
-        isOpen={showReferenceModal}
-        editingReference={editingReference}
-        form={referenceForm}
-        onFormChange={setReferenceForm}
-        onSave={saveReference}
-        onClose={closeReferenceModal}
-      />
-
-      <LinkedInModal
-        isOpen={showLinkedInModal}
-        onClose={() => setShowLinkedInModal(false)}
-        onImport={handleLinkedInImport}
-      />
-
-      <ShareModal
-        isOpen={showShareModal}
-        firstName={portfolio.firstName}
-        lastName={portfolio.lastName}
-        onClose={() => setShowShareModal(false)}
-      />
+      {/* Share Modal */}
+      {showShareModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 w-full max-w-md mx-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold">Share Portfolio</h3>
+              <button onClick={() => setShowShareModal(false)} className="text-gray-400 hover:text-gray-600">
+                <XMarkIcon className="w-6 h-6" />
+              </button>
+            </div>
+            <p className="text-gray-600 mb-4">Share your portfolio with others using this link:</p>
+            <div className="flex items-center space-x-2">
+              <input
+                type="text"
+                readOnly
+                value={portfolio.shareableLink || `${window.location.origin}/portfolio/${portfolio.username}`}
+                className="flex-1 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-600"
+              />
+              <button
+                onClick={copyShareLink}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center space-x-2"
+              >
+                {copied ? (
+                  <ClipboardDocumentCheckIcon className="w-5 h-5" />
+                ) : (
+                  <ClipboardIcon className="w-5 h-5" />
+                )}
+              </button>
+            </div>
+            {copied && <p className="text-green-600 text-sm mt-2">Link copied to clipboard!</p>}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

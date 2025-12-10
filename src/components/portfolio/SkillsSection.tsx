@@ -1,98 +1,113 @@
-import { CodeBracketIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { useState } from 'react'
+import { SparklesIcon, PlusIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { portfolioApi } from '../../ApiService/portfolioApi'
 import type { Skill } from '../../ApiService/types'
-
-const skillLevels: Skill['level'][] = ['Beginner', 'Intermediate', 'Advanced', 'Expert']
-
-const skillLevelColors: Record<Skill['level'], string> = {
-  'Beginner': 'bg-gray-200',
-  'Intermediate': 'bg-blue-300',
-  'Advanced': 'bg-blue-500',
-  'Expert': 'bg-blue-700'
-}
-
-const skillLevelWidth: Record<Skill['level'], string> = {
-  'Beginner': 'w-1/4',
-  'Intermediate': 'w-2/4',
-  'Advanced': 'w-3/4',
-  'Expert': 'w-full'
-}
 
 interface SkillsSectionProps {
   skills: Skill[]
   isEditing: boolean
-  newSkill: { name: string; level: Skill['level'] }
-  onNewSkillChange: (skill: { name: string; level: Skill['level'] }) => void
-  onAdd: () => void
-  onRemove: (id: string) => void
+  onUpdate: (skills: Skill[]) => void
 }
 
-export function SkillsSection({
-  skills,
-  isEditing,
-  newSkill,
-  onNewSkillChange,
-  onAdd,
-  onRemove
-}: SkillsSectionProps) {
+export function SkillsSection({ skills, isEditing, onUpdate }: SkillsSectionProps) {
+  const [showForm, setShowForm] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [form, setForm] = useState({ name: '', category: 'Technical' })
+
+  const handleAdd = async () => {
+    if (!form.name.trim()) return
+    setIsLoading(true)
+    try {
+      const newSkill = await portfolioApi.addSkill({
+        name: form.name.trim(),
+        category: form.category
+      })
+      onUpdate([...skills, newSkill])
+      setForm({ name: '', category: 'Technical' })
+      setShowForm(false)
+    } catch (err) {
+      console.error('Failed to add skill:', err)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleRemove = async (id: string) => {
+    try {
+      await portfolioApi.deleteSkill(id)
+      onUpdate(skills.filter(s => s.id !== id))
+    } catch (err) {
+      console.error('Failed to remove skill:', err)
+    }
+  }
+
+  // Group skills by category
+  const skillsByCategory = skills.reduce<Record<string, Skill[]>>((acc, skill) => {
+    const cat = skill.category || 'Other'
+    if (!acc[cat]) acc[cat] = []
+    acc[cat].push(skill)
+    return acc
+  }, {})
+
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-          <CodeBracketIcon className="w-5 h-5 mr-2 text-blue-600" />
+          <SparklesIcon className="w-5 h-5 mr-2 text-blue-600" />
           Skills
         </h3>
+        {isEditing && !showForm && (
+          <button onClick={() => setShowForm(true)} className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center">
+            <PlusIcon className="w-4 h-4 mr-1" /> Add Skill
+          </button>
+        )}
       </div>
 
-      {isEditing && (
-        <div className="flex items-center gap-3 mb-4 p-4 bg-gray-50 rounded-lg">
-          <input
-            type="text"
-            value={newSkill.name}
-            onChange={(e) => onNewSkillChange({ ...newSkill, name: e.target.value })}
-            placeholder="Skill name"
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-          />
-          <select
-            value={newSkill.level}
-            onChange={(e) => onNewSkillChange({ ...newSkill, level: e.target.value as Skill['level'] })}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-          >
-            {skillLevels.map(level => (
-              <option key={level} value={level}>{level}</option>
-            ))}
+      {/* Add Form */}
+      {showForm && (
+        <div className="mb-6 p-4 bg-gray-50 rounded-lg space-y-3">
+          <div className="flex justify-between items-center">
+            <span className="font-medium text-gray-700">Add Skill</span>
+            <button onClick={() => setShowForm(false)} className="text-gray-400 hover:text-gray-600">
+              <XMarkIcon className="w-5 h-5" />
+            </button>
+          </div>
+          <input type="text" placeholder="Skill name *" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
+          <select value={form.category} onChange={e => setForm({ ...form, category: e.target.value })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+            <option value="Technical">Technical</option>
+            <option value="Language">Language</option>
+            <option value="Soft Skill">Soft Skill</option>
+            <option value="Other">Other</option>
           </select>
-          <button
-            onClick={onAdd}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Add
+          <button onClick={handleAdd} disabled={isLoading || !form.name.trim()}
+            className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">
+            {isLoading ? 'Adding...' : 'Add Skill'}
           </button>
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {skills.length === 0 ? (
-          <p className="text-gray-500 text-center py-4 col-span-2">No skills added yet.</p>
+      {/* Skills by Category */}
+      <div className="space-y-4">
+        {Object.keys(skillsByCategory).length === 0 ? (
+          <p className="text-gray-500 text-center py-4">No skills added yet.</p>
         ) : (
-          skills.map((skill) => (
-            <div key={skill.id} className="flex items-center justify-between">
-              <div className="flex-1">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-sm font-medium text-gray-700">{skill.name}</span>
-                  <span className="text-xs text-gray-500">{skill.level}</span>
-                </div>
-                <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                  <div className={`h-full ${skillLevelColors[skill.level]} ${skillLevelWidth[skill.level]} rounded-full transition-all`} />
-                </div>
+          Object.entries(skillsByCategory).map(([category, categorySkills]) => (
+            <div key={category}>
+              <h4 className="text-sm font-medium text-gray-500 mb-2">{category}</h4>
+              <div className="flex flex-wrap gap-2">
+                {categorySkills.map(skill => (
+                  <div key={skill.id} className="group inline-flex items-center bg-blue-50 text-blue-700 px-3 py-1.5 rounded-full text-sm">
+                    {skill.name}
+                    {isEditing && (
+                      <button onClick={() => handleRemove(skill.id)} className="ml-2 text-blue-400 hover:text-red-600">
+                        <XMarkIcon className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                ))}
               </div>
-              {isEditing && (
-                <button
-                  onClick={() => onRemove(skill.id)}
-                  className="ml-3 p-1 text-gray-400 hover:text-red-600"
-                >
-                  <XMarkIcon className="w-4 h-4" />
-                </button>
-              )}
             </div>
           ))
         )}
