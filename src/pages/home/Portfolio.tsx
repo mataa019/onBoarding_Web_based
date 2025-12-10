@@ -242,9 +242,7 @@ export function Portfolio() {
         />
 
         <ReferencesSection
-          references={portfolio.references}
           isEditing={isEditing}
-          onUpdate={(references) => setPortfolio({ ...portfolio, references })}
         />
 
         {/* Projects Link */}

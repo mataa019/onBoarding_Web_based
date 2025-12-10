@@ -1,15 +1,14 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { UserGroupIcon, PlusIcon, TrashIcon, XMarkIcon, PencilIcon } from '@heroicons/react/24/outline'
 import { portfolioApi } from '../../ApiService/portfolioApi'
 import type { Reference } from '../../ApiService/types'
 
 interface ReferencesSectionProps {
-  references: Reference[]
   isEditing: boolean
-  onUpdate: (references: Reference[]) => void
 }
 
-export function ReferencesSection({ references, isEditing, onUpdate }: ReferencesSectionProps) {
+export function ReferencesSection({ isEditing }: ReferencesSectionProps) {
+  const [references, setReferences] = useState<Reference[]>([])
   const [showForm, setShowForm] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -21,6 +20,19 @@ export function ReferencesSection({ references, isEditing, onUpdate }: Reference
     phone: '',
     relationship: ''
   })
+
+  // Load references from portfolio API
+  useEffect(() => {
+    const loadReferences = async () => {
+      try {
+        const portfolio = await portfolioApi.get()
+        setReferences(portfolio.references || [])
+      } catch (err) {
+        console.error('Failed to load references:', err)
+      }
+    }
+    loadReferences()
+  }, [])
 
   const resetForm = () => {
     setForm({ name: '', position: '', company: '', email: '', phone: '', relationship: '' })
@@ -40,7 +52,7 @@ export function ReferencesSection({ references, isEditing, onUpdate }: Reference
         phone: form.phone,
         relationship: form.relationship
       })
-      onUpdate([...references, newRef])
+      setReferences([...references, newRef])
       resetForm()
     } catch (err) {
       console.error('Failed to add reference:', err)
@@ -61,7 +73,7 @@ export function ReferencesSection({ references, isEditing, onUpdate }: Reference
         phone: form.phone,
         relationship: form.relationship
       })
-      onUpdate(references.map(r => r.id === editingId ? updated : r))
+      setReferences(references.map(r => r.id === editingId ? updated : r))
       resetForm()
     } catch (err) {
       console.error('Failed to update reference:', err)
@@ -73,7 +85,7 @@ export function ReferencesSection({ references, isEditing, onUpdate }: Reference
   const handleRemove = async (id: string) => {
     try {
       await portfolioApi.deleteReference(id)
-      onUpdate(references.filter(r => r.id !== id))
+      setReferences(references.filter(r => r.id !== id))
     } catch (err) {
       console.error('Failed to remove reference:', err)
     }
