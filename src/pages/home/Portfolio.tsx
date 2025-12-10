@@ -20,6 +20,7 @@ import {
 import { Modal } from '../../components/UIComponents'
 import { portfolioApi } from '../../ApiService/portfolioApi'
 import { cloudinaryService } from '../../utils/cloudinary'
+import { useAuth } from '../../context/AuthContext'
 import type { Experience, Education, Skill } from '../../ApiService/types'
 
 // LinkedIn icon component
@@ -64,6 +65,9 @@ const skillLevelWidth = {
 }
 
 export function Portfolio() {
+  // Get user from AuthContext
+  const { user } = useAuth()
+
   // Loading and error states
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
@@ -108,17 +112,19 @@ export function Portfolio() {
     setError('')
     try {
       const data = await portfolioApi.get()
-      // Transform API response to form data (handle nulls)
+      
+      // Merge user info from AuthContext with portfolio data
+      // User info takes precedence for basic fields if portfolio doesn't have them
       setPortfolio({
-        firstName: data.firstName || '',
-        lastName: data.lastName || '',
+        firstName: data.firstName || user?.firstName || '',
+        lastName: data.lastName || user?.lastName || '',
         headline: data.headline || '',
         summary: data.summary || '',
-        avatar: data.avatar || '',
+        avatar: data.avatar || user?.avatar || '',
         coverImage: data.coverImage || '',
-        location: data.location || '',
-        email: data.email || '',
-        phone: data.phone || '',
+        location: data.location || (user?.city && user?.country ? `${user.city}, ${user.country}` : ''),
+        email: data.email || user?.email || '',
+        phone: data.phone || user?.phone || '',
         website: data.website || '',
         linkedinUrl: data.linkedinUrl || '',
         experiences: data.experiences || [],
@@ -127,7 +133,28 @@ export function Portfolio() {
       })
     } catch (err) {
       console.error('Failed to fetch portfolio:', err)
-      setError('Failed to load portfolio. Please try again.')
+      // If portfolio doesn't exist yet, pre-fill with user data
+      if (user) {
+        setPortfolio({
+          firstName: user.firstName || '',
+          lastName: user.lastName || '',
+          headline: '',
+          summary: '',
+          avatar: user.avatar || '',
+          coverImage: '',
+          location: user.city && user.country ? `${user.city}, ${user.country}` : '',
+          email: user.email || '',
+          phone: user.phone || '',
+          website: '',
+          linkedinUrl: '',
+          experiences: [],
+          education: [],
+          skills: []
+        })
+        setError('')
+      } else {
+        setError('Failed to load portfolio. Please try again.')
+      }
     } finally {
       setIsLoading(false)
     }
