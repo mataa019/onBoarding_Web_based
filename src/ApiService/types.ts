@@ -118,7 +118,8 @@ export interface Education {
 export interface Skill {
   id: string
   name: string
-  level: 'Beginner' | 'Intermediate' | 'Advanced' | 'Expert'
+  level?: 'Beginner' | 'Intermediate' | 'Advanced' | 'Expert'
+  category?: string
 }
 
 export interface Reference {
@@ -164,6 +165,20 @@ export interface Portfolio {
   education: Education[]
   skills: Skill[]
   references: Reference[]
+}
+
+// Portfolio Update Data Type (what backend expects)
+export interface PortfolioUpdateData {
+  firstName?: string
+  lastName?: string
+  headline?: string | null
+  summary?: string | null
+  location?: string | null
+  website?: string | null
+  linkedinUrl?: string | null
+  githubUrl?: string | null
+  coverImage?: string | null
+  avatar?: string | null
 }
 
 // Portfolio Response Type

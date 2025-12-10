@@ -1,6 +1,6 @@
 // services/portfolioApi.ts
 import { getStoredToken, makeRequest } from './helpers'
-import type { Portfolio, Experience, Education, Skill, Reference } from './types'
+import type { Portfolio, Experience, Education, Skill, Reference, PortfolioUpdateData } from './types'
 
 class PortfolioApiService {
   private baseURL: string
@@ -35,7 +35,7 @@ class PortfolioApiService {
     return response.portfolio
   }
 
-  async update(data: Partial<Portfolio>): Promise<Portfolio> {
+  async update(data: PortfolioUpdateData): Promise<Portfolio> {
     const response = await this.request<{ portfolio: Portfolio }>('/portfolio', {
       method: 'PATCH',
       body: JSON.stringify(data),

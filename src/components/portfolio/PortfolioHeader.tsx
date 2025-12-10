@@ -3,13 +3,10 @@ import {
   ArrowUpTrayIcon,
   MapPinIcon,
   EnvelopeIcon,
-  GlobeAltIcon,
-  PencilIcon,
-  CheckIcon,
-  XMarkIcon
+  GlobeAltIcon
 } from '@heroicons/react/24/outline'
-import { portfolioApi } from '../../ApiService/portfolioApi'
 import { cloudinaryService } from '../../utils/cloudinary'
+import type { Portfolio } from '../../ApiService/types'
 
 // LinkedIn icon
 const LinkedInIcon = ({ className }: { className?: string }) => (
@@ -19,42 +16,23 @@ const LinkedInIcon = ({ className }: { className?: string }) => (
 )
 
 interface PortfolioHeaderProps {
-  firstName: string
-  lastName: string
-  headline: string
-  avatar: string
-  coverImage: string
-  location: string
-  email: string
-  website: string
-  linkedinUrl: string
+  portfolio: Portfolio
   isEditing: boolean
-  onUpdate: (data: Partial<{
-    firstName: string
-    lastName: string
-    headline: string
-    avatar: string
-    coverImage: string
-    location: string
-    website: string
-    linkedinUrl: string
-  }>) => void
+  onUpdateField: (field: string, value: string) => void
+  onAvatarChange: (url: string) => void
+  onCoverChange: (url: string) => void
 }
 
 export function PortfolioHeader({
-  firstName,
-  lastName,
-  headline,
-  avatar,
-  coverImage,
-  location,
-  email,
-  website,
-  linkedinUrl,
+  portfolio,
   isEditing,
-  onUpdate
+  onUpdateField,
+  onAvatarChange,
+  onCoverChange
 }: PortfolioHeaderProps) {
   const [isUploading, setIsUploading] = useState(false)
+
+  const { user, headline, location, website, linkedinUrl, coverImage } = portfolio
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -62,14 +40,8 @@ export function PortfolioHeader({
 
     setIsUploading(true)
     try {
-      // Preview immediately
-      const reader = new FileReader()
-      reader.onloadend = () => onUpdate({ avatar: reader.result as string })
-      reader.readAsDataURL(file)
-
-      // Upload to Cloudinary
       const url = await cloudinaryService.uploadImage(file, 'avatars')
-      onUpdate({ avatar: url })
+      onAvatarChange(url)
     } catch (err) {
       console.error('Failed to upload avatar:', err)
     } finally {
@@ -83,12 +55,8 @@ export function PortfolioHeader({
 
     setIsUploading(true)
     try {
-      const reader = new FileReader()
-      reader.onloadend = () => onUpdate({ coverImage: reader.result as string })
-      reader.readAsDataURL(file)
-
       const url = await cloudinaryService.uploadImage(file, 'covers')
-      onUpdate({ coverImage: url })
+      onCoverChange(url)
     } catch (err) {
       console.error('Failed to upload cover:', err)
     } finally {
@@ -117,11 +85,11 @@ export function PortfolioHeader({
         {/* Avatar */}
         <div className="absolute -top-16 left-6">
           <div className="relative">
-            {avatar ? (
-              <img src={avatar} alt="Profile" className="w-32 h-32 rounded-full border-4 border-white object-cover shadow-lg" />
+            {user.avatar ? (
+              <img src={user.avatar} alt="Profile" className="w-32 h-32 rounded-full border-4 border-white object-cover shadow-lg" />
             ) : (
               <div className="w-32 h-32 rounded-full border-4 border-white bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white text-4xl font-medium shadow-lg">
-                {firstName[0]}{lastName[0]}
+                {user.firstName?.[0] || ''}{user.lastName?.[0] || ''}
               </div>
             )}
             {isEditing && (
@@ -140,30 +108,30 @@ export function PortfolioHeader({
               <div className="grid grid-cols-2 gap-4">
                 <input
                   type="text"
-                  value={firstName}
-                  onChange={(e) => onUpdate({ firstName: e.target.value })}
+                  value={user.firstName || ''}
+                  onChange={(e) => onUpdateField('firstName', e.target.value)}
                   className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                   placeholder="First Name"
                 />
                 <input
                   type="text"
-                  value={lastName}
-                  onChange={(e) => onUpdate({ lastName: e.target.value })}
+                  value={user.lastName || ''}
+                  onChange={(e) => onUpdateField('lastName', e.target.value)}
                   className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                   placeholder="Last Name"
                 />
               </div>
               <input
                 type="text"
-                value={headline}
-                onChange={(e) => onUpdate({ headline: e.target.value })}
+                value={headline || ''}
+                onChange={(e) => onUpdateField('headline', e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                 placeholder="Professional Headline"
               />
             </div>
           ) : (
             <>
-              <h2 className="text-2xl font-semibold text-gray-900">{firstName} {lastName}</h2>
+              <h2 className="text-2xl font-semibold text-gray-900">{user.firstName} {user.lastName}</h2>
               <p className="text-gray-600 mt-1">{headline || 'No headline set'}</p>
             </>
           )}
@@ -175,8 +143,8 @@ export function PortfolioHeader({
               {isEditing ? (
                 <input
                   type="text"
-                  value={location}
-                  onChange={(e) => onUpdate({ location: e.target.value })}
+                  value={location || ''}
+                  onChange={(e) => onUpdateField('location', e.target.value)}
                   className="px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none text-sm"
                   placeholder="Location"
                 />
@@ -186,7 +154,7 @@ export function PortfolioHeader({
             </span>
             <span className="flex items-center">
               <EnvelopeIcon className="w-4 h-4 mr-1" />
-              {email}
+              {user.email}
             </span>
             {(website || isEditing) && (
               <span className="flex items-center">
@@ -194,14 +162,14 @@ export function PortfolioHeader({
                 {isEditing ? (
                   <input
                     type="url"
-                    value={website}
-                    onChange={(e) => onUpdate({ website: e.target.value })}
+                    value={website || ''}
+                    onChange={(e) => onUpdateField('website', e.target.value)}
                     className="px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none text-sm"
                     placeholder="Website URL"
                   />
                 ) : (
-                  <a href={website} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                    {website.replace('https://', '')}
+                  <a href={website || '#'} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                    {website?.replace('https://', '')}
                   </a>
                 )}
               </span>
@@ -212,13 +180,13 @@ export function PortfolioHeader({
                 {isEditing ? (
                   <input
                     type="url"
-                    value={linkedinUrl}
-                    onChange={(e) => onUpdate({ linkedinUrl: e.target.value })}
+                    value={linkedinUrl || ''}
+                    onChange={(e) => onUpdateField('linkedinUrl', e.target.value)}
                     className="px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none text-sm"
                     placeholder="LinkedIn URL"
                   />
                 ) : (
-                  <a href={linkedinUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                  <a href={linkedinUrl || '#'} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
                     LinkedIn
                   </a>
                 )}

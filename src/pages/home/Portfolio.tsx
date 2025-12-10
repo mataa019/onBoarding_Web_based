@@ -161,8 +161,8 @@ export function Portfolio() {
           portfolio={portfolio}
           isEditing={isEditing}
           onUpdateField={updateField}
-          onAvatarChange={(url) => setPortfolio({ ...portfolio, avatarUrl: url })}
-          onCoverChange={(url) => setPortfolio({ ...portfolio, coverImageUrl: url })}
+          onAvatarChange={(url: string) => setPortfolio({ ...portfolio, user: { ...portfolio.user, avatar: url } })}
+          onCoverChange={(url: string) => setPortfolio({ ...portfolio, coverImage: url })}
         />
 
         <AboutSection
