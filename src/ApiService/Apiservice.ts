@@ -8,7 +8,12 @@ import type {
   CreateProjectRequest,
   UpdateProjectRequest,
   ProjectsResponse,
-  ProjectResponse
+  ProjectResponse,
+  Portfolio,
+  PortfolioResponse,
+  Experience,
+  Education,
+  Skill
 } from './types'
 
 // ApiService Class
@@ -125,6 +130,106 @@ export class ApiService {
 
   async deleteProject(id: string): Promise<void> {
     await this.request(`/projects/${id}`, {
+      method: 'DELETE',
+    })
+  }
+
+  // ==========================================
+  // 👤 PORTFOLIO
+  // ==========================================
+
+  async getPortfolio(): Promise<Portfolio> {
+    const response = await this.request<PortfolioResponse>('/portfolio')
+    return response.portfolio
+  }
+
+  async getPortfolioByUsername(username: string): Promise<Portfolio> {
+    const response = await this.request<PortfolioResponse>(`/portfolio/${username}`)
+    return response.portfolio
+  }
+
+  async updatePortfolio(data: Partial<Portfolio>): Promise<Portfolio> {
+    const response = await this.request<PortfolioResponse>('/portfolio', {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    })
+    return response.portfolio
+  }
+
+  // ==========================================
+  // 💼 EXPERIENCES
+  // ==========================================
+
+  async addExperience(data: Omit<Experience, 'id'>): Promise<Experience> {
+    const response = await this.request<{ experience: Experience }>('/portfolio/experiences', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+    return response.experience
+  }
+
+  async updateExperience(id: string, data: Partial<Experience>): Promise<Experience> {
+    const response = await this.request<{ experience: Experience }>(`/portfolio/experiences/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    })
+    return response.experience
+  }
+
+  async deleteExperience(id: string): Promise<void> {
+    await this.request(`/portfolio/experiences/${id}`, {
+      method: 'DELETE',
+    })
+  }
+
+  // ==========================================
+  // 🎓 EDUCATION
+  // ==========================================
+
+  async addEducation(data: Omit<Education, 'id'>): Promise<Education> {
+    const response = await this.request<{ education: Education }>('/portfolio/education', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+    return response.education
+  }
+
+  async updateEducation(id: string, data: Partial<Education>): Promise<Education> {
+    const response = await this.request<{ education: Education }>(`/portfolio/education/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    })
+    return response.education
+  }
+
+  async deleteEducation(id: string): Promise<void> {
+    await this.request(`/portfolio/education/${id}`, {
+      method: 'DELETE',
+    })
+  }
+
+  // ==========================================
+  // 🛠️ SKILLS
+  // ==========================================
+
+  async addSkill(data: Omit<Skill, 'id'>): Promise<Skill> {
+    const response = await this.request<{ skill: Skill }>('/portfolio/skills', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+    return response.skill
+  }
+
+  async updateSkill(id: string, data: Partial<Skill>): Promise<Skill> {
+    const response = await this.request<{ skill: Skill }>(`/portfolio/skills/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    })
+    return response.skill
+  }
+
+  async deleteSkill(id: string): Promise<void> {
+    await this.request(`/portfolio/skills/${id}`, {
       method: 'DELETE',
     })
   }

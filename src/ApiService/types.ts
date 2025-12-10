@@ -86,3 +86,61 @@ export interface UploadImagesResponse {
   message: string
   images: ProjectImage[]
 }
+
+// ==========================================
+// Portfolio Types
+// ==========================================
+
+export interface Experience {
+  id: string
+  title: string
+  company: string
+  location: string
+  startDate: string
+  endDate: string | null
+  current: boolean
+  description: string
+}
+
+export interface Education {
+  id: string
+  school: string
+  degree: string
+  field: string
+  startYear: string
+  endYear: string
+  description: string
+}
+
+export interface Skill {
+  id: string
+  name: string
+  level: 'Beginner' | 'Intermediate' | 'Advanced' | 'Expert'
+}
+
+export interface Portfolio {
+  id: string
+  userId: string
+  firstName: string
+  lastName: string
+  headline: string
+  summary: string
+  avatar: string | null
+  coverImage: string | null
+  location: string
+  email: string
+  phone: string | null
+  website: string | null
+  linkedinUrl: string | null
+  experiences: Experience[]
+  education: Education[]
+  skills: Skill[]
+  createdAt: string
+  updatedAt: string
+}
+
+// Portfolio Response Type
+export interface PortfolioResponse {
+  message: string
+  portfolio: Portfolio
+}
