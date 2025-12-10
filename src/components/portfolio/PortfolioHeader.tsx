@@ -4,7 +4,8 @@ import {
   MapPinIcon,
   EnvelopeIcon,
   GlobeAltIcon,
-  PhoneIcon
+  PhoneIcon,
+  UserIcon
 } from '@heroicons/react/24/outline'
 import { cloudinaryService } from '../../utils/cloudinary'
 import type { Portfolio } from '../../ApiService/types'
@@ -159,6 +160,7 @@ export function PortfolioHeader({
             </span>
             {user.gender && (
               <span className="flex items-center text-gray-500">
+                <UserIcon className="w-4 h-4 mr-1" />
                 {user.gender}
               </span>
             )}
