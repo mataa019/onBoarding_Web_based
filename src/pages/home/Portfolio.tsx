@@ -236,9 +236,7 @@ export function Portfolio() {
         />
 
         <SkillsSection
-          skills={portfolio.skills}
           isEditing={isEditing}
-          onUpdate={(skills) => setPortfolio({ ...portfolio, skills })}
         />
 
         <ReferencesSection

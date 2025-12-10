@@ -118,7 +118,7 @@ export interface Education {
 export interface Skill {
   id: string
   name: string
-  level?: 'Beginner' | 'Intermediate' | 'Advanced' | 'Expert'
+  level?: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'EXPERT'
   category?: string
 }
 
