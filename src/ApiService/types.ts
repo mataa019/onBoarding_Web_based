@@ -123,34 +123,47 @@ export interface Skill {
 
 export interface Reference {
   id: string
+  portfolioId?: string
   name: string
-  title: string
+  position: string  // Backend uses 'position' not 'title'
   company: string
   email: string
   phone?: string
   relationship: string
+  order?: number
+  createdAt?: string
+  updatedAt?: string
+}
+
+// User info nested in Portfolio response
+export interface PortfolioUser {
+  firstName: string
+  lastName: string
+  email: string
+  phone: string | null
+  avatar: string | null
 }
 
 export interface Portfolio {
   id: string
   userId: string
-  firstName: string
-  lastName: string
-  headline: string
-  summary: string
-  avatar: string | null
-  coverImage: string | null
-  location: string
-  email: string
-  phone: string | null
+  username: string
+  headline: string | null
+  summary: string | null
+  location: string | null
   website: string | null
   linkedinUrl: string | null
+  githubUrl: string | null
+  coverImage: string | null
+  isPublic: boolean
+  shareableLink: string | null
+  createdAt: string
+  updatedAt: string
+  user: PortfolioUser  // Nested user object from API
   experiences: Experience[]
   education: Education[]
   skills: Skill[]
   references: Reference[]
-  createdAt: string
-  updatedAt: string
 }
 
 // Portfolio Response Type

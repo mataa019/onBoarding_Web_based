@@ -113,18 +113,18 @@ export function Portfolio() {
     try {
       const data = await portfolioApi.get()
       
-      // Merge user info from AuthContext with portfolio data
-      // User info takes precedence for basic fields if portfolio doesn't have them
+      // Map API response (with nested user object) to flat form data
+      // User info from API response takes precedence, then AuthContext user
       setPortfolio({
-        firstName: data.firstName || user?.firstName || '',
-        lastName: data.lastName || user?.lastName || '',
+        firstName: data.user?.firstName || user?.firstName || '',
+        lastName: data.user?.lastName || user?.lastName || '',
         headline: data.headline || '',
         summary: data.summary || '',
-        avatar: data.avatar || user?.avatar || '',
+        avatar: data.user?.avatar || user?.avatar || '',
         coverImage: data.coverImage || '',
         location: data.location || (user?.city && user?.country ? `${user.city}, ${user.country}` : ''),
-        email: data.email || user?.email || '',
-        phone: data.phone || user?.phone || '',
+        email: data.user?.email || user?.email || '',
+        phone: data.user?.phone || user?.phone || '',
         website: data.website || '',
         linkedinUrl: data.linkedinUrl || '',
         experiences: data.experiences || [],
@@ -165,16 +165,12 @@ export function Portfolio() {
     setIsSaving(true)
     setError('')
     try {
+      // Only update portfolio-specific fields (user data is managed separately via /auth/me)
       await portfolioApi.update({
-        firstName: portfolio.firstName,
-        lastName: portfolio.lastName,
         headline: portfolio.headline,
         summary: portfolio.summary,
-        avatar: portfolio.avatar || null,
         coverImage: portfolio.coverImage || null,
         location: portfolio.location,
-        email: portfolio.email,
-        phone: portfolio.phone || null,
         website: portfolio.website || null,
         linkedinUrl: portfolio.linkedinUrl || null
       })
