@@ -21,7 +21,7 @@ import { Modal } from '../../components/UIComponents'
 import { portfolioApi } from '../../ApiService/portfolioApi'
 import { cloudinaryService } from '../../utils/cloudinary'
 import { useAuth } from '../../context/AuthContext'
-import type { Experience, Education, Skill } from '../../ApiService/types'
+import type { Experience, Education, Skill, Reference } from '../../ApiService/types'
 
 // LinkedIn icon component
 const LinkedInIcon = ({ className }: { className?: string }) => (
@@ -46,6 +46,17 @@ interface PortfolioFormData {
   experiences: Experience[]
   education: Education[]
   skills: Skill[]
+  references: Reference[]
+}
+
+// Reference form data for add/edit
+interface ReferenceFormData {
+  name: string
+  position: string
+  company: string
+  email: string
+  phone: string
+  relationship: string
 }
 
 const skillLevels: Skill['level'][] = ['Beginner', 'Intermediate', 'Advanced', 'Expert']
@@ -96,7 +107,8 @@ export function Portfolio() {
     linkedinUrl: '',
     experiences: [],
     education: [],
-    skills: []
+    skills: [],
+    references: []
   })
 
   // Edit states
