@@ -1,52 +1,95 @@
-import { useState } from 'react'
-import { AcademicCapIcon, PlusIcon, TrashIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { useState, useEffect } from 'react'
+import { AcademicCapIcon, PlusIcon, TrashIcon, XMarkIcon, PencilIcon } from '@heroicons/react/24/outline'
 import { portfolioApi } from '../../ApiService/portfolioApi'
 import type { Education } from '../../ApiService/types'
 
 interface EducationSectionProps {
-  education: Education[]
   isEditing: boolean
-  onUpdate: (education: Education[]) => void
 }
 
-export function EducationSection({ education, isEditing, onUpdate }: EducationSectionProps) {
+export function EducationSection({ isEditing }: EducationSectionProps) {
+  const [education, setEducation] = useState<Education[]>([])
   const [showForm, setShowForm] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [isFetching, setIsFetching] = useState(true)
+  const [editingId, setEditingId] = useState<string | null>(null)
   const [form, setForm] = useState({
     school: '',
     degree: '',
     field: '',
     startYear: '',
     endYear: '',
+    current: 'false',
     description: ''
   })
+
+  // Fetch education on mount
+  useEffect(() => {
+    const fetchEducation = async () => {
+      try {
+        setIsFetching(true)
+        const data = await portfolioApi.get()
+        setEducation(data.education || [])
+      } catch (err) {
+        console.error('Failed to fetch education:', err)
+      } finally {
+        setIsFetching(false)
+      }
+    }
+    fetchEducation()
+  }, [])
 
   const handleAdd = async () => {
     if (!form.school || !form.degree) return
     setIsLoading(true)
     try {
-      const newEdu = await portfolioApi.addEducation({
+      const payload = {
         school: form.school,
         degree: form.degree,
-        field: form.field,
-        startYear: form.startYear,
-        endYear: form.endYear,
-        description: form.description
-      })
-      onUpdate([...education, newEdu])
-      setForm({ school: '', degree: '', field: '', startYear: '', endYear: '', description: '' })
+        field: form.field || null,
+        startYear: form.startYear ? parseInt(form.startYear) : null,
+        endYear: form.current === 'true' ? null : (form.endYear ? parseInt(form.endYear) : null),
+        current: form.current === 'true',
+        description: form.description || null,
+        order: education.length
+      }
+
+      if (editingId) {
+        const updated = await portfolioApi.updateEducation(editingId, payload)
+        setEducation(education.map(e => e.id === editingId ? updated : e))
+        setEditingId(null)
+      } else {
+        const newEdu = await portfolioApi.addEducation(payload)
+        setEducation([...education, newEdu])
+      }
+      
+      setForm({ school: '', degree: '', field: '', startYear: '', endYear: '', current: 'false', description: '' })
       setShowForm(false)
     } catch (err) {
-      console.error('Failed to add education:', err)
+      console.error('Failed to save education:', err)
     } finally {
       setIsLoading(false)
     }
   }
 
+  const startEdit = (edu: Education) => {
+    setEditingId(edu.id)
+    setForm({
+      school: edu.school,
+      degree: edu.degree,
+      field: edu.field || '',
+      startYear: edu.startYear?.toString() || '',
+      endYear: edu.endYear?.toString() || '',
+      current: edu.current ? 'true' : 'false',
+      description: edu.description || ''
+    })
+    setShowForm(true)
+  }
+
   const handleRemove = async (id: string) => {
     try {
       await portfolioApi.deleteEducation(id)
-      onUpdate(education.filter(e => e.id !== id))
+      setEducation(education.filter(e => e.id !== id))
     } catch (err) {
       console.error('Failed to remove education:', err)
     }
@@ -70,8 +113,8 @@ export function EducationSection({ education, isEditing, onUpdate }: EducationSe
       {showForm && (
         <div className="mb-6 p-4 bg-gray-50 rounded-lg space-y-3">
           <div className="flex justify-between items-center">
-            <span className="font-medium text-gray-700">Add Education</span>
-            <button onClick={() => setShowForm(false)} className="text-gray-400 hover:text-gray-600">
+            <span className="font-medium text-gray-700">{editingId ? 'Edit Education' : 'Add Education'}</span>
+            <button onClick={() => { setShowForm(false); setEditingId(null) }} className="text-gray-400 hover:text-gray-600">
               <XMarkIcon className="w-5 h-5" />
             </button>
           </div>
@@ -85,13 +128,18 @@ export function EducationSection({ education, isEditing, onUpdate }: EducationSe
             <input type="text" placeholder="Start Year" value={form.startYear} onChange={e => setForm({ ...form, startYear: e.target.value })}
               className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
             <input type="text" placeholder="End Year" value={form.endYear} onChange={e => setForm({ ...form, endYear: e.target.value })}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
+              disabled={form.current === 'true'} className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none disabled:bg-gray-100" />
           </div>
+          <select value={form.current} onChange={e => setForm({ ...form, current: e.target.value })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+            <option value="false">Not currently studying</option>
+            <option value="true">Currently studying</option>
+          </select>
           <textarea placeholder="Description" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none resize-none" rows={3} />
           <button onClick={handleAdd} disabled={isLoading || !form.school || !form.degree}
             className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">
-            {isLoading ? 'Adding...' : 'Add Education'}
+            {isLoading ? 'Saving...' : editingId ? 'Update Education' : 'Add Education'}
           </button>
         </div>
       )}
@@ -116,9 +164,14 @@ export function EducationSection({ education, isEditing, onUpdate }: EducationSe
                   </div>
                 </div>
                 {isEditing && (
-                  <button onClick={() => handleRemove(edu.id)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg">
-                    <TrashIcon className="w-4 h-4" />
-                  </button>
+                  <div className="flex gap-2">
+                    <button onClick={() => startEdit(edu)} className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg">
+                      <PencilIcon className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => handleRemove(edu.id)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg">
+                      <TrashIcon className="w-4 h-4" />
+                    </button>
+                  </div>
                 )}
               </div>
             </div>

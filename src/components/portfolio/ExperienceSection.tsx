@@ -1,17 +1,18 @@
-import { useState } from 'react'
-import { BriefcaseIcon, PlusIcon, TrashIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { useState, useEffect } from 'react'
+import { BriefcaseIcon, PlusIcon, TrashIcon, XMarkIcon, PencilIcon } from '@heroicons/react/24/outline'
 import { portfolioApi } from '../../ApiService/portfolioApi'
 import type { Experience } from '../../ApiService/types'
 
 interface ExperienceSectionProps {
-  experiences: Experience[]
   isEditing: boolean
-  onUpdate: (experiences: Experience[]) => void
 }
 
-export function ExperienceSection({ experiences, isEditing, onUpdate }: ExperienceSectionProps) {
+export function ExperienceSection({ isEditing }: ExperienceSectionProps) {
+  const [experiences, setExperiences] = useState<Experience[]>([])
   const [showForm, setShowForm] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [isFetching, setIsFetching] = useState(true)
+  const [editingId, setEditingId] = useState<string | null>(null)
   const [form, setForm] = useState({
     title: '',
     company: '',
@@ -22,6 +23,22 @@ export function ExperienceSection({ experiences, isEditing, onUpdate }: Experien
     description: ''
   })
 
+  // Fetch experiences on mount
+  useEffect(() => {
+    const fetchExperiences = async () => {
+      try {
+        setIsFetching(true)
+        const data = await portfolioApi.get()
+        setExperiences(data.experiences || [])
+      } catch (err) {
+        console.error('Failed to fetch experiences:', err)
+      } finally {
+        setIsFetching(false)
+      }
+    }
+    fetchExperiences()
+  }, [])
+
   const formatDate = (dateStr: string | null) => {
     if (!dateStr) return 'Present'
     return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
@@ -31,29 +48,53 @@ export function ExperienceSection({ experiences, isEditing, onUpdate }: Experien
     if (!form.title || !form.company) return
     setIsLoading(true)
     try {
-      const newExp = await portfolioApi.addExperience({
+      const payload = {
         title: form.title,
         company: form.company,
-        location: form.location,
+        location: form.location || null,
         startDate: form.startDate,
         endDate: form.current === 'true' ? null : form.endDate,
         current: form.current === 'true',
-        description: form.description
-      })
-      onUpdate([...experiences, newExp])
+        description: form.description || null,
+        order: experiences.length
+      }
+
+      if (editingId) {
+        const updated = await portfolioApi.updateExperience(editingId, payload)
+        setExperiences(experiences.map(e => e.id === editingId ? updated : e))
+        setEditingId(null)
+      } else {
+        const newExp = await portfolioApi.addExperience(payload)
+        setExperiences([...experiences, newExp])
+      }
+      
       setForm({ title: '', company: '', location: '', startDate: '', endDate: '', current: 'false', description: '' })
       setShowForm(false)
     } catch (err) {
-      console.error('Failed to add experience:', err)
+      console.error('Failed to save experience:', err)
     } finally {
       setIsLoading(false)
     }
   }
 
+  const startEdit = (exp: Experience) => {
+    setEditingId(exp.id)
+    setForm({
+      title: exp.title,
+      company: exp.company,
+      location: exp.location || '',
+      startDate: exp.startDate,
+      endDate: exp.endDate || '',
+      current: exp.current ? 'true' : 'false',
+      description: exp.description || ''
+    })
+    setShowForm(true)
+  }
+
   const handleRemove = async (id: string) => {
     try {
       await portfolioApi.deleteExperience(id)
-      onUpdate(experiences.filter(e => e.id !== id))
+      setExperiences(experiences.filter(e => e.id !== id))
     } catch (err) {
       console.error('Failed to remove experience:', err)
     }
@@ -77,8 +118,8 @@ export function ExperienceSection({ experiences, isEditing, onUpdate }: Experien
       {showForm && (
         <div className="mb-6 p-4 bg-gray-50 rounded-lg space-y-3">
           <div className="flex justify-between items-center">
-            <span className="font-medium text-gray-700">Add Experience</span>
-            <button onClick={() => setShowForm(false)} className="text-gray-400 hover:text-gray-600">
+            <span className="font-medium text-gray-700">{editingId ? 'Edit Experience' : 'Add Experience'}</span>
+            <button onClick={() => { setShowForm(false); setEditingId(null) }} className="text-gray-400 hover:text-gray-600">
               <XMarkIcon className="w-5 h-5" />
             </button>
           </div>
@@ -103,7 +144,7 @@ export function ExperienceSection({ experiences, isEditing, onUpdate }: Experien
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none resize-none" rows={3} />
           <button onClick={handleAdd} disabled={isLoading || !form.title || !form.company}
             className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">
-            {isLoading ? 'Adding...' : 'Add Experience'}
+            {isLoading ? 'Saving...' : editingId ? 'Update Experience' : 'Add Experience'}
           </button>
         </div>
       )}
@@ -130,9 +171,14 @@ export function ExperienceSection({ experiences, isEditing, onUpdate }: Experien
                   </div>
                 </div>
                 {isEditing && (
-                  <button onClick={() => handleRemove(exp.id)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg">
-                    <TrashIcon className="w-4 h-4" />
-                  </button>
+                  <div className="flex gap-2">
+                    <button onClick={() => startEdit(exp)} className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg">
+                      <PencilIcon className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => handleRemove(exp.id)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg">
+                      <TrashIcon className="w-4 h-4" />
+                    </button>
+                  </div>
                 )}
               </div>
             </div>

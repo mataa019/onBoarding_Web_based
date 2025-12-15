@@ -224,15 +224,11 @@ export function Portfolio() {
         />
 
         <ExperienceSection
-          experiences={portfolio.experiences}
           isEditing={isEditing}
-          onUpdate={(experiences) => setPortfolio({ ...portfolio, experiences })}
         />
 
         <EducationSection
-          education={portfolio.education}
           isEditing={isEditing}
-          onUpdate={(education) => setPortfolio({ ...portfolio, education })}
         />
 
         <SkillsSection
