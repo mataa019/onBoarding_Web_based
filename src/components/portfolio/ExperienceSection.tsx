@@ -18,7 +18,7 @@ export function ExperienceSection({ experiences, isEditing, onUpdate }: Experien
     location: '',
     startDate: '',
     endDate: '',
-    current: false,
+    current: 'false',
     description: ''
   })
 
@@ -36,12 +36,12 @@ export function ExperienceSection({ experiences, isEditing, onUpdate }: Experien
         company: form.company,
         location: form.location,
         startDate: form.startDate,
-        endDate: form.current ? null : form.endDate,
-        current: form.current,
+        endDate: form.current === 'true' ? null : form.endDate,
+        current: form.current === 'true',
         description: form.description
       })
       onUpdate([...experiences, newExp])
-      setForm({ title: '', company: '', location: '', startDate: '', endDate: '', current: false, description: '' })
+      setForm({ title: '', company: '', location: '', startDate: '', endDate: '', current: 'false', description: '' })
       setShowForm(false)
     } catch (err) {
       console.error('Failed to add experience:', err)
@@ -92,12 +92,13 @@ export function ExperienceSection({ experiences, isEditing, onUpdate }: Experien
             <input type="date" placeholder="Start Date" value={form.startDate} onChange={e => setForm({ ...form, startDate: e.target.value })}
               className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
             <input type="date" placeholder="End Date" value={form.endDate} onChange={e => setForm({ ...form, endDate: e.target.value })}
-              disabled={form.current} className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none disabled:bg-gray-100" />
+              disabled={form.current === 'true'} className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none disabled:bg-gray-100" />
           </div>
-          <label className="flex items-center gap-2 text-sm text-gray-600">
-            <input type="checkbox" checked={form.current} onChange={e => setForm({ ...form, current: e.target.checked })} className="rounded" />
-            I currently work here
-          </label>
+          <select value={form.current} onChange={e => setForm({ ...form, current: e.target.value })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+            <option value="false">Not currently employed</option>
+            <option value="true">Currently employed</option>
+          </select>
           <textarea placeholder="Description" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none resize-none" rows={3} />
           <button onClick={handleAdd} disabled={isLoading || !form.title || !form.company}
