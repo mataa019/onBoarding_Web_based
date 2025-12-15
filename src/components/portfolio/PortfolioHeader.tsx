@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   ArrowUpTrayIcon,
   MapPinIcon,
@@ -8,6 +8,7 @@ import {
   UserIcon
 } from '@heroicons/react/24/outline'
 import { cloudinaryService } from '../../utils/cloudinary'
+import { portfolioApi } from '../../ApiService/portfolioApi'
 import type { Portfolio } from '../../ApiService/types'
 
 // LinkedIn icon
@@ -18,11 +19,7 @@ const LinkedInIcon = ({ className }: { className?: string }) => (
 )
 
 interface PortfolioHeaderProps {
-  portfolio: Portfolio
   isEditing: boolean
-  onUpdateField: (field: string, value: string) => void
-  onAvatarChange: (url: string) => void
-  onCoverChange: (url: string) => void
 }
 
 export function PortfolioHeader({
