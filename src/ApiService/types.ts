@@ -161,15 +161,15 @@ export interface Portfolio {
   linkedinUrl: string | null
   githubUrl: string | null
   coverImage: string | null
-  isPublic: boolean
-  shareableLink: string | null
-  createdAt: string
-  updatedAt: string
+  isPublic?: boolean
+  shareableLink?: string | null
+  createdAt?: string
+  updatedAt?: string
   user: PortfolioUser  // Nested user object from API with headline and summary
-  experiences: Experience[]
-  education: Education[]
-  skills: Skill[]
-  references: Reference[]
+  experiences?: Experience[]
+  education?: Education[]
+  skills?: Skill[]
+  references?: Reference[]
 }
 
 // Portfolio Update Data Type (what backend expects)
