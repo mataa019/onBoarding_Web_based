@@ -63,6 +63,27 @@ export function PortfolioHeader({ isEditing }: PortfolioHeaderProps) {
         [field]: value
       }
     })
+    
+    // Save to backend immediately
+    saveField(field, value)
+  }
+
+  const saveField = async (field: string, value: string) => {
+    try {
+      const updatePayload: Record<string, any> = {}
+      
+      // Handle nested user fields
+      if (field === 'firstName' || field === 'lastName' || field === 'email' || field === 'phone' || field === 'gender') {
+        updatePayload[field] = value
+      } else {
+        // Handle portfolio-level fields
+        updatePayload[field] = value
+      }
+      
+      await portfolioApi.update(updatePayload)
+    } catch (err) {
+      console.error(`Failed to save ${field}:`, err)
+    }
   }
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
