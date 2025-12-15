@@ -109,10 +109,11 @@ export interface Education {
   id: string
   school: string
   degree: string
-  field: string
-  startYear: string
-  endYear: string
-  description: string
+  field: string | null
+  startYear: number | null
+  endYear: number | null
+  current: boolean
+  description: string | null
 }
 
 export interface Skill {

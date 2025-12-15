@@ -11,7 +11,6 @@ export function ExperienceSection({ isEditing }: ExperienceSectionProps) {
   const [experiences, setExperiences] = useState<Experience[]>([])
   const [showForm, setShowForm] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [isFetching, setIsFetching] = useState(true)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [form, setForm] = useState({
     title: '',
@@ -27,13 +26,10 @@ export function ExperienceSection({ isEditing }: ExperienceSectionProps) {
   useEffect(() => {
     const fetchExperiences = async () => {
       try {
-        setIsFetching(true)
         const data = await portfolioApi.get()
         setExperiences(data.experiences || [])
       } catch (err) {
         console.error('Failed to fetch experiences:', err)
-      } finally {
-        setIsFetching(false)
       }
     }
     fetchExperiences()
@@ -51,20 +47,20 @@ export function ExperienceSection({ isEditing }: ExperienceSectionProps) {
       const payload = {
         title: form.title,
         company: form.company,
-        location: form.location || null,
+        location: form.location || undefined,
         startDate: form.startDate,
-        endDate: form.current === 'true' ? null : form.endDate,
+        endDate: form.current === 'true' ? undefined : form.endDate,
         current: form.current === 'true',
-        description: form.description || null,
+        description: form.description || undefined,
         order: experiences.length
       }
 
       if (editingId) {
-        const updated = await portfolioApi.updateExperience(editingId, payload)
+        const updated = await portfolioApi.updateExperience(editingId, payload as Partial<Experience>)
         setExperiences(experiences.map(e => e.id === editingId ? updated : e))
         setEditingId(null)
       } else {
-        const newExp = await portfolioApi.addExperience(payload)
+        const newExp = await portfolioApi.addExperience(payload as Omit<Experience, 'id'>)
         setExperiences([...experiences, newExp])
       }
       
