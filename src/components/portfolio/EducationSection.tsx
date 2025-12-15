@@ -26,8 +26,8 @@ export function EducationSection({ isEditing }: EducationSectionProps) {
   useEffect(() => {
     const fetchEducation = async () => {
       try {
-        const data = await portfolioApi.get()
-        setEducation(data.education || [])
+        const data = await portfolioApi.getEducation()
+        setEducation(data || [])
       } catch (err) {
         console.error('Failed to fetch education:', err)
       }

@@ -47,6 +47,11 @@ class PortfolioApiService {
   // 💼 EXPERIENCES
   // ==========================================
 
+  async getExperiences(): Promise<Experience[]> {
+    const response = await this.request<{ experiences: Experience[] }>('/portfolio/experiences')
+    return response.experiences || []
+  }
+
   async addExperience(data: Omit<Experience, 'id'>): Promise<Experience> {
     const response = await this.request<{ experience: Experience }>('/portfolio/experiences', {
       method: 'POST',
@@ -72,6 +77,11 @@ class PortfolioApiService {
   // ==========================================
   // 🎓 EDUCATION
   // ==========================================
+
+  async getEducation(): Promise<Education[]> {
+    const response = await this.request<{ education: Education[] }>('/portfolio/education')
+    return response.education || []
+  }
 
   async addEducation(data: Omit<Education, 'id'>): Promise<Education> {
     const response = await this.request<{ education: Education }>('/portfolio/education', {
@@ -99,6 +109,11 @@ class PortfolioApiService {
   // 🛠️ SKILLS
   // ==========================================
 
+  async getSkills(): Promise<Skill[]> {
+    const response = await this.request<{ skills: Skill[] }>('/portfolio/skills')
+    return response.skills || []
+  }
+
   async addSkill(data: Omit<Skill, 'id'>): Promise<Skill> {
     const response = await this.request<{ skill: Skill }>('/portfolio/skills', {
       method: 'POST',
@@ -124,6 +139,11 @@ class PortfolioApiService {
   // ==========================================
   // 📋 REFERENCES
   // ==========================================
+
+  async getReferences(): Promise<Reference[]> {
+    const response = await this.request<{ references: Reference[] }>('/portfolio/references')
+    return response.references || []
+  }
 
   async addReference(data: Omit<Reference, 'id'>): Promise<Reference> {
     const response = await this.request<{ reference: Reference }>('/portfolio/references', {

@@ -26,8 +26,8 @@ export function ExperienceSection({ isEditing }: ExperienceSectionProps) {
   useEffect(() => {
     const fetchExperiences = async () => {
       try {
-        const data = await portfolioApi.get()
-        setExperiences(data.experiences || [])
+        const data = await portfolioApi.getExperiences()
+        setExperiences(data || [])
       } catch (err) {
         console.error('Failed to fetch experiences:', err)
       }
