@@ -103,14 +103,6 @@ export function Portfolio() {
     }
   }
 
-  const updateField = (field: string, value: string) => {
-    if (field === 'firstName' || field === 'lastName') {
-      setPortfolio({ ...portfolio, user: { ...portfolio.user, [field]: value } })
-    } else {
-      setPortfolio({ ...portfolio, [field]: value })
-    }
-  }
-
   const copyShareLink = () => {
     const link = portfolio.shareableLink || `${window.location.origin}/portfolio/${portfolio.username}`
     navigator.clipboard.writeText(link)
@@ -210,11 +202,7 @@ export function Portfolio() {
       {/* Main Content */}
       <div className="max-w-5xl mx-auto px-4 py-8">
         <PortfolioHeader
-          portfolio={portfolio}
           isEditing={isEditing}
-          onUpdateField={updateField}
-          onAvatarChange={(url: string) => setPortfolio({ ...portfolio, user: { ...portfolio.user, avatar: url } })}
-          onCoverChange={(url: string) => setPortfolio({ ...portfolio, coverImage: url })}
         />
 
         <AboutSection

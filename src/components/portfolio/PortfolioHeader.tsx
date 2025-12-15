@@ -22,25 +22,62 @@ interface PortfolioHeaderProps {
   isEditing: boolean
 }
 
-export function PortfolioHeader({
-  portfolio,
-  isEditing,
-  onUpdateField,
-  onAvatarChange,
-  onCoverChange
-}: PortfolioHeaderProps) {
+export function PortfolioHeader({ isEditing }: PortfolioHeaderProps) {
+  const [portfolio, setPortfolio] = useState<Portfolio | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
   const [isUploading, setIsUploading] = useState(false)
 
-  const { user, headline, location, website, linkedinUrl, coverImage } = portfolio
+  // Fetch portfolio on mount
+  useEffect(() => {
+    const fetchPortfolio = async () => {
+      try {
+        setIsLoading(true)
+        const data = await portfolioApi.get()
+        setPortfolio(data)
+      } catch (err) {
+        console.error('Failed to fetch portfolio:', err)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    fetchPortfolio()
+  }, [])
+
+  const updateField = (field: string, value: string) => {
+    if (!portfolio) return
+    
+    setPortfolio(prev => {
+      if (!prev) return prev
+      
+      // Handle nested user fields
+      if (field === 'firstName' || field === 'lastName' || field === 'email' || field === 'phone' || field === 'gender') {
+        return {
+          ...prev,
+          user: { ...prev.user, [field]: value }
+        }
+      }
+      
+      // Handle portfolio-level fields
+      return {
+        ...prev,
+        [field]: value
+      }
+    })
+  }
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (!file) return
+    if (!file || !portfolio) return
 
     setIsUploading(true)
     try {
       const url = await cloudinaryService.uploadImage(file, 'avatars')
-      onAvatarChange(url)
+      setPortfolio({
+        ...portfolio,
+        user: { ...portfolio.user, avatar: url }
+      })
+      // Save to backend
+      await portfolioApi.update({ avatar: url })
     } catch (err) {
       console.error('Failed to upload avatar:', err)
     } finally {
@@ -50,18 +87,33 @@ export function PortfolioHeader({
 
   const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (!file) return
+    if (!file || !portfolio) return
 
     setIsUploading(true)
     try {
       const url = await cloudinaryService.uploadImage(file, 'covers')
-      onCoverChange(url)
+      setPortfolio({
+        ...portfolio,
+        coverImage: url
+      })
+      // Save to backend
+      await portfolioApi.update({ coverImage: url })
     } catch (err) {
       console.error('Failed to upload cover:', err)
     } finally {
       setIsUploading(false)
     }
   }
+
+  if (isLoading || !portfolio) {
+    return (
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
+        <div className="h-32 bg-gray-200 rounded animate-pulse"></div>
+      </div>
+    )
+  }
+
+  const { user, headline, location, website, linkedinUrl, coverImage } = portfolio
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-6">
@@ -108,14 +160,14 @@ export function PortfolioHeader({
                 <input
                   type="text"
                   value={user.firstName || ''}
-                  onChange={(e) => onUpdateField('firstName', e.target.value)}
+                  onChange={(e) => updateField('firstName', e.target.value)}
                   className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                   placeholder="First Name"
                 />
                 <input
                   type="text"
                   value={user.lastName || ''}
-                  onChange={(e) => onUpdateField('lastName', e.target.value)}
+                  onChange={(e) => updateField('lastName', e.target.value)}
                   className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                   placeholder="Last Name"
                 />
@@ -123,7 +175,7 @@ export function PortfolioHeader({
               <input
                 type="text"
                 value={headline || ''}
-                onChange={(e) => onUpdateField('headline', e.target.value)}
+                onChange={(e) => updateField('headline', e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                 placeholder="Professional Headline"
               />
@@ -143,7 +195,7 @@ export function PortfolioHeader({
                 <input
                   type="text"
                   value={location || ''}
-                  onChange={(e) => onUpdateField('location', e.target.value)}
+                  onChange={(e) => updateField('location', e.target.value)}
                   className="px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none text-sm"
                   placeholder="Location"
                 />
@@ -174,7 +226,7 @@ export function PortfolioHeader({
                   <input
                     type="url"
                     value={website || ''}
-                    onChange={(e) => onUpdateField('website', e.target.value)}
+                    onChange={(e) => updateField('website', e.target.value)}
                     className="px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none text-sm"
                     placeholder="Website URL"
                   />
@@ -192,7 +244,7 @@ export function PortfolioHeader({
                   <input
                     type="url"
                     value={linkedinUrl || ''}
-                    onChange={(e) => onUpdateField('linkedinUrl', e.target.value)}
+                    onChange={(e) => updateField('linkedinUrl', e.target.value)}
                     className="px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none text-sm"
                     placeholder="LinkedIn URL"
                   />
