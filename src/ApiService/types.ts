@@ -148,14 +148,14 @@ export interface PortfolioUser {
   country: string | null
   city: string | null
   avatar: string | null
+  headline: string | null
+  summary: string | null
 }
 
 export interface Portfolio {
   id: string
   userId: string
   username: string
-  headline: string | null
-  summary: string | null
   location: string | null
   website: string | null
   linkedinUrl: string | null
@@ -165,7 +165,7 @@ export interface Portfolio {
   shareableLink: string | null
   createdAt: string
   updatedAt: string
-  user: PortfolioUser  // Nested user object from API
+  user: PortfolioUser  // Nested user object from API with headline and summary
   experiences: Experience[]
   education: Education[]
   skills: Skill[]

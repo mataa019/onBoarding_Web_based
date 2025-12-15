@@ -49,8 +49,8 @@ export function PortfolioHeader({ isEditing }: PortfolioHeaderProps) {
     setPortfolio(prev => {
       if (!prev) return prev
       
-      // Handle nested user fields
-      if (field === 'firstName' || field === 'lastName' || field === 'email' || field === 'phone' || field === 'gender') {
+      // All fields are nested in user object (firstName, lastName, email, phone, gender, headline, summary)
+      if (field === 'firstName' || field === 'lastName' || field === 'email' || field === 'phone' || field === 'gender' || field === 'headline' || field === 'summary') {
         return {
           ...prev,
           user: { ...prev.user, [field]: value }
@@ -72,8 +72,8 @@ export function PortfolioHeader({ isEditing }: PortfolioHeaderProps) {
     try {
       const updatePayload: Record<string, any> = {}
       
-      // Handle nested user fields
-      if (field === 'firstName' || field === 'lastName' || field === 'email' || field === 'phone' || field === 'gender') {
+      // All user fields go into the payload
+      if (field === 'firstName' || field === 'lastName' || field === 'email' || field === 'phone' || field === 'gender' || field === 'headline' || field === 'summary') {
         updatePayload[field] = value
       } else {
         // Handle portfolio-level fields
@@ -134,7 +134,7 @@ export function PortfolioHeader({ isEditing }: PortfolioHeaderProps) {
     )
   }
 
-  const { user, headline, location, website, linkedinUrl, coverImage } = portfolio
+  const { user, location, website, linkedinUrl, coverImage } = portfolio
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-6">
@@ -195,7 +195,7 @@ export function PortfolioHeader({ isEditing }: PortfolioHeaderProps) {
               </div>
               <input
                 type="text"
-                value={headline || ''}
+                value={user.headline || ''}
                 onChange={(e) => updateField('headline', e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                 placeholder="Professional Headline"
@@ -204,8 +204,8 @@ export function PortfolioHeader({ isEditing }: PortfolioHeaderProps) {
           ) : (
             <>
               <h2 className="text-2xl font-semibold text-gray-900">{user.firstName} {user.lastName}</h2>
-              <p className="text-gray-600 mt-1">{headline || 'No headline set'}</p>
-            </>
+              <p className="text-gray-600 mt-1">{user.headline || 'No headline set'}</p>
+            <>
           )}
 
           {/* Contact Info */}

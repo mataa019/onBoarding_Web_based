@@ -24,8 +24,6 @@ const defaultPortfolio: PortfolioType = {
   id: '',
   userId: '',
   username: '',
-  headline: '',
-  summary: '',
   location: '',
   website: '',
   linkedinUrl: '',
@@ -44,7 +42,9 @@ const defaultPortfolio: PortfolioType = {
     dateOfBirth: null,
     country: null,
     city: null,
-    avatar: null
+    avatar: null,
+    headline: null,
+    summary: null
   },
   experiences: [],
   education: [],
