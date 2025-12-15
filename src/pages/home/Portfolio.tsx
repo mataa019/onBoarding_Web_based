@@ -206,9 +206,7 @@ export function Portfolio() {
         />
 
         <AboutSection
-          summary={portfolio.summary || ''}
           isEditing={isEditing}
-          onUpdate={(value) => setPortfolio({ ...portfolio, summary: value })}
         />
 
         <ExperienceSection
