@@ -205,7 +205,7 @@ export function PortfolioHeader({ isEditing }: PortfolioHeaderProps) {
             <>
               <h2 className="text-2xl font-semibold text-gray-900">{user.firstName} {user.lastName}</h2>
               <p className="text-gray-600 mt-1">{user.headline || 'No headline set'}</p>
-            <>
+            </>
           )}
 
           {/* Contact Info */}

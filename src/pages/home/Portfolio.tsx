@@ -87,8 +87,8 @@ export function Portfolio() {
       await portfolioApi.update({
         firstName: portfolio.user.firstName,
         lastName: portfolio.user.lastName,
-        headline: portfolio.headline,
-        summary: portfolio.summary,
+        headline: portfolio.user.headline,
+        summary: portfolio.user.summary,
         location: portfolio.location,
         website: portfolio.website,
         linkedinUrl: portfolio.linkedinUrl,
