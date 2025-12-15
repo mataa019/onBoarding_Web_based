@@ -20,8 +20,8 @@ export function SkillsSection({ isEditing }: SkillsSectionProps) {
   useEffect(() => {
     const loadSkills = async () => {
       try {
-        const portfolio = await portfolioApi.get()
-        setSkills(portfolio.skills || [])
+        const skills = await portfolioApi.getSkills()
+        setSkills(skills || [])
       } catch (err) {
         console.error('Failed to load skills:', err)
       }

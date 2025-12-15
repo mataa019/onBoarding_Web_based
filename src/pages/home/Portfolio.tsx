@@ -70,8 +70,16 @@ export function Portfolio() {
     try {
       setIsLoading(true)
       setError('')
-      const data = await portfolioApi.get()
-      setPortfolio(data)
+      // Get username from URL or use a default/current user
+      const username = new URLSearchParams(window.location.search).get('username') || ''
+      if (!username) {
+        // Fallback to fetching current user's portfolio
+        const data = await portfolioApi.get()
+        setPortfolio(data)
+      } else {
+        const data = await portfolioApi.getByUsername(username)
+        setPortfolio(data)
+      }
     } catch (err) {
       // If loading fails, keep the default empty portfolio so user can still see/edit the layout
       console.error('Failed to load portfolio:', err)
@@ -203,26 +211,32 @@ export function Portfolio() {
       <div className="max-w-5xl mx-auto px-4 py-8">
         <PortfolioHeader
           isEditing={isEditing}
+          username={portfolio.username}
         />
 
         <AboutSection
           isEditing={isEditing}
+          username={portfolio.username}
         />
 
         <ExperienceSection
           isEditing={isEditing}
+          username={portfolio.username}
         />
 
         <EducationSection
           isEditing={isEditing}
+          username={portfolio.username}
         />
 
         <SkillsSection
           isEditing={isEditing}
+          username={portfolio.username}
         />
 
         <ReferencesSection
           isEditing={isEditing}
+          username={portfolio.username}
         />
 
         {/* Projects Link */}

@@ -25,8 +25,8 @@ export function ReferencesSection({ isEditing }: ReferencesSectionProps) {
   useEffect(() => {
     const loadReferences = async () => {
       try {
-        const portfolio = await portfolioApi.get()
-        setReferences(portfolio.references || [])
+        const references = await portfolioApi.getReferences()
+        setReferences(references || [])
       } catch (err) {
         console.error('Failed to load references:', err)
       }
