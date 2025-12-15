@@ -79,7 +79,7 @@ export function ExperienceSection({ isEditing }: ExperienceSectionProps) {
       title: exp.title,
       company: exp.company,
       location: exp.location || '',
-      startDate: exp.startDate,
+      startDate: exp.startDate || '',
       endDate: exp.endDate || '',
       current: exp.current ? 'true' : 'false',
       description: exp.description || ''

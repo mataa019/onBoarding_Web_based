@@ -98,11 +98,11 @@ export interface Experience {
   id: string
   title: string
   company: string
-  location: string
-  startDate: string
+  location: string | null
+  startDate: string | null
   endDate: string | null
   current: boolean
-  description: string
+  description: string | null
 }
 
 export interface Education {

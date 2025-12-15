@@ -11,7 +11,6 @@ export function EducationSection({ isEditing }: EducationSectionProps) {
   const [education, setEducation] = useState<Education[]>([])
   const [showForm, setShowForm] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [isFetching, setIsFetching] = useState(true)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [form, setForm] = useState({
     school: '',
@@ -27,13 +26,10 @@ export function EducationSection({ isEditing }: EducationSectionProps) {
   useEffect(() => {
     const fetchEducation = async () => {
       try {
-        setIsFetching(true)
         const data = await portfolioApi.get()
         setEducation(data.education || [])
       } catch (err) {
         console.error('Failed to fetch education:', err)
-      } finally {
-        setIsFetching(false)
       }
     }
     fetchEducation()
@@ -46,20 +42,20 @@ export function EducationSection({ isEditing }: EducationSectionProps) {
       const payload = {
         school: form.school,
         degree: form.degree,
-        field: form.field || null,
-        startYear: form.startYear ? parseInt(form.startYear) : null,
-        endYear: form.current === 'true' ? null : (form.endYear ? parseInt(form.endYear) : null),
+        field: form.field || undefined,
+        startYear: form.startYear ? parseInt(form.startYear) : undefined,
+        endYear: form.current === 'true' ? undefined : (form.endYear ? parseInt(form.endYear) : undefined),
         current: form.current === 'true',
-        description: form.description || null,
+        description: form.description || undefined,
         order: education.length
       }
 
       if (editingId) {
-        const updated = await portfolioApi.updateEducation(editingId, payload)
+        const updated = await portfolioApi.updateEducation(editingId, payload as Partial<Education>)
         setEducation(education.map(e => e.id === editingId ? updated : e))
         setEditingId(null)
       } else {
-        const newEdu = await portfolioApi.addEducation(payload)
+        const newEdu = await portfolioApi.addEducation(payload as Omit<Education, 'id'>)
         setEducation([...education, newEdu])
       }
       
