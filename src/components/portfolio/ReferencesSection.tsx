@@ -27,7 +27,7 @@ export function ReferencesSection({ isEditing, username }: ReferencesSectionProp
     const loadReferences = async () => {
       try {
         const data = await portfolioApi.getByUsername(username)
-        setReferences(data.references || [])
+        setReferences(data?.references || [])
       } catch (err) {
         console.error('Failed to load references:', err)
       }
