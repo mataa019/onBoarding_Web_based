@@ -8,7 +8,7 @@ import {
   UserIcon
 } from '@heroicons/react/24/outline'
 import { cloudinaryService } from '../../utils/cloudinary'
-import { usePortfolio, useUpdatePortfolio } from '../../hooks/usePortfolioQueries'
+import type { Portfolio } from '../../ApiService/types'
 
 // LinkedIn icon
 const LinkedInIcon = ({ className }: { className?: string }) => (
@@ -19,29 +19,26 @@ const LinkedInIcon = ({ className }: { className?: string }) => (
 
 interface PortfolioHeaderProps {
   isEditing: boolean
-  username?: string
+  portfolio?: Portfolio | null
+  onUpdate?: (data: Partial<Record<string, any>>) => Promise<void> | void
 }
 
-export function PortfolioHeader({ isEditing, username }: PortfolioHeaderProps) {
-  const { data: portfolio, isLoading } = usePortfolio(username)
-  const updateMutation = useUpdatePortfolio()
+export function PortfolioHeader({ isEditing, portfolio, onUpdate }: PortfolioHeaderProps) {
   const [isUploading, setIsUploading] = useState(false)
 
   const updateField = (field: string, value: string) => {
-    if (!portfolio) return
-    // Simple save via mutation (query invalidation will refresh the header)
-    updateMutation.mutate({ [field]: value })
+    if (!portfolio || !onUpdate) return
+    onUpdate({ [field]: value })
   }
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (!file || !portfolio) return
+    if (!file || !portfolio || !onUpdate) return
 
     setIsUploading(true)
     try {
       const url = await cloudinaryService.uploadImage(file, 'avatars')
-      // Save to backend via mutation (query will refresh)
-      await updateMutation.mutateAsync({ avatar: url })
+      await onUpdate({ avatar: url })
     } catch (err) {
       console.error('Failed to upload avatar:', err)
     } finally {
@@ -51,13 +48,12 @@ export function PortfolioHeader({ isEditing, username }: PortfolioHeaderProps) {
 
   const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (!file || !portfolio) return
+    if (!file || !portfolio || !onUpdate) return
 
     setIsUploading(true)
     try {
       const url = await cloudinaryService.uploadImage(file, 'covers')
-      // Save to backend via mutation (query will refresh)
-      await updateMutation.mutateAsync({ coverImage: url })
+      await onUpdate({ coverImage: url })
     } catch (err) {
       console.error('Failed to upload cover:', err)
     } finally {
@@ -65,7 +61,7 @@ export function PortfolioHeader({ isEditing, username }: PortfolioHeaderProps) {
     }
   }
 
-  if (isLoading || !portfolio) {
+  if (!portfolio) {
     return (
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
         <div className="h-32 bg-gray-200 rounded animate-pulse"></div>

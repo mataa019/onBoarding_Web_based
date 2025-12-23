@@ -186,6 +186,12 @@ export function Portfolio() {
     setPortfolio((prev) => ({ ...prev, references: (prev.references || []).filter(r => r.id !== id) }))
   }
 
+  const updateProfile = async (data: Partial<any>) => {
+    const updated = await portfolioApi.update(data)
+    setPortfolio((prev) => ({ ...prev, ...updated, user: { ...(prev.user || {}), ...(updated.user || {}) } }))
+    return updated
+  }
+
   const copyShareLink = () => {
     const link = portfolio.shareableLink || `${window.location.origin}/portfolio/${portfolio.username}`
     navigator.clipboard.writeText(link)
@@ -286,12 +292,14 @@ export function Portfolio() {
       <div className="max-w-5xl mx-auto px-4 py-8">
         <PortfolioHeader
           isEditing={isEditing}
-          username={portfolio.username || undefined}
+          portfolio={portfolio}
+          onUpdate={updateProfile}
         />
 
         <AboutSection
-          username={portfolio.username || undefined}
+          summary={portfolio.user?.summary || ''}
           isEditing={isEditing}
+          onUpdate={(value: string) => updateProfile({ summary: value })}
         />
 
         <ExperienceSection
