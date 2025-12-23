@@ -7,9 +7,10 @@ type SkillLevel = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'EXPERT'
 
 interface SkillsSectionProps {
   isEditing: boolean
+  username: string
 }
 
-export function SkillsSection({ isEditing }: SkillsSectionProps) {
+export function SkillsSection({ isEditing, username }: SkillsSectionProps) {
   const [skills, setSkills] = useState<Skill[]>([])
   const [showForm, setShowForm] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -20,14 +21,16 @@ export function SkillsSection({ isEditing }: SkillsSectionProps) {
   useEffect(() => {
     const loadSkills = async () => {
       try {
-        const skills = await portfolioApi.getSkills()
-        setSkills(skills || [])
+        const data = await portfolioApi.getByUsername(username)
+        setSkills(data.skills || [])
       } catch (err) {
         console.error('Failed to load skills:', err)
       }
     }
-    loadSkills()
-  }, [])
+    if (username) {
+      loadSkills()
+    }
+  }, [username])
 
   const resetForm = () => {
     setForm({ name: '', level: 'INTERMEDIATE' })

@@ -4,23 +4,26 @@ import { portfolioApi } from '../../ApiService/portfolioApi'
 
 interface AboutSectionProps {
   isEditing: boolean
+  username: string
 }
 
-export function AboutSection({ isEditing }: AboutSectionProps) {
+export function AboutSection({ isEditing, username }: AboutSectionProps) {
   const [summary, setSummary] = useState('')
 
   // Fetch portfolio summary on mount
   useEffect(() => {
     const fetchSummary = async () => {
       try {
-        const data = await portfolioApi.get()
+        const data = await portfolioApi.getByUsername(username)
         setSummary(data.user.summary || '')
       } catch (err) {
         console.error('Failed to fetch summary:', err)
       }
     }
-    fetchSummary()
-  }, [])
+    if (username) {
+      fetchSummary()
+    }
+  }, [username])
 
   const handleUpdate = async (value: string) => {
     setSummary(value)

@@ -5,9 +5,10 @@ import type { Education } from '../../ApiService/types'
 
 interface EducationSectionProps {
   isEditing: boolean
+  username: string
 }
 
-export function EducationSection({ isEditing }: EducationSectionProps) {
+export function EducationSection({ isEditing, username }: EducationSectionProps) {
   const [education, setEducation] = useState<Education[]>([])
   const [showForm, setShowForm] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -26,14 +27,16 @@ export function EducationSection({ isEditing }: EducationSectionProps) {
   useEffect(() => {
     const fetchEducation = async () => {
       try {
-        const data = await portfolioApi.getEducation()
-        setEducation(data || [])
+        const data = await portfolioApi.getByUsername(username)
+        setEducation(data.education || [])
       } catch (err) {
         console.error('Failed to fetch education:', err)
       }
     }
-    fetchEducation()
-  }, [])
+    if (username) {
+      fetchEducation()
+    }
+  }, [username])
 
   const handleAdd = async () => {
     if (!form.school || !form.degree) return

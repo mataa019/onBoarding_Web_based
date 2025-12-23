@@ -5,9 +5,10 @@ import type { Experience } from '../../ApiService/types'
 
 interface ExperienceSectionProps {
   isEditing: boolean
+  username: string
 }
 
-export function ExperienceSection({ isEditing }: ExperienceSectionProps) {
+export function ExperienceSection({ isEditing, username }: ExperienceSectionProps) {
   const [experiences, setExperiences] = useState<Experience[]>([])
   const [showForm, setShowForm] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -26,14 +27,16 @@ export function ExperienceSection({ isEditing }: ExperienceSectionProps) {
   useEffect(() => {
     const fetchExperiences = async () => {
       try {
-        const data = await portfolioApi.getExperiences()
-        setExperiences(data || [])
+        const data = await portfolioApi.getByUsername(username)
+        setExperiences(data.experiences || [])
       } catch (err) {
         console.error('Failed to fetch experiences:', err)
       }
     }
-    fetchExperiences()
-  }, [])
+    if (username) {
+      fetchExperiences()
+    }
+  }, [username])
 
   const formatDate = (dateStr: string | null) => {
     if (!dateStr) return 'Present'

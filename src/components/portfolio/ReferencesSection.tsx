@@ -5,9 +5,10 @@ import type { Reference } from '../../ApiService/types'
 
 interface ReferencesSectionProps {
   isEditing: boolean
+  username: string
 }
 
-export function ReferencesSection({ isEditing }: ReferencesSectionProps) {
+export function ReferencesSection({ isEditing, username }: ReferencesSectionProps) {
   const [references, setReferences] = useState<Reference[]>([])
   const [showForm, setShowForm] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -25,14 +26,16 @@ export function ReferencesSection({ isEditing }: ReferencesSectionProps) {
   useEffect(() => {
     const loadReferences = async () => {
       try {
-        const references = await portfolioApi.getReferences()
-        setReferences(references || [])
+        const data = await portfolioApi.getByUsername(username)
+        setReferences(data.references || [])
       } catch (err) {
         console.error('Failed to load references:', err)
       }
     }
-    loadReferences()
-  }, [])
+    if (username) {
+      loadReferences()
+    }
+  }, [username])
 
   const resetForm = () => {
     setForm({ name: '', position: '', company: '', email: '', phone: '', relationship: '' })
