@@ -23,21 +23,6 @@ export function ReferencesSection({ references: initialReferences, isEditing, us
     relationship: ''
   })
 
-  // Load references from portfolio API
-  useEffect(() => {
-    const loadReferences = async () => {z
-      try {
-        const data = await portfolioApi.getByUsername(username)
-        setReferences(data.references || [])
-      } catch (err) {
-        console.error('Failed to load references:', err)
-      }
-    }
-    if (username) {
-      loadReferences()
-    }
-  })
-
   const resetForm = () => {
     setForm({ name: '', position: '', company: '', email: '', phone: '', relationship: '' })
     setShowForm(false)
