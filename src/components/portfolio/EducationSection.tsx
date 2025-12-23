@@ -2,15 +2,15 @@ import { useState, useEffect } from 'react'
 import { AcademicCapIcon, PlusIcon, TrashIcon, XMarkIcon, PencilIcon } from '@heroicons/react/24/outline'
 import type { Education } from '../../ApiService/types'
 
+import { portfolioApi } from '../../ApiService/portfolioApi'
+
 interface EducationSectionProps {
   education: Education[]
   isEditing: boolean
-  onAdd: (data: Omit<Education, 'id'>) => Promise<Education>
-  onUpdate: (id: string, data: Partial<Education>) => Promise<Education>
-  onDelete: (id: string) => Promise<void>
+  onRefresh?: () => Promise<void> | void
 }
 
-export function EducationSection({ education: initialEducation, isEditing, onAdd, onUpdate, onDelete }: EducationSectionProps) {
+export function EducationSection({ education: initialEducation, isEditing, onRefresh }: EducationSectionProps) {
   const [education, setEducation] = useState<Education[]>(initialEducation || [])
   useEffect(() => setEducation(initialEducation || []), [initialEducation])
 
@@ -43,14 +43,15 @@ export function EducationSection({ education: initialEducation, isEditing, onAdd
       }
 
       if (editingId) {
-        const updated = await onUpdate(editingId, payload as Partial<Education>)
+        const updated = await portfolioApi.updateEducation(editingId, payload as Partial<Education>)
         setEducation(education.map(e => e.id === editingId ? updated : e))
         setEditingId(null)
       } else {
-        const newEdu = await onAdd(payload as Omit<Education, 'id'>)
+        const newEdu = await portfolioApi.addEducation(payload as Omit<Education, 'id'>)
         setEducation([...education, newEdu])
       }
-      
+
+      if (onRefresh) await onRefresh()
       setForm({ school: '', degree: '', field: '', startYear: '', endYear: '', current: 'false', description: '' })
       setShowForm(false)
     } catch (err) {
@@ -62,8 +63,9 @@ export function EducationSection({ education: initialEducation, isEditing, onAdd
 
   const handleRemove = async (id: string) => {
     try {
-      await onDelete(id)
+      await portfolioApi.deleteEducation(id)
       setEducation(education.filter(e => e.id !== id))
+      if (onRefresh) await onRefresh()
     } catch (err) {
       console.error('Failed to remove education:', err)
     }

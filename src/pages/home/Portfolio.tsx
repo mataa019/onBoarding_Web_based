@@ -117,8 +117,6 @@ export function Portfolio() {
     }
   }
 
-  // (moved CRUD logic into individual section components)
-
   // Refresh loader for sections to call after they mutate
   const refreshPortfolio = async () => {
     await loadPortfolio()
@@ -242,33 +240,25 @@ export function Portfolio() {
         <ExperienceSection
           experiences={portfolio.experiences || []}
           isEditing={isEditing}
-          onAdd={addExperience}
-          onUpdate={updateExperience}
-          onDelete={deleteExperience}
+          onRefresh={refreshPortfolio}
         />
 
         <EducationSection
           education={portfolio.education || []}
           isEditing={isEditing}
-          onAdd={addEducation}
-          onUpdate={updateEducation}
-          onDelete={deleteEducation}
+          onRefresh={refreshPortfolio}
         />
 
         <SkillsSection
           skills={portfolio.skills || []}
           isEditing={isEditing}
-          onAdd={addSkill}
-          onUpdate={updateSkill}
-          onDelete={deleteSkill}
+          onRefresh={refreshPortfolio}
         />
 
         <ReferencesSection
           references={portfolio.references || []}
           isEditing={isEditing}
-          onAdd={addReference}
-          onUpdate={updateReference}
-          onDelete={deleteReference}
+          onRefresh={refreshPortfolio}
         />
 
         {/* Projects Link */}

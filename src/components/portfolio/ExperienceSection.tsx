@@ -2,15 +2,15 @@ import { useState, useEffect } from 'react'
 import { BriefcaseIcon, PlusIcon, TrashIcon, XMarkIcon, PencilIcon } from '@heroicons/react/24/outline'
 import type { Experience } from '../../ApiService/types'
 
+import { portfolioApi } from '../../ApiService/portfolioApi'
+
 interface ExperienceSectionProps {
   experiences: Experience[]
   isEditing: boolean
-  onAdd: (data: Omit<Experience, 'id'>) => Promise<Experience>
-  onUpdate: (id: string, data: Partial<Experience>) => Promise<Experience>
-  onDelete: (id: string) => Promise<void>
+  onRefresh?: () => Promise<void> | void
 }
 
-export function ExperienceSection({ experiences: initialExperiences, isEditing, onAdd, onUpdate, onDelete }: ExperienceSectionProps) {
+export function ExperienceSection({ experiences: initialExperiences, isEditing, onRefresh }: ExperienceSectionProps) {
   const [experiences, setExperiences] = useState<Experience[]>(initialExperiences || [])
   useEffect(() => setExperiences(initialExperiences || []), [initialExperiences])
 
@@ -56,13 +56,16 @@ export function ExperienceSection({ experiences: initialExperiences, isEditing, 
       }
 
       if (editingId) {
-        const updated = await onUpdate(editingId, payload)
+        const updated = await portfolioApi.updateExperience(editingId, payload)
         setExperiences(experiences.map(e => e.id === editingId ? updated : e))
         setEditingId(null)
       } else {
-        const newExp = await onAdd(payload as Omit<Experience, 'id'>)
+        const newExp = await portfolioApi.addExperience(payload as Omit<Experience, 'id'>)
         setExperiences([...experiences, newExp])
       }
+
+      // Optionally refresh the parent
+      if (onRefresh) await onRefresh()
 
       setForm({ title: '', company: '', location: '', startDate: '', endDate: '', current: 'false', description: '' })
       setShowForm(false)
@@ -89,8 +92,9 @@ export function ExperienceSection({ experiences: initialExperiences, isEditing, 
 
   const handleRemove = async (id: string) => {
     try {
-      await onDelete(id)
+      await portfolioApi.deleteExperience(id)
       setExperiences(experiences.filter(e => e.id !== id))
+      if (onRefresh) await onRefresh()
     } catch (err) {
       console.error('Failed to remove experience:', err)
     }
