@@ -27,9 +27,17 @@ export function ExperienceSection({ username, isEditing }: ExperienceSectionProp
     description: ''
   })
 
-  const formatDate = (dateStr: string | null) => {
+  // Show loading or error states for the list
+  const listLoading = isLoadingList
+  const listError = error
+
+  const formatDate = (dateStr: string | null | undefined) => {
     if (!dateStr) return 'Present'
-    return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+    try {
+      return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+    } catch (e) {
+      return String(dateStr)
+    }
   }
 
   const handleAdd = async () => {
@@ -39,11 +47,12 @@ export function ExperienceSection({ username, isEditing }: ExperienceSectionProp
       const payload = {
         title: form.title,
         company: form.company,
-        location: form.location || undefined,
-        startDate: form.startDate,
-        endDate: form.current === 'true' ? undefined : form.endDate,
+        // API expects string | null for optional fields, use null instead of undefined
+        location: form.location || null,
+        startDate: form.startDate || null,
+        endDate: form.current === 'true' ? null : (form.endDate || null),
         current: form.current === 'true',
-        description: form.description || undefined,
+        description: form.description || null,
         order: experiences.length
       }
 
@@ -136,7 +145,11 @@ export function ExperienceSection({ username, isEditing }: ExperienceSectionProp
 
       {/* Experience List */}
       <div className="space-y-6">
-        {experiences.length === 0 ? (
+        {listLoading ? (
+          <p className="text-gray-500 text-center py-4">Loading experiences…</p>
+        ) : listError ? (
+          <p className="text-red-600 text-center py-4">Failed to load experiences.</p>
+        ) : experiences.length === 0 ? (
           <p className="text-gray-500 text-center py-4">No experience added yet.</p>
         ) : (
           experiences.map((exp, index) => (
