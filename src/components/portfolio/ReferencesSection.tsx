@@ -1,18 +1,18 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { UserGroupIcon, PlusIcon, TrashIcon, XMarkIcon, PencilIcon } from '@heroicons/react/24/outline'
 import type { Reference } from '../../ApiService/types'
-import { useReferences, useAddReference, useUpdateReference, useDeleteReference } from '../../hooks/usePortfolioQueries'
 
 interface ReferencesSectionProps {
-  username?: string
+  references: Reference[]
   isEditing: boolean
+  onAdd: (data: Omit<Reference, 'id'>) => Promise<Reference>
+  onUpdate: (id: string, data: Partial<Reference>) => Promise<Reference>
+  onDelete: (id: string) => Promise<void>
 }
 
-export function ReferencesSection({ username, isEditing }: ReferencesSectionProps) {
-  const { data: references = [], isLoading: listLoading, error: listError } = useReferences(username)
-  const addMutation = useAddReference()
-  const updateMutation = useUpdateReference()
-  const deleteMutation = useDeleteReference()
+export function ReferencesSection({ references: initialReferences, isEditing, onAdd, onUpdate, onDelete }: ReferencesSectionProps) {
+  const [references, setReferences] = useState<Reference[]>(initialReferences || [])
+  useEffect(() => setReferences(initialReferences || []), [initialReferences])
 
   const [showForm, setShowForm] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -33,17 +33,18 @@ export function ReferencesSection({ username, isEditing }: ReferencesSectionProp
   }
 
   const handleAdd = async () => {
-    if (!form.name || !form.company) return
+    if (!form.name || !form.company || !onAdd) return
     setIsLoading(true)
     try {
-      await addMutation.mutateAsync({
+      const newRef = await onAdd({
         name: form.name,
-        position: form.position,
+        position: form.position || null,
         company: form.company,
-        email: form.email,
-        phone: form.phone,
-        relationship: form.relationship
+        email: form.email || null,
+        phone: form.phone || null,
+        relationship: form.relationship || null
       })
+      setReferences(prev => [newRef, ...prev])
       resetForm()
     } catch (err) {
       console.error('Failed to add reference:', err)
@@ -53,17 +54,18 @@ export function ReferencesSection({ username, isEditing }: ReferencesSectionProp
   }
 
   const handleUpdate = async () => {
-    if (!editingId || !form.name || !form.company) return
+    if (!editingId || !form.name || !form.company || !onUpdate) return
     setIsLoading(true)
     try {
-      await updateMutation.mutateAsync({ id: editingId, data: {
+      const updated = await onUpdate(editingId, {
         name: form.name,
-        position: form.position,
+        position: form.position || null,
         company: form.company,
-        email: form.email,
-        phone: form.phone,
-        relationship: form.relationship
-      }})
+        email: form.email || null,
+        phone: form.phone || null,
+        relationship: form.relationship || null
+      })
+      setReferences(prev => prev.map(r => r.id === editingId ? updated : r))
       resetForm()
     } catch (err) {
       console.error('Failed to update reference:', err)
@@ -74,7 +76,9 @@ export function ReferencesSection({ username, isEditing }: ReferencesSectionProp
 
   const handleRemove = async (id: string) => {
     try {
-      await deleteMutation.mutateAsync(id)
+      if (!onDelete) return
+      await onDelete(id)
+      setReferences(prev => prev.filter(r => r.id !== id))
     } catch (err) {
       console.error('Failed to remove reference:', err)
     }
@@ -137,11 +141,7 @@ export function ReferencesSection({ username, isEditing }: ReferencesSectionProp
 
       {/* References List */}
       <div className="space-y-4">
-        {listLoading ? (
-          <p className="text-gray-500 text-center py-4">Loading references…</p>
-        ) : listError ? (
-          <p className="text-red-600 text-center py-4">Failed to load references.</p>
-        ) : references.length === 0 ? (
+        {references.length === 0 ? (
           <p className="text-gray-500 text-center py-4">No references added yet.</p>
         ) : (
           references.map(ref => (

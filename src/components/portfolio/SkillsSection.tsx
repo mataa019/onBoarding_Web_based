@@ -1,20 +1,20 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { SparklesIcon, PlusIcon, XMarkIcon, PencilIcon } from '@heroicons/react/24/outline'
 import type { Skill } from '../../ApiService/types'
-import { useSkills, useAddSkill, useUpdateSkill, useDeleteSkill } from '../../hooks/usePortfolioQueries'
 
 type SkillLevel = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'EXPERT'
 
 interface SkillsSectionProps {
-  username?: string
+  skills: Skill[]
   isEditing: boolean
+  onAdd: (data: Omit<Skill, 'id'>) => Promise<Skill>
+  onUpdate: (id: string, data: Partial<Skill>) => Promise<Skill>
+  onDelete: (id: string) => Promise<void>
 }
 
-export function SkillsSection({ username, isEditing }: SkillsSectionProps) {
-  const { data: skills = [], isLoading: listLoading, error: listError } = useSkills(username)
-  const addMutation = useAddSkill()
-  const updateMutation = useUpdateSkill()
-  const deleteMutation = useDeleteSkill()
+export function SkillsSection({ skills: initialSkills, isEditing, onAdd, onUpdate, onDelete }: SkillsSectionProps) {
+  const [skills, setSkills] = useState<Skill[]>(initialSkills || [])
+  useEffect(() => setSkills(initialSkills || []), [initialSkills])
 
   const [showForm, setShowForm] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -32,7 +32,8 @@ export function SkillsSection({ username, isEditing }: SkillsSectionProps) {
     if (!form.name.trim()) return
     setIsLoading(true)
     try {
-      await addMutation.mutateAsync({ name: form.name.trim(), level: form.level })
+      const newSkill = await onAdd({ name: form.name.trim(), level: form.level })
+      setSkills([...skills, newSkill])
       resetForm()
     } catch (err) {
       console.error('Failed to add skill:', err)
@@ -45,7 +46,8 @@ export function SkillsSection({ username, isEditing }: SkillsSectionProps) {
     if (!editingId || !form.name.trim()) return
     setIsLoading(true)
     try {
-      await updateMutation.mutateAsync({ id: editingId, data: { name: form.name.trim(), level: form.level } })
+      const updated = await onUpdate(editingId, { name: form.name.trim(), level: form.level })
+      setSkills(skills.map(s => s.id === editingId ? updated : s))
       resetForm()
     } catch (err) {
       console.error('Failed to update skill:', err)
@@ -56,7 +58,8 @@ export function SkillsSection({ username, isEditing }: SkillsSectionProps) {
 
   const handleRemove = async (id: string) => {
     try {
-      await deleteMutation.mutateAsync(id)
+      await onDelete(id)
+      setSkills(skills.filter(s => s.id !== id))
     } catch (err) {
       console.error('Failed to remove skill:', err)
     }
@@ -120,11 +123,7 @@ export function SkillsSection({ username, isEditing }: SkillsSectionProps) {
 
       {/* Skills by Level */}
       <div className="space-y-4">
-        {listLoading ? (
-          <p className="text-gray-500 text-center py-4">Loading skills…</p>
-        ) : listError ? (
-          <p className="text-red-600 text-center py-4">Failed to load skills.</p>
-        ) : Object.keys(skillsByLevel).length === 0 ? (
+        {Object.keys(skillsByLevel).length === 0 ? (
           <p className="text-gray-500 text-center py-4">No skills added yet.</p>
         ) : (
           Object.entries(skillsByLevel).map(([level, levelSkills]) => (

@@ -1,18 +1,18 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { AcademicCapIcon, PlusIcon, TrashIcon, XMarkIcon, PencilIcon } from '@heroicons/react/24/outline'
 import type { Education } from '../../ApiService/types'
-import { useEducation, useAddEducation, useUpdateEducation, useDeleteEducation } from '../../hooks/usePortfolioQueries'
 
 interface EducationSectionProps {
-  username?: string
+  education: Education[]
   isEditing: boolean
+  onAdd: (data: Omit<Education, 'id'>) => Promise<Education>
+  onUpdate: (id: string, data: Partial<Education>) => Promise<Education>
+  onDelete: (id: string) => Promise<void>
 }
 
-export function EducationSection({ username, isEditing }: EducationSectionProps) {
-  const { data: education = [], isLoading: listLoading, error: listError } = useEducation(username)
-  const addMutation = useAddEducation()
-  const updateMutation = useUpdateEducation()
-  const deleteMutation = useDeleteEducation()
+export function EducationSection({ education: initialEducation, isEditing, onAdd, onUpdate, onDelete }: EducationSectionProps) {
+  const [education, setEducation] = useState<Education[]>(initialEducation || [])
+  useEffect(() => setEducation(initialEducation || []), [initialEducation])
 
   const [showForm, setShowForm] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -43,10 +43,12 @@ export function EducationSection({ username, isEditing }: EducationSectionProps)
       }
 
       if (editingId) {
-        await updateMutation.mutateAsync({ id: editingId, data: payload as Partial<Education> })
+        const updated = await onUpdate(editingId, payload as Partial<Education>)
+        setEducation(education.map(e => e.id === editingId ? updated : e))
         setEditingId(null)
       } else {
-        await addMutation.mutateAsync(payload as Omit<Education, 'id'>)
+        const newEdu = await onAdd(payload as Omit<Education, 'id'>)
+        setEducation([...education, newEdu])
       }
       
       setForm({ school: '', degree: '', field: '', startYear: '', endYear: '', current: 'false', description: '' })
@@ -60,7 +62,8 @@ export function EducationSection({ username, isEditing }: EducationSectionProps)
 
   const handleRemove = async (id: string) => {
     try {
-      await deleteMutation.mutateAsync(id)
+      await onDelete(id)
+      setEducation(education.filter(e => e.id !== id))
     } catch (err) {
       console.error('Failed to remove education:', err)
     }
@@ -131,11 +134,7 @@ export function EducationSection({ username, isEditing }: EducationSectionProps)
 
       {/* Education List */}
       <div className="space-y-6">
-        {listLoading ? (
-          <p className="text-gray-500 text-center py-4">Loading education…</p>
-        ) : listError ? (
-          <p className="text-red-600 text-center py-4">Failed to load education.</p>
-        ) : education.length === 0 ? (
+        {education.length === 0 ? (
           <p className="text-gray-500 text-center py-4">No education added yet.</p>
         ) : (
           education.map((edu, index) => (
