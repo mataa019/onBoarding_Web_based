@@ -45,6 +45,27 @@ export function useEducation(username?: string) {
   })
 }
 
+export function useAddEducation() {
+  const qc = useQueryClient()
+  return useMutation((data: Omit<Education, 'id'>) => portfolioApi.addEducation(data), {
+    onSuccess: () => qc.invalidateQueries(['education'])
+  })
+}
+
+export function useUpdateEducation() {
+  const qc = useQueryClient()
+  return useMutation(({ id, data }: { id: string; data: Partial<Education> }) => portfolioApi.updateEducation(id, data), {
+    onSuccess: () => qc.invalidateQueries(['education'])
+  })
+}
+
+export function useDeleteEducation() {
+  const qc = useQueryClient()
+  return useMutation((id: string) => portfolioApi.deleteEducation(id), {
+    onSuccess: () => qc.invalidateQueries(['education'])
+  })
+}
+
 export function useSkills(username?: string) {
   return useQuery<Skill[], Error>(['skills', username || 'me'], async () => {
     if (username) {
@@ -55,6 +76,27 @@ export function useSkills(username?: string) {
   })
 }
 
+export function useAddSkill() {
+  const qc = useQueryClient()
+  return useMutation((data: Omit<Skill, 'id'>) => portfolioApi.addSkill(data), {
+    onSuccess: () => qc.invalidateQueries(['skills'])
+  })
+}
+
+export function useUpdateSkill() {
+  const qc = useQueryClient()
+  return useMutation(({ id, data }: { id: string; data: Partial<Skill> }) => portfolioApi.updateSkill(id, data), {
+    onSuccess: () => qc.invalidateQueries(['skills'])
+  })
+}
+
+export function useDeleteSkill() {
+  const qc = useQueryClient()
+  return useMutation((id: string) => portfolioApi.deleteSkill(id), {
+    onSuccess: () => qc.invalidateQueries(['skills'])
+  })
+}
+
 export function useReferences(username?: string) {
   return useQuery<Reference[], Error>(['references', username || 'me'], async () => {
     if (username) {
@@ -62,5 +104,26 @@ export function useReferences(username?: string) {
       return p?.references || []
     }
     return portfolioApi.getReferences()
+  })
+}
+
+export function useAddReference() {
+  const qc = useQueryClient()
+  return useMutation((data: Omit<Reference, 'id'>) => portfolioApi.addReference(data), {
+    onSuccess: () => qc.invalidateQueries(['references'])
+  })
+}
+
+export function useUpdateReference() {
+  const qc = useQueryClient()
+  return useMutation(({ id, data }: { id: string; data: Partial<Reference> }) => portfolioApi.updateReference(id, data), {
+    onSuccess: () => qc.invalidateQueries(['references'])
+  })
+}
+
+export function useDeleteReference() {
+  const qc = useQueryClient()
+  return useMutation((id: string) => portfolioApi.deleteReference(id), {
+    onSuccess: () => qc.invalidateQueries(['references'])
   })
 }

@@ -1,15 +1,19 @@
 import { useState } from 'react'
 import { AcademicCapIcon, PlusIcon, TrashIcon, XMarkIcon, PencilIcon } from '@heroicons/react/24/outline'
-import { portfolioApi } from '../../ApiService/portfolioApi'
 import type { Education } from '../../ApiService/types'
+import { useEducation, useAddEducation, useUpdateEducation, useDeleteEducation } from '../../hooks/usePortfolioQueries'
 
 interface EducationSectionProps {
-  education: Education[]
+  username?: string
   isEditing: boolean
 }
 
-export function EducationSection({ education: initialEducation, isEditing }: EducationSectionProps) {
-  const [education, setEducation] = useState<Education[]>(initialEducation || [])
+export function EducationSection({ username, isEditing }: EducationSectionProps) {
+  const { data: education = [], isLoading: listLoading, error: listError } = useEducation(username)
+  const addMutation = useAddEducation()
+  const updateMutation = useUpdateEducation()
+  const deleteMutation = useDeleteEducation()
+
   const [showForm, setShowForm] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -30,21 +34,19 @@ export function EducationSection({ education: initialEducation, isEditing }: Edu
       const payload = {
         school: form.school,
         degree: form.degree,
-        field: form.field || undefined,
-        startYear: form.startYear ? parseInt(form.startYear) : undefined,
-        endYear: form.current === 'true' ? undefined : (form.endYear ? parseInt(form.endYear) : undefined),
+        field: form.field || null,
+        startYear: form.startYear ? parseInt(form.startYear) : null,
+        endYear: form.current === 'true' ? null : (form.endYear ? parseInt(form.endYear) : null),
         current: form.current === 'true',
-        description: form.description || undefined,
+        description: form.description || null,
         order: education.length
       }
 
       if (editingId) {
-        const updated = await portfolioApi.updateEducation(editingId, payload as Partial<Education>)
-        setEducation(education.map(e => e.id === editingId ? updated : e))
+        await updateMutation.mutateAsync({ id: editingId, data: payload as Partial<Education> })
         setEditingId(null)
       } else {
-        const newEdu = await portfolioApi.addEducation(payload as Omit<Education, 'id'>)
-        setEducation([...education, newEdu])
+        await addMutation.mutateAsync(payload as Omit<Education, 'id'>)
       }
       
       setForm({ school: '', degree: '', field: '', startYear: '', endYear: '', current: 'false', description: '' })
@@ -53,6 +55,14 @@ export function EducationSection({ education: initialEducation, isEditing }: Edu
       console.error('Failed to save education:', err)
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const handleRemove = async (id: string) => {
+    try {
+      await deleteMutation.mutateAsync(id)
+    } catch (err) {
+      console.error('Failed to remove education:', err)
     }
   }
 
@@ -68,15 +78,6 @@ export function EducationSection({ education: initialEducation, isEditing }: Edu
       description: edu.description || ''
     })
     setShowForm(true)
-  }
-
-  const handleRemove = async (id: string) => {
-    try {
-      await portfolioApi.deleteEducation(id)
-      setEducation(education.filter(e => e.id !== id))
-    } catch (err) {
-      console.error('Failed to remove education:', err)
-    }
   }
 
   return (
@@ -130,7 +131,11 @@ export function EducationSection({ education: initialEducation, isEditing }: Edu
 
       {/* Education List */}
       <div className="space-y-6">
-        {education.length === 0 ? (
+        {listLoading ? (
+          <p className="text-gray-500 text-center py-4">Loading education…</p>
+        ) : listError ? (
+          <p className="text-red-600 text-center py-4">Failed to load education.</p>
+        ) : education.length === 0 ? (
           <p className="text-gray-500 text-center py-4">No education added yet.</p>
         ) : (
           education.map((edu, index) => (

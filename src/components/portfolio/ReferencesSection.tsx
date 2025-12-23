@@ -1,15 +1,19 @@
 import { useState } from 'react'
 import { UserGroupIcon, PlusIcon, TrashIcon, XMarkIcon, PencilIcon } from '@heroicons/react/24/outline'
-import { portfolioApi } from '../../ApiService/portfolioApi'
 import type { Reference } from '../../ApiService/types'
+import { useReferences, useAddReference, useUpdateReference, useDeleteReference } from '../../hooks/usePortfolioQueries'
 
 interface ReferencesSectionProps {
-  references: Reference[]
+  username?: string
   isEditing: boolean
 }
 
-export function ReferencesSection({ references: initialReferences, isEditing }: ReferencesSectionProps) {
-  const [references, setReferences] = useState<Reference[]>(initialReferences || [])
+export function ReferencesSection({ username, isEditing }: ReferencesSectionProps) {
+  const { data: references = [], isLoading: listLoading, error: listError } = useReferences(username)
+  const addMutation = useAddReference()
+  const updateMutation = useUpdateReference()
+  const deleteMutation = useDeleteReference()
+
   const [showForm, setShowForm] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -32,7 +36,7 @@ export function ReferencesSection({ references: initialReferences, isEditing }: 
     if (!form.name || !form.company) return
     setIsLoading(true)
     try {
-      const newRef = await portfolioApi.addReference({
+      await addMutation.mutateAsync({
         name: form.name,
         position: form.position,
         company: form.company,
@@ -40,7 +44,6 @@ export function ReferencesSection({ references: initialReferences, isEditing }: 
         phone: form.phone,
         relationship: form.relationship
       })
-      setReferences([...references, newRef])
       resetForm()
     } catch (err) {
       console.error('Failed to add reference:', err)
@@ -53,15 +56,14 @@ export function ReferencesSection({ references: initialReferences, isEditing }: 
     if (!editingId || !form.name || !form.company) return
     setIsLoading(true)
     try {
-      const updated = await portfolioApi.updateReference(editingId, {
+      await updateMutation.mutateAsync({ id: editingId, data: {
         name: form.name,
         position: form.position,
         company: form.company,
         email: form.email,
         phone: form.phone,
         relationship: form.relationship
-      })
-      setReferences(references.map(r => r.id === editingId ? updated : r))
+      }})
       resetForm()
     } catch (err) {
       console.error('Failed to update reference:', err)
@@ -72,8 +74,7 @@ export function ReferencesSection({ references: initialReferences, isEditing }: 
 
   const handleRemove = async (id: string) => {
     try {
-      await portfolioApi.deleteReference(id)
-      setReferences(references.filter(r => r.id !== id))
+      await deleteMutation.mutateAsync(id)
     } catch (err) {
       console.error('Failed to remove reference:', err)
     }
@@ -136,7 +137,11 @@ export function ReferencesSection({ references: initialReferences, isEditing }: 
 
       {/* References List */}
       <div className="space-y-4">
-        {references.length === 0 ? (
+        {listLoading ? (
+          <p className="text-gray-500 text-center py-4">Loading references…</p>
+        ) : listError ? (
+          <p className="text-red-600 text-center py-4">Failed to load references.</p>
+        ) : references.length === 0 ? (
           <p className="text-gray-500 text-center py-4">No references added yet.</p>
         ) : (
           references.map(ref => (

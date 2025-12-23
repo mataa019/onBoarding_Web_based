@@ -227,17 +227,17 @@ export function Portfolio() {
         />
 
         <EducationSection
-          education={portfolio.education || []}
+          username={portfolio.username || undefined}
           isEditing={isEditing}
         />
 
         <SkillsSection
-          skills={portfolio.skills || []}
+          username={portfolio.username || undefined}
           isEditing={isEditing}
         />
 
         <ReferencesSection
-          references={portfolio.references || []}
+          username={portfolio.username || undefined}
           isEditing={isEditing}
         />
 

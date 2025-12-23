@@ -1,17 +1,21 @@
 import { useState } from 'react'
 import { SparklesIcon, PlusIcon, XMarkIcon, PencilIcon } from '@heroicons/react/24/outline'
-import { portfolioApi } from '../../ApiService/portfolioApi'
 import type { Skill } from '../../ApiService/types'
+import { useSkills, useAddSkill, useUpdateSkill, useDeleteSkill } from '../../hooks/usePortfolioQueries'
 
 type SkillLevel = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'EXPERT'
 
 interface SkillsSectionProps {
-  skills: Skill[]
+  username?: string
   isEditing: boolean
 }
 
-export function SkillsSection({ skills: initialSkills, isEditing }: SkillsSectionProps) {
-  const [skills, setSkills] = useState<Skill[]>(initialSkills || [])
+export function SkillsSection({ username, isEditing }: SkillsSectionProps) {
+  const { data: skills = [], isLoading: listLoading, error: listError } = useSkills(username)
+  const addMutation = useAddSkill()
+  const updateMutation = useUpdateSkill()
+  const deleteMutation = useDeleteSkill()
+
   const [showForm, setShowForm] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -28,11 +32,7 @@ export function SkillsSection({ skills: initialSkills, isEditing }: SkillsSectio
     if (!form.name.trim()) return
     setIsLoading(true)
     try {
-      const newSkill = await portfolioApi.addSkill({
-        name: form.name.trim(),
-        level: form.level
-      })
-      setSkills([...skills, newSkill])
+      await addMutation.mutateAsync({ name: form.name.trim(), level: form.level })
       resetForm()
     } catch (err) {
       console.error('Failed to add skill:', err)
@@ -45,11 +45,7 @@ export function SkillsSection({ skills: initialSkills, isEditing }: SkillsSectio
     if (!editingId || !form.name.trim()) return
     setIsLoading(true)
     try {
-      const updated = await portfolioApi.updateSkill(editingId, {
-        name: form.name.trim(),
-        level: form.level
-      })
-      setSkills(skills.map(s => s.id === editingId ? updated : s))
+      await updateMutation.mutateAsync({ id: editingId, data: { name: form.name.trim(), level: form.level } })
       resetForm()
     } catch (err) {
       console.error('Failed to update skill:', err)
@@ -60,8 +56,7 @@ export function SkillsSection({ skills: initialSkills, isEditing }: SkillsSectio
 
   const handleRemove = async (id: string) => {
     try {
-      await portfolioApi.deleteSkill(id)
-      setSkills(skills.filter(s => s.id !== id))
+      await deleteMutation.mutateAsync(id)
     } catch (err) {
       console.error('Failed to remove skill:', err)
     }
@@ -125,7 +120,11 @@ export function SkillsSection({ skills: initialSkills, isEditing }: SkillsSectio
 
       {/* Skills by Level */}
       <div className="space-y-4">
-        {Object.keys(skillsByLevel).length === 0 ? (
+        {listLoading ? (
+          <p className="text-gray-500 text-center py-4">Loading skills…</p>
+        ) : listError ? (
+          <p className="text-red-600 text-center py-4">Failed to load skills.</p>
+        ) : Object.keys(skillsByLevel).length === 0 ? (
           <p className="text-gray-500 text-center py-4">No skills added yet.</p>
         ) : (
           Object.entries(skillsByLevel).map(([level, levelSkills]) => (
