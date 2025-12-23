@@ -28,7 +28,7 @@ export function ExperienceSection({ isEditing, username }: ExperienceSectionProp
     const fetchExperiences = async () => {
       try {
         const data = await portfolioApi.getByUsername(username)
-        setExperiences(data.experiences || [])
+        setExperiences(data?.experiences || [])
       } catch (err) {
         console.error('Failed to fetch experiences:', err)
       }

@@ -15,7 +15,7 @@ export function AboutSection({ isEditing, username }: AboutSectionProps) {
     const fetchSummary = async () => {
       try {
         const data = await portfolioApi.getByUsername(username)
-        setSummary(data.user.summary || '')
+        setSummary(data?.user?.summary || '')
       } catch (err) {
         console.error('Failed to fetch summary:', err)
       }
