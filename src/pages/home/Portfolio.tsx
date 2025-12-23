@@ -227,6 +227,7 @@ export function Portfolio() {
         />
 
         <EducationSection
+          education={portfolio.education}
           isEditing={isEditing}
           username={portfolio.username}
         />

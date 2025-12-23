@@ -4,12 +4,13 @@ import { portfolioApi } from '../../ApiService/portfolioApi'
 import type { Experience } from '../../ApiService/types'
 
 interface ExperienceSectionProps {
+  experiences: Experience[]
   isEditing: boolean
   username: string
 }
 
-export function ExperienceSection({ isEditing, username }: ExperienceSectionProps) {
-  const [experiences, setExperiences] = useState<Experience[]>([])
+export function ExperienceSection({ experiences: initialExperiences, isEditing, username }: ExperienceSectionProps) {
+  const [experiences, setExperiences] = useState<Experience[]>(initialExperiences || [])
   const [showForm, setShowForm] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)

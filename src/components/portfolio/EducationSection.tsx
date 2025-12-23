@@ -4,12 +4,13 @@ import { portfolioApi } from '../../ApiService/portfolioApi'
 import type { Education } from '../../ApiService/types'
 
 interface EducationSectionProps {
+  education: Education[]
   isEditing: boolean
   username: string
 }
 
-export function EducationSection({ isEditing, username }: EducationSectionProps) {
-  const [education, setEducation] = useState<Education[]>([])
+export function EducationSection({ education: initialEducation, isEditing, username }: EducationSectionProps) {
+  const [education, setEducation] = useState<Education[]>(initialEducation || [])
   const [showForm, setShowForm] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -22,21 +23,6 @@ export function EducationSection({ isEditing, username }: EducationSectionProps)
     current: 'false',
     description: ''
   })
-
-  // Fetch education on mount
-  useEffect(() => {
-    const fetchEducation = async () => {
-      try {
-        const data = await portfolioApi.getByUsername(username)
-        setEducation(data.education || [])
-      } catch (err) {
-        console.error('Failed to fetch education:', err)
-      }
-    }
-    if (username) {
-      fetchEducation()
-    }
-  }, [username])
 
   const handleAdd = async () => {
     if (!form.school || !form.degree) return
