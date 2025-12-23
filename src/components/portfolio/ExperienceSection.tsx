@@ -24,19 +24,6 @@ export function ExperienceSection({ experiences: initialExperiences, isEditing, 
     description: ''
   })
 
-  // Fetch experiences on mount
-  useEffect(() => {
-    const fetchExperiences = async () => {
-      try {
-        const data = await portfolioApi.getByUsername(username)
-        setExperiences(data.experiences || [])
-      } catch (err) {
-        console.error('Failed to fetch experiences:', err)
-      }
-    }
-    if (username) {
-      fetchExperiences()
-    }
   const formatDate = (dateStr: string | null) => {
     if (!dateStr) return 'Present'
     return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
