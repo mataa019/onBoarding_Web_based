@@ -64,6 +64,12 @@ export function ReferencesSection({ references: initialReferences, isEditing, on
         email: form.email || '',
         phone: form.phone || undefined,
         relationship: form.relationship || ''
+      })
+      setReferences(prev => prev.map(r => r.id === editingId ? updated : r))
+      resetForm()
+    } catch (err) {
+      console.error('Failed to update reference:', err)
+    } finally {
       setIsLoading(false)
     }
   }
