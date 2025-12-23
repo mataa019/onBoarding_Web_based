@@ -189,7 +189,6 @@ export function Portfolio() {
   const updateProfile = async (data: Partial<any>) => {
     const updated = await portfolioApi.update(data)
     setPortfolio((prev) => ({ ...prev, ...updated, user: { ...(prev.user || {}), ...(updated.user || {}) } }))
-    return updated
   }
 
   const copyShareLink = () => {
