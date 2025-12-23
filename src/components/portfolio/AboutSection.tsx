@@ -3,30 +3,20 @@ import { UserCircleIcon } from '@heroicons/react/24/outline'
 import { portfolioApi } from '../../ApiService/portfolioApi'
 
 interface AboutSectionProps {
+  summary: string
   isEditing: boolean
-  username: string
 }
 
-export function AboutSection({ isEditing, username }: AboutSectionProps) {
-  const [summary, setSummary] = useState('')
+export function AboutSection({ summary, isEditing }: AboutSectionProps) {
+  const [currentSummary, setCurrentSummary] = useState(summary || '')
 
-  // Fetch portfolio summary on mount
+  // Update local state when prop changes
   useEffect(() => {
-    const fetchSummary = async () => {
-      try {
-        const data = await portfolioApi.getByUsername(username)
-        setSummary(data?.user?.summary || '')
-      } catch (err) {
-        console.error('Failed to fetch summary:', err)
-      }
-    }
-    if (username) {
-      fetchSummary()
-    }
-  }, [username])
+    setCurrentSummary(summary || '')
+  }, [summary])
 
   const handleUpdate = async (value: string) => {
-    setSummary(value)
+    setCurrentSummary(value)
     
     // Save to backend immediately
     try {
@@ -44,13 +34,13 @@ export function AboutSection({ isEditing, username }: AboutSectionProps) {
       {isEditing ? (
         <textarea
           rows={4}
-          value={summary}
+          value={currentSummary}
           onChange={(e) => handleUpdate(e.target.value)}
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none"
           placeholder="Tell your story..."
         />
       ) : (
-        <p className="text-gray-600 leading-relaxed">{summary || 'No summary added yet.'}</p>
+        <p className="text-gray-600 leading-relaxed">{currentSummary || 'No summary added yet.'}</p>
       )}
     </div>
   )

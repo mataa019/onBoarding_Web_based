@@ -217,8 +217,8 @@ export function Portfolio() {
         />
 
         <AboutSection
+          summary={portfolio.user.summary}
           isEditing={isEditing}
-          username={portfolio.username}
         />
 
         <ExperienceSection

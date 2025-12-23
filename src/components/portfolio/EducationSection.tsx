@@ -28,7 +28,7 @@ export function EducationSection({ isEditing, username }: EducationSectionProps)
     const fetchEducation = async () => {
       try {
         const data = await portfolioApi.getByUsername(username)
-        setEducation(data?.education || [])
+        setEducation(data.education || [])
       } catch (err) {
         console.error('Failed to fetch education:', err)
       }

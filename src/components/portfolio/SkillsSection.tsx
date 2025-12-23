@@ -22,10 +22,10 @@ export function SkillsSection({ isEditing, username }: SkillsSectionProps) {
     const loadSkills = async () => {
       try {
         const data = await portfolioApi.getByUsername(username)
-        setSkills(data?.skills || [])
+        setSkills(data.skills || [])
       } catch (err) {
         console.error('Failed to load skills:', err)
-      }
+      }z
     }
     if (username) {
       loadSkills()

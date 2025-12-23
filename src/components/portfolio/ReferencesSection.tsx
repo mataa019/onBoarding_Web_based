@@ -24,10 +24,10 @@ export function ReferencesSection({ isEditing, username }: ReferencesSectionProp
 
   // Load references from portfolio API
   useEffect(() => {
-    const loadReferences = async () => {
+    const loadReferences = async () => {z
       try {
         const data = await portfolioApi.getByUsername(username)
-        setReferences(data?.references || [])
+        setReferences(data.references || [])
       } catch (err) {
         console.error('Failed to load references:', err)
       }
