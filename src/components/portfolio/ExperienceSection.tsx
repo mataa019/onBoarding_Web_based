@@ -37,8 +37,6 @@ export function ExperienceSection({ experiences: initialExperiences, isEditing, 
     if (username) {
       fetchExperiences()
     }
-  })
-
   const formatDate = (dateStr: string | null) => {
     if (!dateStr) return 'Present'
     return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
