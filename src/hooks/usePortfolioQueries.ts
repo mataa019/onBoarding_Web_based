@@ -127,3 +127,20 @@ export function useDeleteReference() {
     onSuccess: () => qc.invalidateQueries(['references'])
   })
 }
+
+// Full portfolio (useful for About & Header)
+export function usePortfolio(username?: string) {
+  return useQuery(['portfolio', username || 'me'], async () => {
+    if (username) {
+      return portfolioApi.getByUsername(username)
+    }
+    return portfolioApi.get()
+  })
+}
+
+export function useUpdatePortfolio() {
+  const qc = useQueryClient()
+  return useMutation((data: Partial<Record<string, any>>) => portfolioApi.update(data), {
+    onSuccess: () => qc.invalidateQueries(['portfolio'])
+  })
+}

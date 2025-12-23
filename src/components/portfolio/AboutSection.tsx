@@ -1,26 +1,27 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { UserCircleIcon } from '@heroicons/react/24/outline'
-import { portfolioApi } from '../../ApiService/portfolioApi'
+import { usePortfolio, useUpdatePortfolio } from '../../hooks/usePortfolioQueries'
 
 interface AboutSectionProps {
-  summary: string
+  username?: string
   isEditing: boolean
 }
 
-export function AboutSection({ summary, isEditing }: AboutSectionProps) {
-  const [currentSummary, setCurrentSummary] = useState(summary || '')
+export function AboutSection({ username, isEditing }: AboutSectionProps) {
+  const { data: portfolio, isLoading } = usePortfolio(username)
+  const updateMutation = useUpdatePortfolio()
 
-  // Update local state when prop changes
-  useEffect(() => {
-    setCurrentSummary(summary || '')
-  }, [summary])
+  const [currentSummary, setCurrentSummary] = useState(portfolio?.user?.summary || '')
+
+  // Keep local state in sync when query updates
+  if (!isLoading && portfolio && currentSummary !== (portfolio?.user?.summary || '')) {
+    setCurrentSummary(portfolio?.user?.summary || '')
+  }
 
   const handleUpdate = async (value: string) => {
     setCurrentSummary(value)
-    
-    // Save to backend immediately
     try {
-      await portfolioApi.update({ summary: value })
+      await updateMutation.mutateAsync({ summary: value })
     } catch (err) {
       console.error('Failed to save summary:', err)
     }

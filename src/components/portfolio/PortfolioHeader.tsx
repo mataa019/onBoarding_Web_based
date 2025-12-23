@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import {
   ArrowUpTrayIcon,
   MapPinIcon,
@@ -8,8 +8,7 @@ import {
   UserIcon
 } from '@heroicons/react/24/outline'
 import { cloudinaryService } from '../../utils/cloudinary'
-import { portfolioApi } from '../../ApiService/portfolioApi'
-import type { Portfolio } from '../../ApiService/types'
+import { usePortfolio, useUpdatePortfolio } from '../../hooks/usePortfolioQueries'
 
 // LinkedIn icon
 const LinkedInIcon = ({ className }: { className?: string }) => (
@@ -20,60 +19,18 @@ const LinkedInIcon = ({ className }: { className?: string }) => (
 
 interface PortfolioHeaderProps {
   isEditing: boolean
-  portfolio: Portfolio
+  username?: string
 }
 
-export function PortfolioHeader({ isEditing, portfolio: initialPortfolio }: PortfolioHeaderProps) {
-  const [portfolio, setPortfolio] = useState<Portfolio>(initialPortfolio)
-  const [isLoading, setIsLoading] = useState(false)
+export function PortfolioHeader({ isEditing, username }: PortfolioHeaderProps) {
+  const { data: portfolio, isLoading } = usePortfolio(username)
+  const updateMutation = useUpdatePortfolio()
   const [isUploading, setIsUploading] = useState(false)
-
-  // Update portfolio when prop changes
-  useEffect(() => {
-    setPortfolio(initialPortfolio)
-  }, [initialPortfolio])
 
   const updateField = (field: string, value: string) => {
     if (!portfolio) return
-    
-    setPortfolio(prev => {
-      if (!prev) return prev
-      
-      // All fields are nested in user object (firstName, lastName, email, phone, gender, headline, summary)
-      if (field === 'firstName' || field === 'lastName' || field === 'email' || field === 'phone' || field === 'gender' || field === 'headline' || field === 'summary') {
-        return {
-          ...prev,
-          user: { ...prev.user, [field]: value }
-        }
-      }
-      
-      // Handle portfolio-level fields
-      return {
-        ...prev,
-        [field]: value
-      }
-    })
-    
-    // Save to backend immediately
-    saveField(field, value)
-  }
-
-  const saveField = async (field: string, value: string) => {
-    try {
-      const updatePayload: Record<string, any> = {}
-      
-      // All user fields go into the payload
-      if (field === 'firstName' || field === 'lastName' || field === 'email' || field === 'phone' || field === 'gender' || field === 'headline' || field === 'summary') {
-        updatePayload[field] = value
-      } else {
-        // Handle portfolio-level fields
-        updatePayload[field] = value
-      }
-      
-      await portfolioApi.update(updatePayload)
-    } catch (err) {
-      console.error(`Failed to save ${field}:`, err)
-    }
+    // Simple save via mutation (query invalidation will refresh the header)
+    updateMutation.mutate({ [field]: value })
   }
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -83,12 +40,8 @@ export function PortfolioHeader({ isEditing, portfolio: initialPortfolio }: Port
     setIsUploading(true)
     try {
       const url = await cloudinaryService.uploadImage(file, 'avatars')
-      setPortfolio({
-        ...portfolio,
-        user: { ...portfolio.user, avatar: url }
-      })
-      // Save to backend
-      await portfolioApi.update({ avatar: url })
+      // Save to backend via mutation (query will refresh)
+      await updateMutation.mutateAsync({ avatar: url })
     } catch (err) {
       console.error('Failed to upload avatar:', err)
     } finally {
@@ -103,12 +56,8 @@ export function PortfolioHeader({ isEditing, portfolio: initialPortfolio }: Port
     setIsUploading(true)
     try {
       const url = await cloudinaryService.uploadImage(file, 'covers')
-      setPortfolio({
-        ...portfolio,
-        coverImage: url
-      })
-      // Save to backend
-      await portfolioApi.update({ coverImage: url })
+      // Save to backend via mutation (query will refresh)
+      await updateMutation.mutateAsync({ coverImage: url })
     } catch (err) {
       console.error('Failed to upload cover:', err)
     } finally {
