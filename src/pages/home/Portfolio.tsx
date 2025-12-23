@@ -70,8 +70,12 @@ export function Portfolio() {
     try {
       setIsLoading(true)
       setError('')
-      // Get username from URL or use a default/current user
-      const username = new URLSearchParams(window.location.search).get('username') || ''
+          // Get username from query param or from path (/portfolio/:username)
+      const usernameQuery = new URLSearchParams(window.location.search).get('username') || ''
+      const pathMatch = window.location.pathname.match(/\/portfolio\/(?:@?([^\/\?]+))/)
+      const pathUsername = pathMatch ? pathMatch[1] : ''
+      const username = usernameQuery || pathUsername
+
       if (!username) {
         // Fallback to fetching current user's portfolio
         const data = await portfolioApi.get()
@@ -111,6 +115,75 @@ export function Portfolio() {
     } finally {
       setIsSaving(false)
     }
+  }
+
+  // ======= Central handlers for sections =======
+  const addExperience = async (data: Omit<any, 'id'>) => {
+    const newExp = await portfolioApi.addExperience(data)
+    setPortfolio((prev) => ({ ...prev, experiences: [...(prev.experiences || []), newExp] }))
+    return newExp
+  }
+
+  const updateExperience = async (id: string, data: Partial<any>) => {
+    const updated = await portfolioApi.updateExperience(id, data)
+    setPortfolio((prev) => ({ ...prev, experiences: (prev.experiences || []).map(e => e.id === id ? updated : e) }))
+    return updated
+  }
+
+  const deleteExperience = async (id: string) => {
+    await portfolioApi.deleteExperience(id)
+    setPortfolio((prev) => ({ ...prev, experiences: (prev.experiences || []).filter(e => e.id !== id) }))
+  }
+
+  const addEducation = async (data: Omit<any, 'id'>) => {
+    const newEdu = await portfolioApi.addEducation(data)
+    setPortfolio((prev) => ({ ...prev, education: [...(prev.education || []), newEdu] }))
+    return newEdu
+  }
+
+  const updateEducation = async (id: string, data: Partial<any>) => {
+    const updated = await portfolioApi.updateEducation(id, data)
+    setPortfolio((prev) => ({ ...prev, education: (prev.education || []).map(e => e.id === id ? updated : e) }))
+    return updated
+  }
+
+  const deleteEducation = async (id: string) => {
+    await portfolioApi.deleteEducation(id)
+    setPortfolio((prev) => ({ ...prev, education: (prev.education || []).filter(e => e.id !== id) }))
+  }
+
+  const addSkill = async (data: Omit<any, 'id'>) => {
+    const newSkill = await portfolioApi.addSkill(data)
+    setPortfolio((prev) => ({ ...prev, skills: [...(prev.skills || []), newSkill] }))
+    return newSkill
+  }
+
+  const updateSkill = async (id: string, data: Partial<any>) => {
+    const updated = await portfolioApi.updateSkill(id, data)
+    setPortfolio((prev) => ({ ...prev, skills: (prev.skills || []).map(s => s.id === id ? updated : s) }))
+    return updated
+  }
+
+  const deleteSkill = async (id: string) => {
+    await portfolioApi.deleteSkill(id)
+    setPortfolio((prev) => ({ ...prev, skills: (prev.skills || []).filter(s => s.id !== id) }))
+  }
+
+  const addReference = async (data: Omit<any, 'id'>) => {
+    const newRef = await portfolioApi.addReference(data)
+    setPortfolio((prev) => ({ ...prev, references: [...(prev.references || []), newRef] }))
+    return newRef
+  }
+
+  const updateReference = async (id: string, data: Partial<any>) => {
+    const updated = await portfolioApi.updateReference(id, data)
+    setPortfolio((prev) => ({ ...prev, references: (prev.references || []).map(r => r.id === id ? updated : r) }))
+    return updated
+  }
+
+  const deleteReference = async (id: string) => {
+    await portfolioApi.deleteReference(id)
+    setPortfolio((prev) => ({ ...prev, references: (prev.references || []).filter(r => r.id !== id) }))
   }
 
   const copyShareLink = () => {
@@ -222,23 +295,35 @@ export function Portfolio() {
         />
 
         <ExperienceSection
-          username={portfolio.username || undefined}
+          experiences={portfolio.experiences || []}
           isEditing={isEditing}
+          onAdd={addExperience}
+          onUpdate={updateExperience}
+          onDelete={deleteExperience}
         />
 
         <EducationSection
-          username={portfolio.username || undefined}
+          education={portfolio.education || []}
           isEditing={isEditing}
+          onAdd={addEducation}
+          onUpdate={updateEducation}
+          onDelete={deleteEducation}
         />
 
         <SkillsSection
-          username={portfolio.username || undefined}
+          skills={portfolio.skills || []}
           isEditing={isEditing}
+          onAdd={addSkill}
+          onUpdate={updateSkill}
+          onDelete={deleteSkill}
         />
 
         <ReferencesSection
-          username={portfolio.username || undefined}
+          references={portfolio.references || []}
           isEditing={isEditing}
+          onAdd={addReference}
+          onUpdate={updateReference}
+          onDelete={deleteReference}
         />
 
         {/* Projects Link */}
