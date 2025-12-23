@@ -9,7 +9,6 @@ class PortfolioApiService {
   constructor(baseURL: string = import.meta.env.VITE_API_URL || 'http://10.36.60.64:3000') {
     this.baseURL = baseURL
     this.accessToken = getStoredToken()
-    console.log('PortfolioApi initialized with token:', this.accessToken ? 'Token present' : 'No token')
   }
 
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
@@ -20,7 +19,6 @@ class PortfolioApiService {
   // Refresh token from storage (call after login)
   refreshToken(): void {
     this.accessToken = getStoredToken()
-    console.log('PortfolioApi token refreshed:', this.accessToken ? 'Token set' : 'No token')
   }
 
   // ==========================================

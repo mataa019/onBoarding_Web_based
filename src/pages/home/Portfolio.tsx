@@ -10,7 +10,6 @@ import {
 } from '@heroicons/react/24/outline'
 import { portfolioApi } from '../../ApiService/portfolioApi'
 import type { Portfolio as PortfolioType } from '../../ApiService/types'
-import { useAuth } from '../../context/AuthContext'
 import {
   PortfolioHeader,
   AboutSection,
@@ -54,7 +53,6 @@ const defaultPortfolio: PortfolioType = {
 }
 
 export function Portfolio() {
-  const { logout } = useAuth()
   const [portfolio, setPortfolio] = useState<PortfolioType>(defaultPortfolio)
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
@@ -77,20 +75,16 @@ export function Portfolio() {
       if (!username) {
         // Fallback to fetching current user's portfolio
         const data = await portfolioApi.get()
-        setPortfolio(data)
+        console.log('Fetched current portfolio:', data)
+        setPortfolio(data || defaultPortfolio)
       } else {
         const data = await portfolioApi.getByUsername(username)
-        setPortfolio(data)
+        console.log('Fetched portfolio by username:', data)
+        setPortfolio(data || defaultPortfolio)
       }
-    } catch (err: any) {
-      // If 401 Unauthorized, logout and redirect
-      if (err.statusCode === 401) {
-        logout()
-        return
-      }
+    } catch (err) {
       // If loading fails, keep the default empty portfolio so user can still see/edit the layout
       console.error('Failed to load portfolio:', err)
-      setError('Failed to load portfolio. Please try refreshing the page.')
     } finally {
       setIsLoading(false)
     }
