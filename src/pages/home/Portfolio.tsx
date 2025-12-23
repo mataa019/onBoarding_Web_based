@@ -213,7 +213,7 @@ export function Portfolio() {
       <div className="max-w-5xl mx-auto px-4 py-8">
         <PortfolioHeader
           isEditing={isEditing}
-          username={portfolio.username}
+          portfolio={portfolio}
         />
 
         <AboutSection

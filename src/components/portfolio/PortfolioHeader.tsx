@@ -20,31 +20,18 @@ const LinkedInIcon = ({ className }: { className?: string }) => (
 
 interface PortfolioHeaderProps {
   isEditing: boolean
-  username: string
+  portfolio: Portfolio
 }
 
-export function PortfolioHeader({ isEditing, username }: PortfolioHeaderProps) {
-  const [portfolio, setPortfolio] = useState<Portfolio | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
+export function PortfolioHeader({ isEditing, portfolio: initialPortfolio }: PortfolioHeaderProps) {
+  const [portfolio, setPortfolio] = useState<Portfolio>(initialPortfolio)
+  const [isLoading, setIsLoading] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
 
-  // Fetch portfolio on mount
+  // Update portfolio when prop changes
   useEffect(() => {
-    const fetchPortfolio = async () => {
-      try {
-        setIsLoading(true)
-        const data = await portfolioApi.getByUsername(username)
-        setPortfolio(data)
-      } catch (err) {
-        console.error('Failed to fetch portfolio:', err)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-    if (username) {
-      fetchPortfolio()
-    }
-  }, [username])
+    setPortfolio(initialPortfolio)
+  }, [initialPortfolio])
 
   const updateField = (field: string, value: string) => {
     if (!portfolio) return
