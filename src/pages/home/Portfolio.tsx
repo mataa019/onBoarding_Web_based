@@ -217,27 +217,27 @@ export function Portfolio() {
         />
 
         <AboutSection
-          summary={portfolio.user.summary}
+          summary={portfolio.user?.summary || ''}
           isEditing={isEditing}
         />
 
         <ExperienceSection
-          experiences={portfolio.experiences}
+          experiences={portfolio.experiences || []}
           isEditing={isEditing}
         />
 
         <EducationSection
-          education={portfolio.education}
+          education={portfolio.education || []}
           isEditing={isEditing}
         />
 
         <SkillsSection
-          skills={portfolio.skills}
+          skills={portfolio.skills || []}
           isEditing={isEditing}
         />
 
         <ReferencesSection
-          references={portfolio.references}
+          references={portfolio.references || []}
           isEditing={isEditing}
         />
 
