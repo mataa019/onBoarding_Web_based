@@ -113,6 +113,81 @@ export function Portfolio() {
     }
   }
 
+  // ======= Central handlers for sections =======
+  const addExperience = async (data: Omit<any, 'id'>) => {
+    const newExp = await portfolioApi.addExperience(data)
+    setPortfolio((prev) => ({ ...prev, experiences: [...(prev.experiences || []), newExp] }))
+    return newExp
+  }
+
+  const updateExperience = async (id: string, data: Partial<any>) => {
+    const updated = await portfolioApi.updateExperience(id, data)
+    setPortfolio((prev) => ({ ...prev, experiences: (prev.experiences || []).map(e => e.id === id ? updated : e) }))
+    return updated
+  }
+
+  const deleteExperience = async (id: string) => {
+    await portfolioApi.deleteExperience(id)
+    setPortfolio((prev) => ({ ...prev, experiences: (prev.experiences || []).filter(e => e.id !== id) }))
+  }
+
+  const addEducation = async (data: Omit<any, 'id'>) => {
+    const newEdu = await portfolioApi.addEducation(data)
+    setPortfolio((prev) => ({ ...prev, education: [...(prev.education || []), newEdu] }))
+    return newEdu
+  }
+
+  const updateEducation = async (id: string, data: Partial<any>) => {
+    const updated = await portfolioApi.updateEducation(id, data)
+    setPortfolio((prev) => ({ ...prev, education: (prev.education || []).map(e => e.id === id ? updated : e) }))
+    return updated
+  }
+
+  const deleteEducation = async (id: string) => {
+    await portfolioApi.deleteEducation(id)
+    setPortfolio((prev) => ({ ...prev, education: (prev.education || []).filter(e => e.id !== id) }))
+  }
+
+  const addSkill = async (data: Omit<any, 'id'>) => {
+    const newSkill = await portfolioApi.addSkill(data)
+    setPortfolio((prev) => ({ ...prev, skills: [...(prev.skills || []), newSkill] }))
+    return newSkill
+  }
+
+  const updateSkill = async (id: string, data: Partial<any>) => {
+    const updated = await portfolioApi.updateSkill(id, data)
+    setPortfolio((prev) => ({ ...prev, skills: (prev.skills || []).map(s => s.id === id ? updated : s) }))
+    return updated
+  }
+
+  const deleteSkill = async (id: string) => {
+    await portfolioApi.deleteSkill(id)
+    setPortfolio((prev) => ({ ...prev, skills: (prev.skills || []).filter(s => s.id !== id) }))
+  }
+
+  const addReference = async (data: Omit<any, 'id'>) => {
+    const newRef = await portfolioApi.addReference(data)
+    setPortfolio((prev) => ({ ...prev, references: [...(prev.references || []), newRef] }))
+    return newRef
+  }
+
+  const updateReference = async (id: string, data: Partial<any>) => {
+    const updated = await portfolioApi.updateReference(id, data)
+    setPortfolio((prev) => ({ ...prev, references: (prev.references || []).map(r => r.id === id ? updated : r) }))
+    return updated
+  }
+
+  const deleteReference = async (id: string) => {
+    await portfolioApi.deleteReference(id)
+    setPortfolio((prev) => ({ ...prev, references: (prev.references || []).filter(r => r.id !== id) }))
+  }
+
+  const updateProfile = async (data: Partial<any>) => {
+    const updated = await portfolioApi.update(data)
+    setPortfolio((prev) => ({ ...prev, user: { ...prev.user, ...(updated.user || {}) }, ...updated }))
+    return updated
+  }
+
   const copyShareLink = () => {
     const link = portfolio.shareableLink || `${window.location.origin}/portfolio/${portfolio.username}`
     navigator.clipboard.writeText(link)
