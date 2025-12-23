@@ -4,15 +4,15 @@ import type { Skill } from '../../ApiService/types'
 
 type SkillLevel = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'EXPERT'
 
+import { portfolioApi } from '../../ApiService/portfolioApi'
+
 interface SkillsSectionProps {
   skills: Skill[]
   isEditing: boolean
-  onAdd: (data: Omit<Skill, 'id'>) => Promise<Skill>
-  onUpdate: (id: string, data: Partial<Skill>) => Promise<Skill>
-  onDelete: (id: string) => Promise<void>
+  onRefresh?: () => Promise<void> | void
 }
 
-export function SkillsSection({ skills: initialSkills, isEditing, onAdd, onUpdate, onDelete }: SkillsSectionProps) {
+export function SkillsSection({ skills: initialSkills, isEditing, onRefresh }: SkillsSectionProps) {
   const [skills, setSkills] = useState<Skill[]>(initialSkills || [])
   useEffect(() => setSkills(initialSkills || []), [initialSkills])
 
@@ -32,8 +32,9 @@ export function SkillsSection({ skills: initialSkills, isEditing, onAdd, onUpdat
     if (!form.name.trim()) return
     setIsLoading(true)
     try {
-      const newSkill = await onAdd({ name: form.name.trim(), level: form.level })
+      const newSkill = await portfolioApi.addSkill({ name: form.name.trim(), level: form.level })
       setSkills([...skills, newSkill])
+      if (onRefresh) await onRefresh()
       resetForm()
     } catch (err) {
       console.error('Failed to add skill:', err)
@@ -46,8 +47,9 @@ export function SkillsSection({ skills: initialSkills, isEditing, onAdd, onUpdat
     if (!editingId || !form.name.trim()) return
     setIsLoading(true)
     try {
-      const updated = await onUpdate(editingId, { name: form.name.trim(), level: form.level })
+      const updated = await portfolioApi.updateSkill(editingId, { name: form.name.trim(), level: form.level })
       setSkills(skills.map(s => s.id === editingId ? updated : s))
+      if (onRefresh) await onRefresh()
       resetForm()
     } catch (err) {
       console.error('Failed to update skill:', err)
@@ -58,8 +60,9 @@ export function SkillsSection({ skills: initialSkills, isEditing, onAdd, onUpdat
 
   const handleRemove = async (id: string) => {
     try {
-      await onDelete(id)
+      await portfolioApi.deleteSkill(id)
       setSkills(skills.filter(s => s.id !== id))
+      if (onRefresh) await onRefresh()
     } catch (err) {
       console.error('Failed to remove skill:', err)
     }
