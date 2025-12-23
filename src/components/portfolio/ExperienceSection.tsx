@@ -37,7 +37,7 @@ export function ExperienceSection({ experiences: initialExperiences, isEditing, 
     if (username) {
       fetchExperiences()
     }
-  }, [username])
+  })
 
   const formatDate = (dateStr: string | null) => {
     if (!dateStr) return 'Present'

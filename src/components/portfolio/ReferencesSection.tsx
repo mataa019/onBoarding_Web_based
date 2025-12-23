@@ -4,12 +4,13 @@ import { portfolioApi } from '../../ApiService/portfolioApi'
 import type { Reference } from '../../ApiService/types'
 
 interface ReferencesSectionProps {
+  references: Reference[]
   isEditing: boolean
   username: string
 }
 
-export function ReferencesSection({ isEditing, username }: ReferencesSectionProps) {
-  const [references, setReferences] = useState<Reference[]>([])
+export function ReferencesSection({ references: initialReferences, isEditing, username }: ReferencesSectionProps) {
+  const [references, setReferences] = useState<Reference[]>(initialReferences || [])
   const [showForm, setShowForm] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -35,7 +36,7 @@ export function ReferencesSection({ isEditing, username }: ReferencesSectionProp
     if (username) {
       loadReferences()
     }
-  }, [username])
+  })
 
   const resetForm = () => {
     setForm({ name: '', position: '', company: '', email: '', phone: '', relationship: '' })

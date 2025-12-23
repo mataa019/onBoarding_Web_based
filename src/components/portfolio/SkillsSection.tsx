@@ -6,31 +6,18 @@ import type { Skill } from '../../ApiService/types'
 type SkillLevel = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'EXPERT'
 
 interface SkillsSectionProps {
+  skills: Skill[]
   isEditing: boolean
   username: string
 }
 
-export function SkillsSection({ isEditing, username }: SkillsSectionProps) {
-  const [skills, setSkills] = useState<Skill[]>([])
+export function SkillsSection({ skills: initialSkills, isEditing, username }: SkillsSectionProps) {
+  const [skills, setSkills] = useState<Skill[]>(initialSkills || [])
   const [showForm, setShowForm] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [form, setForm] = useState<{ name: string; level: SkillLevel }>({ name: '', level: 'INTERMEDIATE' })
 
-  // Load skills from portfolio API
-  useEffect(() => {
-    const loadSkills = async () => {
-      try {
-        const data = await portfolioApi.getByUsername(username)
-        setSkills(data.skills || [])
-      } catch (err) {
-        console.error('Failed to load skills:', err)
-      }z
-    }
-    if (username) {
-      loadSkills()
-    }
-  }, [username])
 
   const resetForm = () => {
     setForm({ name: '', level: 'INTERMEDIATE' })

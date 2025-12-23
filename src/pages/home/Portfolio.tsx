@@ -222,6 +222,7 @@ export function Portfolio() {
         />
 
         <ExperienceSection
+          experiences={portfolio.experiences}
           isEditing={isEditing}
           username={portfolio.username}
         />
@@ -233,6 +234,7 @@ export function Portfolio() {
         />
 
         <SkillsSection
+          skills={portfolio.skills}
           isEditing={isEditing}
           username={portfolio.username}
         />
