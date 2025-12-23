@@ -240,6 +240,7 @@ export function Portfolio() {
         />
 
         <ReferencesSection
+          references={portfolio.references}
           isEditing={isEditing}
           username={portfolio.username}
         />
