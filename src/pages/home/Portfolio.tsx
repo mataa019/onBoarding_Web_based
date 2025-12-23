@@ -217,7 +217,7 @@ export function Portfolio() {
         />
 
         <AboutSection
-          summary={portfolio.user?.summary || ''}
+          username={portfolio.username || undefined}
           isEditing={isEditing}
         />
 
