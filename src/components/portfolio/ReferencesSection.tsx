@@ -2,15 +2,15 @@ import { useState, useEffect } from 'react'
 import { UserGroupIcon, PlusIcon, TrashIcon, XMarkIcon, PencilIcon } from '@heroicons/react/24/outline'
 import type { Reference } from '../../ApiService/types'
 
+import { portfolioApi } from '../../ApiService/portfolioApi'
+
 interface ReferencesSectionProps {
   references: Reference[]
   isEditing: boolean
-  onAdd: (data: Omit<Reference, 'id'>) => Promise<Reference>
-  onUpdate: (id: string, data: Partial<Reference>) => Promise<Reference>
-  onDelete: (id: string) => Promise<void>
+  onRefresh?: () => Promise<void> | void
 }
 
-export function ReferencesSection({ references: initialReferences, isEditing, onAdd, onUpdate, onDelete }: ReferencesSectionProps) {
+export function ReferencesSection({ references: initialReferences, isEditing, onRefresh }: ReferencesSectionProps) {
   const [references, setReferences] = useState<Reference[]>(initialReferences || [])
   useEffect(() => setReferences(initialReferences || []), [initialReferences])
 
@@ -33,10 +33,10 @@ export function ReferencesSection({ references: initialReferences, isEditing, on
   }
 
   const handleAdd = async () => {
-    if (!form.name || !form.company || !onAdd) return
+    if (!form.name || !form.company) return
     setIsLoading(true)
     try {
-      const newRef = await onAdd({
+      const newRef = await portfolioApi.addReference({
         name: form.name,
         position: form.position || '',
         company: form.company,
@@ -45,6 +45,7 @@ export function ReferencesSection({ references: initialReferences, isEditing, on
         relationship: form.relationship || ''
       })
       setReferences(prev => [newRef, ...prev])
+      if (onRefresh) await onRefresh()
       resetForm()
     } catch (err) {
       console.error('Failed to add reference:', err)
@@ -54,10 +55,10 @@ export function ReferencesSection({ references: initialReferences, isEditing, on
   }
 
   const handleUpdate = async () => {
-    if (!editingId || !form.name || !form.company || !onUpdate) return
+    if (!editingId || !form.name || !form.company) return
     setIsLoading(true)
     try {
-      const updated = await onUpdate(editingId, {
+      const updated = await portfolioApi.updateReference(editingId, {
         name: form.name,
         position: form.position || '',
         company: form.company,
@@ -66,6 +67,7 @@ export function ReferencesSection({ references: initialReferences, isEditing, on
         relationship: form.relationship || ''
       })
       setReferences(prev => prev.map(r => r.id === editingId ? updated : r))
+      if (onRefresh) await onRefresh()
       resetForm()
     } catch (err) {
       console.error('Failed to update reference:', err)
@@ -76,9 +78,9 @@ export function ReferencesSection({ references: initialReferences, isEditing, on
 
   const handleRemove = async (id: string) => {
     try {
-      if (!onDelete) return
-      await onDelete(id)
+      await portfolioApi.deleteReference(id)
       setReferences(prev => prev.filter(r => r.id !== id))
+      if (onRefresh) await onRefresh()
     } catch (err) {
       console.error('Failed to remove reference:', err)
     }
