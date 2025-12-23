@@ -222,7 +222,7 @@ export function Portfolio() {
         />
 
         <ExperienceSection
-          experiences={portfolio.experiences || []}
+          username={portfolio.username || undefined}
           isEditing={isEditing}
         />
 

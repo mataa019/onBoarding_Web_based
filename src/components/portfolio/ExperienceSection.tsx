@@ -1,15 +1,19 @@
 import { useState } from 'react'
 import { BriefcaseIcon, PlusIcon, TrashIcon, XMarkIcon, PencilIcon } from '@heroicons/react/24/outline'
-import { portfolioApi } from '../../ApiService/portfolioApi'
 import type { Experience } from '../../ApiService/types'
+import { useExperiences, useAddExperience, useUpdateExperience, useDeleteExperience } from '../../hooks/usePortfolioQueries'
 
 interface ExperienceSectionProps {
-  experiences: Experience[]
+  username?: string
   isEditing: boolean
 }
 
-export function ExperienceSection({ experiences: initialExperiences, isEditing }: ExperienceSectionProps) {
-  const [experiences, setExperiences] = useState<Experience[]>(initialExperiences || [])
+export function ExperienceSection({ username, isEditing }: ExperienceSectionProps) {
+  const { data: experiences = [], isLoading: isLoadingList, error } = useExperiences(username)
+  const addMutation = useAddExperience()
+  const updateMutation = useUpdateExperience()
+  const deleteMutation = useDeleteExperience()
+
   const [showForm, setShowForm] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -44,14 +48,12 @@ export function ExperienceSection({ experiences: initialExperiences, isEditing }
       }
 
       if (editingId) {
-        const updated = await portfolioApi.updateExperience(editingId, payload as Partial<Experience>)
-        setExperiences(experiences.map(e => e.id === editingId ? updated : e))
+        await updateMutation.mutateAsync({ id: editingId, data: payload })
         setEditingId(null)
       } else {
-        const newExp = await portfolioApi.addExperience(payload as Omit<Experience, 'id'>)
-        setExperiences([...experiences, newExp])
+        await addMutation.mutateAsync(payload)
       }
-      
+
       setForm({ title: '', company: '', location: '', startDate: '', endDate: '', current: 'false', description: '' })
       setShowForm(false)
     } catch (err) {
@@ -77,8 +79,7 @@ export function ExperienceSection({ experiences: initialExperiences, isEditing }
 
   const handleRemove = async (id: string) => {
     try {
-      await portfolioApi.deleteExperience(id)
-      setExperiences(experiences.filter(e => e.id !== id))
+      await deleteMutation.mutateAsync(id)
     } catch (err) {
       console.error('Failed to remove experience:', err)
     }
