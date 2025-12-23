@@ -224,25 +224,21 @@ export function Portfolio() {
         <ExperienceSection
           experiences={portfolio.experiences}
           isEditing={isEditing}
-          username={portfolio.username}
         />
 
         <EducationSection
           education={portfolio.education}
           isEditing={isEditing}
-          username={portfolio.username}
         />
 
         <SkillsSection
           skills={portfolio.skills}
           isEditing={isEditing}
-          username={portfolio.username}
         />
 
         <ReferencesSection
           references={portfolio.references}
           isEditing={isEditing}
-          username={portfolio.username}
         />
 
         {/* Projects Link */}

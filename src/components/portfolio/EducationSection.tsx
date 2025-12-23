@@ -6,10 +6,9 @@ import type { Education } from '../../ApiService/types'
 interface EducationSectionProps {
   education: Education[]
   isEditing: boolean
-  username: string
 }
 
-export function EducationSection({ education: initialEducation, isEditing, username }: EducationSectionProps) {
+export function EducationSection({ education: initialEducation, isEditing }: EducationSectionProps) {
   const [education, setEducation] = useState<Education[]>(initialEducation || [])
   const [showForm, setShowForm] = useState(false)
   const [isLoading, setIsLoading] = useState(false)

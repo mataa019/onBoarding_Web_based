@@ -8,10 +8,9 @@ type SkillLevel = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'EXPERT'
 interface SkillsSectionProps {
   skills: Skill[]
   isEditing: boolean
-  username: string
 }
 
-export function SkillsSection({ skills: initialSkills, isEditing, username }: SkillsSectionProps) {
+export function SkillsSection({ skills: initialSkills, isEditing }: SkillsSectionProps) {
   const [skills, setSkills] = useState<Skill[]>(initialSkills || [])
   const [showForm, setShowForm] = useState(false)
   const [isLoading, setIsLoading] = useState(false)

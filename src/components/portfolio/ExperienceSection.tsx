@@ -6,10 +6,9 @@ import type { Experience } from '../../ApiService/types'
 interface ExperienceSectionProps {
   experiences: Experience[]
   isEditing: boolean
-  username: string
 }
 
-export function ExperienceSection({ experiences: initialExperiences, isEditing, username }: ExperienceSectionProps) {
+export function ExperienceSection({ experiences: initialExperiences, isEditing }: ExperienceSectionProps) {
   const [experiences, setExperiences] = useState<Experience[]>(initialExperiences || [])
   const [showForm, setShowForm] = useState(false)
   const [isLoading, setIsLoading] = useState(false)

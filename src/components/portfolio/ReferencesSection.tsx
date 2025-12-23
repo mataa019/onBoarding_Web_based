@@ -6,10 +6,9 @@ import type { Reference } from '../../ApiService/types'
 interface ReferencesSectionProps {
   references: Reference[]
   isEditing: boolean
-  username: string
 }
 
-export function ReferencesSection({ references: initialReferences, isEditing, username }: ReferencesSectionProps) {
+export function ReferencesSection({ references: initialReferences, isEditing }: ReferencesSectionProps) {
   const [references, setReferences] = useState<Reference[]>(initialReferences || [])
   const [showForm, setShowForm] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
