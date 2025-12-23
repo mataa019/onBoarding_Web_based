@@ -38,11 +38,11 @@ export function ReferencesSection({ references: initialReferences, isEditing, on
     try {
       const newRef = await onAdd({
         name: form.name,
-        position: form.position || null,
+        position: form.position || '',
         company: form.company,
-        email: form.email || null,
-        phone: form.phone || null,
-        relationship: form.relationship || null
+        email: form.email || '',
+        phone: form.phone || undefined,
+        relationship: form.relationship || ''
       })
       setReferences(prev => [newRef, ...prev])
       resetForm()
@@ -59,17 +59,11 @@ export function ReferencesSection({ references: initialReferences, isEditing, on
     try {
       const updated = await onUpdate(editingId, {
         name: form.name,
-        position: form.position || null,
+        position: form.position || '',
         company: form.company,
-        email: form.email || null,
-        phone: form.phone || null,
-        relationship: form.relationship || null
-      })
-      setReferences(prev => prev.map(r => r.id === editingId ? updated : r))
-      resetForm()
-    } catch (err) {
-      console.error('Failed to update reference:', err)
-    } finally {
+        email: form.email || '',
+        phone: form.phone || undefined,
+        relationship: form.relationship || ''
       setIsLoading(false)
     }
   }
