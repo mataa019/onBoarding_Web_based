@@ -237,13 +237,13 @@ export function Portfolio() {
           onUpdate={(value: string) => updateProfile({ summary: value })}
         />
 
-        <ExperienceSection isEditing={isEditing} onRefresh={refreshPortfolio} />
+        <ExperienceSection username={portfolio.username} isEditing={isEditing} onRefresh={refreshPortfolio} />
 
-        <EducationSection isEditing={isEditing} onRefresh={refreshPortfolio} />
+        <EducationSection username={portfolio.username} isEditing={isEditing} onRefresh={refreshPortfolio} />
 
-        <SkillsSection isEditing={isEditing} onRefresh={refreshPortfolio} />
+        <SkillsSection username={portfolio.username} isEditing={isEditing} onRefresh={refreshPortfolio} />
 
-        <ReferencesSection isEditing={isEditing} onRefresh={refreshPortfolio} />
+        <ReferencesSection username={portfolio.username} isEditing={isEditing} onRefresh={refreshPortfolio} />
 
         {/* Projects Link */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">

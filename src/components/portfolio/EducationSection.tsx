@@ -7,10 +7,11 @@ import { portfolioApi } from '../../ApiService/portfolioApi'
 interface EducationSectionProps {
   education?: Education[]
   isEditing: boolean
+  username?: string
   onRefresh?: () => Promise<void> | void
 }
 
-export function EducationSection({ education: initialEducation, isEditing, onRefresh }: EducationSectionProps) {
+export function EducationSection({ education: initialEducation, isEditing, username, onRefresh }: EducationSectionProps) {
   const [education, setEducation] = useState<Education[]>(initialEducation || [])
   useEffect(() => setEducation(initialEducation || []), [initialEducation])
 
@@ -34,7 +35,7 @@ export function EducationSection({ education: initialEducation, isEditing, onRef
     setIsFetching(true)
     setFetchError(null)
     try {
-      const data = await portfolioApi.getEducation()
+      const data = username ? await portfolioApi.getEducationByUsername(username) : await portfolioApi.getEducation()
       setEducation(data)
     } catch (err) {
       console.error('Failed to fetch education:', err)
@@ -44,7 +45,7 @@ export function EducationSection({ education: initialEducation, isEditing, onRef
     }
   }
 
-  useEffect(() => { fetchEducation() }, [])
+  useEffect(() => { fetchEducation() }, [username])
 
   const handleAdd = async () => {
     if (!form.school || !form.degree) return

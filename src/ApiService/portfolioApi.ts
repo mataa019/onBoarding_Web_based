@@ -52,6 +52,11 @@ class PortfolioApiService {
     return response.experiences;
   }
 
+  async getExperiencesByUsername(username: string): Promise<Experience[]> {
+    const response = await this.request<{ experiences: Experience[] }>(`/portfolio/${username}/experiences`)
+    return response.experiences || []
+  }
+
   async addExperience(data: Omit<Experience, 'id'>): Promise<Experience> {
     const response = await this.request<{ experience: Experience }>('/portfolio/experiences', {
       method: 'POST',
@@ -80,9 +85,12 @@ class PortfolioApiService {
 
   async getEducation(): Promise<Education[]> {
     const response = await this.request<{ education: Education[] }>('/portfolio/education')
+    return response.education;
+  }
+  async getEducationByUsername(username: string): Promise<Education[]> {
+    const response = await this.request<{ education: Education[] }>(`/portfolio/${username}/education`)
     return response.education || []
   }
-
   async addEducation(data: Omit<Education, 'id'>): Promise<Education> {
     const response = await this.request<{ education: Education }>('/portfolio/education', {
       method: 'POST',
@@ -114,6 +122,11 @@ class PortfolioApiService {
     return response.skills || []
   }
 
+  async getSkillsByUsername(username: string): Promise<Skill[]> {
+    const response = await this.request<{ skills: Skill[] }>(`/portfolio/${username}/skills`)
+    return response.skills || []
+  }
+
   async addSkill(data: Omit<Skill, 'id'>): Promise<Skill> {
     const response = await this.request<{ skill: Skill }>('/portfolio/skills', {
       method: 'POST',
@@ -142,6 +155,11 @@ class PortfolioApiService {
 
   async getReferences(): Promise<Reference[]> {
     const response = await this.request<{ references: Reference[] }>('/portfolio/references')
+    return response.references || []
+  }
+
+  async getReferencesByUsername(username: string): Promise<Reference[]> {
+    const response = await this.request<{ references: Reference[] }>(`/portfolio/${username}/references`)
     return response.references || []
   }
 

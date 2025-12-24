@@ -7,10 +7,11 @@ import { portfolioApi } from '../../ApiService/portfolioApi'
 interface ExperienceSectionProps {
   experiences?: Experience[]
   isEditing: boolean
+  username?: string
   onRefresh?: () => Promise<void> | void
 }
 
-export function ExperienceSection({ experiences: initialExperiences, isEditing, onRefresh }: ExperienceSectionProps) {
+export function ExperienceSection({ experiences: initialExperiences, isEditing, username, onRefresh }: ExperienceSectionProps) {
   const [experiences, setExperiences] = useState<Experience[]>(initialExperiences || [])
   useEffect(() => setExperiences(initialExperiences || []), [initialExperiences])
 
@@ -34,7 +35,7 @@ export function ExperienceSection({ experiences: initialExperiences, isEditing, 
     setIsFetching(true)
     setFetchError(null)
     try {
-      const data = await portfolioApi.getExperiences()
+      const data = username ? await portfolioApi.getExperiencesByUsername(username) : await portfolioApi.getExperiences()
       setExperiences(data)
     } catch (err) {
       console.error('Failed to fetch experiences:', err)
@@ -44,7 +45,7 @@ export function ExperienceSection({ experiences: initialExperiences, isEditing, 
     }
   }
 
-  useEffect(() => { fetchExperiences() }, [])
+  useEffect(() => { fetchExperiences() }, [username])
 
   const formatDate = (dateStr: string | null | undefined) => {
     if (!dateStr) return 'Present'

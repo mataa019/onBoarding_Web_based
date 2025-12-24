@@ -9,10 +9,11 @@ import { portfolioApi } from '../../ApiService/portfolioApi'
 interface SkillsSectionProps {
   skills?: Skill[]
   isEditing: boolean
+  username?: string
   onRefresh?: () => Promise<void> | void
 }
 
-export function SkillsSection({ skills: initialSkills, isEditing, onRefresh }: SkillsSectionProps) {
+export function SkillsSection({ skills: initialSkills, isEditing, username, onRefresh }: SkillsSectionProps) {
   const [skills, setSkills] = useState<Skill[]>(initialSkills || [])
   useEffect(() => setSkills(initialSkills || []), [initialSkills])
 
@@ -28,7 +29,7 @@ export function SkillsSection({ skills: initialSkills, isEditing, onRefresh }: S
     setIsFetching(true)
     setFetchError(null)
     try {
-      const data = await portfolioApi.getSkills()
+      const data = username ? await portfolioApi.getSkillsByUsername(username) : await portfolioApi.getSkills()
       setSkills(data)
     } catch (err) {
       console.error('Failed to fetch skills:', err)
@@ -38,7 +39,7 @@ export function SkillsSection({ skills: initialSkills, isEditing, onRefresh }: S
     }
   }
 
-  useEffect(() => { fetchSkills() }, [])
+  useEffect(() => { fetchSkills() }, [username])
 
 
   const resetForm = () => {

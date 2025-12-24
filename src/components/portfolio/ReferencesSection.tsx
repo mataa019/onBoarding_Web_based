@@ -7,10 +7,11 @@ import { portfolioApi } from '../../ApiService/portfolioApi'
 interface ReferencesSectionProps {
   references?: Reference[]
   isEditing: boolean
+  username?: string
   onRefresh?: () => Promise<void> | void
 }
 
-export function ReferencesSection({ references: initialReferences, isEditing, onRefresh }: ReferencesSectionProps) {
+export function ReferencesSection({ references: initialReferences, isEditing, username, onRefresh }: ReferencesSectionProps) {
   const [references, setReferences] = useState<Reference[]>(initialReferences || [])
   useEffect(() => setReferences(initialReferences || []), [initialReferences])
 
@@ -33,7 +34,7 @@ export function ReferencesSection({ references: initialReferences, isEditing, on
     setIsFetching(true)
     setFetchError(null)
     try {
-      const data = await portfolioApi.getReferences()
+      const data = username ? await portfolioApi.getReferencesByUsername(username) : await portfolioApi.getReferences()
       setReferences(data)
     } catch (err) {
       console.error('Failed to fetch references:', err)
@@ -43,7 +44,7 @@ export function ReferencesSection({ references: initialReferences, isEditing, on
     }
   }
 
-  useEffect(() => { fetchReferences() }, [])
+  useEffect(() => { fetchReferences() }, [username])
 
   const resetForm = () => {
     setForm({ name: '', position: '', company: '', email: '', phone: '', relationship: '' })
