@@ -5,7 +5,7 @@ import type { Education } from '../../ApiService/types'
 import { portfolioApi } from '../../ApiService/portfolioApi'
 
 interface EducationSectionProps {
-  education: Education[]
+  education?: Education[]
   isEditing: boolean
   onRefresh?: () => Promise<void> | void
 }
@@ -27,6 +27,25 @@ export function EducationSection({ education: initialEducation, isEditing, onRef
     description: ''
   })
 
+  const [isFetching, setIsFetching] = useState(false)
+  const [fetchError, setFetchError] = useState<string | null>(null)
+
+  const fetchEducation = async () => {
+    setIsFetching(true)
+    setFetchError(null)
+    try {
+      const data = await portfolioApi.getEducation()
+      setEducation(data)
+    } catch (err) {
+      console.error('Failed to fetch education:', err)
+      setFetchError((err as any)?.message || 'Failed to load education')
+    } finally {
+      setIsFetching(false)
+    }
+  }
+
+  useEffect(() => { fetchEducation() }, [])
+
   const handleAdd = async () => {
     if (!form.school || !form.degree) return
     setIsLoading(true)
@@ -43,14 +62,14 @@ export function EducationSection({ education: initialEducation, isEditing, onRef
       }
 
       if (editingId) {
-        const updated = await portfolioApi.updateEducation(editingId, payload as Partial<Education>)
-        setEducation(education.map(e => e.id === editingId ? updated : e))
+        await portfolioApi.updateEducation(editingId, payload as Partial<Education>)
         setEditingId(null)
       } else {
-        const newEdu = await portfolioApi.addEducation(payload as Omit<Education, 'id'>)
-        setEducation([...education, newEdu])
+        await portfolioApi.addEducation(payload as Omit<Education, 'id'>)
       }
 
+      // Refresh local list and parent
+      await fetchEducation()
       if (onRefresh) await onRefresh()
       setForm({ school: '', degree: '', field: '', startYear: '', endYear: '', current: 'false', description: '' })
       setShowForm(false)
@@ -64,7 +83,7 @@ export function EducationSection({ education: initialEducation, isEditing, onRef
   const handleRemove = async (id: string) => {
     try {
       await portfolioApi.deleteEducation(id)
-      setEducation(education.filter(e => e.id !== id))
+      await fetchEducation()
       if (onRefresh) await onRefresh()
     } catch (err) {
       console.error('Failed to remove education:', err)
@@ -136,7 +155,11 @@ export function EducationSection({ education: initialEducation, isEditing, onRef
 
       {/* Education List */}
       <div className="space-y-6">
-        {education.length === 0 ? (
+        {isFetching ? (
+          <p className="text-gray-500 text-center py-4">Loading education…</p>
+        ) : fetchError ? (
+          <p className="text-red-600 text-center py-4">Failed to load education: {fetchError}</p>
+        ) : education.length === 0 ? (
           <p className="text-gray-500 text-center py-4">No education added yet.</p>
         ) : (
           education.map((edu, index) => (

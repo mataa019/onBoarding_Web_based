@@ -7,7 +7,7 @@ type SkillLevel = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'EXPERT'
 import { portfolioApi } from '../../ApiService/portfolioApi'
 
 interface SkillsSectionProps {
-  skills: Skill[]
+  skills?: Skill[]
   isEditing: boolean
   onRefresh?: () => Promise<void> | void
 }
@@ -21,6 +21,25 @@ export function SkillsSection({ skills: initialSkills, isEditing, onRefresh }: S
   const [editingId, setEditingId] = useState<string | null>(null)
   const [form, setForm] = useState<{ name: string; level: SkillLevel }>({ name: '', level: 'INTERMEDIATE' })
 
+  const [isFetching, setIsFetching] = useState(false)
+  const [fetchError, setFetchError] = useState<string | null>(null)
+
+  const fetchSkills = async () => {
+    setIsFetching(true)
+    setFetchError(null)
+    try {
+      const data = await portfolioApi.getSkills()
+      setSkills(data)
+    } catch (err) {
+      console.error('Failed to fetch skills:', err)
+      setFetchError((err as any)?.message || 'Failed to load skills')
+    } finally {
+      setIsFetching(false)
+    }
+  }
+
+  useEffect(() => { fetchSkills() }, [])
+
 
   const resetForm = () => {
     setForm({ name: '', level: 'INTERMEDIATE' })
@@ -32,8 +51,8 @@ export function SkillsSection({ skills: initialSkills, isEditing, onRefresh }: S
     if (!form.name.trim()) return
     setIsLoading(true)
     try {
-      const newSkill = await portfolioApi.addSkill({ name: form.name.trim(), level: form.level })
-      setSkills([...skills, newSkill])
+        await portfolioApi.addSkill({ name: form.name.trim(), level: form.level })
+      await fetchSkills()
       if (onRefresh) await onRefresh()
       resetForm()
     } catch (err) {
@@ -47,8 +66,8 @@ export function SkillsSection({ skills: initialSkills, isEditing, onRefresh }: S
     if (!editingId || !form.name.trim()) return
     setIsLoading(true)
     try {
-      const updated = await portfolioApi.updateSkill(editingId, { name: form.name.trim(), level: form.level })
-      setSkills(skills.map(s => s.id === editingId ? updated : s))
+      await portfolioApi.updateSkill(editingId, { name: form.name.trim(), level: form.level })
+      await fetchSkills()
       if (onRefresh) await onRefresh()
       resetForm()
     } catch (err) {
@@ -61,7 +80,7 @@ export function SkillsSection({ skills: initialSkills, isEditing, onRefresh }: S
   const handleRemove = async (id: string) => {
     try {
       await portfolioApi.deleteSkill(id)
-      setSkills(skills.filter(s => s.id !== id))
+      await fetchSkills()
       if (onRefresh) await onRefresh()
     } catch (err) {
       console.error('Failed to remove skill:', err)
@@ -126,7 +145,11 @@ export function SkillsSection({ skills: initialSkills, isEditing, onRefresh }: S
 
       {/* Skills by Level */}
       <div className="space-y-4">
-        {Object.keys(skillsByLevel).length === 0 ? (
+        {isFetching ? (
+          <p className="text-gray-500 text-center py-4">Loading skills…</p>
+        ) : fetchError ? (
+          <p className="text-red-600 text-center py-4">Failed to load skills: {fetchError}</p>
+        ) : Object.keys(skillsByLevel).length === 0 ? (
           <p className="text-gray-500 text-center py-4">No skills added yet.</p>
         ) : (
           Object.entries(skillsByLevel).map(([level, levelSkills]) => (

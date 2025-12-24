@@ -49,7 +49,7 @@ class PortfolioApiService {
 
   async getExperiences(): Promise<Experience[]> {
     const response = await this.request<{ experiences: Experience[] }>('/portfolio/experiences')
-    return response.experiences || []
+    return response.experiences;
   }
 
   async addExperience(data: Omit<Experience, 'id'>): Promise<Experience> {

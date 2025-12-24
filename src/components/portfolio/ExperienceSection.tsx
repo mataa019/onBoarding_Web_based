@@ -5,7 +5,7 @@ import type { Experience } from '../../ApiService/types'
 import { portfolioApi } from '../../ApiService/portfolioApi'
 
 interface ExperienceSectionProps {
-  experiences: Experience[]
+  experiences?: Experience[]
   isEditing: boolean
   onRefresh?: () => Promise<void> | void
 }
@@ -27,8 +27,24 @@ export function ExperienceSection({ experiences: initialExperiences, isEditing, 
     description: ''
   })
 
-  const listLoading = false
-  const listError = null
+  const [isFetching, setIsFetching] = useState(false)
+  const [fetchError, setFetchError] = useState<string | null>(null)
+
+  const fetchExperiences = async () => {
+    setIsFetching(true)
+    setFetchError(null)
+    try {
+      const data = await portfolioApi.getExperiences()
+      setExperiences(data)
+    } catch (err) {
+      console.error('Failed to fetch experiences:', err)
+      setFetchError((err as any)?.message || 'Failed to load experiences')
+    } finally {
+      setIsFetching(false)
+    }
+  }
+
+  useEffect(() => { fetchExperiences() }, [])
 
   const formatDate = (dateStr: string | null | undefined) => {
     if (!dateStr) return 'Present'
@@ -56,15 +72,14 @@ export function ExperienceSection({ experiences: initialExperiences, isEditing, 
       }
 
       if (editingId) {
-        const updated = await portfolioApi.updateExperience(editingId, payload)
-        setExperiences(experiences.map(e => e.id === editingId ? updated : e))
+        await portfolioApi.updateExperience(editingId, payload)
         setEditingId(null)
       } else {
-        const newExp = await portfolioApi.addExperience(payload as Omit<Experience, 'id'>)
-        setExperiences([...experiences, newExp])
+        await portfolioApi.addExperience(payload as Omit<Experience, 'id'>)
       }
 
-      // Optionally refresh the parent
+      // Refresh local list and parent
+      await fetchExperiences()
       if (onRefresh) await onRefresh()
 
       setForm({ title: '', company: '', location: '', startDate: '', endDate: '', current: 'false', description: '' })
@@ -93,7 +108,7 @@ export function ExperienceSection({ experiences: initialExperiences, isEditing, 
   const handleRemove = async (id: string) => {
     try {
       await portfolioApi.deleteExperience(id)
-      setExperiences(experiences.filter(e => e.id !== id))
+      await fetchExperiences()
       if (onRefresh) await onRefresh()
     } catch (err) {
       console.error('Failed to remove experience:', err)
@@ -151,10 +166,10 @@ export function ExperienceSection({ experiences: initialExperiences, isEditing, 
 
       {/* Experience List */}
       <div className="space-y-6">
-        {listLoading ? (
+        {isFetching ? (
           <p className="text-gray-500 text-center py-4">Loading experiences…</p>
-        ) : listError ? (
-          <p className="text-red-600 text-center py-4">Failed to load experiences.</p>
+        ) : fetchError ? (
+          <p className="text-red-600 text-center py-4">Failed to load experiences: {fetchError}</p>
         ) : experiences.length === 0 ? (
           <p className="text-gray-500 text-center py-4">No experience added yet.</p>
         ) : (
