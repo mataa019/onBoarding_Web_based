@@ -4,16 +4,15 @@ import type { Education } from '../../ApiService/types'
 
 import { portfolioApi } from '../../ApiService/portfolioApi'
 
+import { usePortfolioResource } from '../../hooks/usePortfolioResource'
+
 interface EducationSectionProps {
-  education?: Education[]
   isEditing: boolean
-  username?: string
   onRefresh?: () => Promise<void> | void
 }
 
-export function EducationSection({ education: initialEducation, isEditing, username, onRefresh }: EducationSectionProps) {
-  const [education, setEducation] = useState<Education[]>(initialEducation || [])
-  useEffect(() => setEducation(initialEducation || []), [initialEducation])
+export function EducationSection({ isEditing, onRefresh }: EducationSectionProps) {
+  const { education, isFetching, error: fetchError, refresh } = usePortfolioResource()
 
   const [showForm, setShowForm] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -27,25 +26,6 @@ export function EducationSection({ education: initialEducation, isEditing, usern
     current: 'false',
     description: ''
   })
-
-  const [isFetching, setIsFetching] = useState(false)
-  const [fetchError, setFetchError] = useState<string | null>(null)
-
-  const fetchEducation = async () => {
-    setIsFetching(true)
-    setFetchError(null)
-    try {
-      const data = username ? await portfolioApi.getEducationByUsername(username) : await portfolioApi.getEducation()
-      setEducation(data)
-    } catch (err) {
-      console.error('Failed to fetch education:', err)
-      setFetchError((err as any)?.message || 'Failed to load education')
-    } finally {
-      setIsFetching(false)
-    }
-  }
-
-  useEffect(() => { fetchEducation() }, [username])
 
   const handleAdd = async () => {
     if (!form.school || !form.degree) return
@@ -69,8 +49,8 @@ export function EducationSection({ education: initialEducation, isEditing, usern
         await portfolioApi.addEducation(payload as Omit<Education, 'id'>)
       }
 
-      // Refresh local list and parent
-      await fetchEducation()
+      // Refresh shared resource and parent
+      await refresh()
       if (onRefresh) await onRefresh()
       setForm({ school: '', degree: '', field: '', startYear: '', endYear: '', current: 'false', description: '' })
       setShowForm(false)
@@ -84,7 +64,7 @@ export function EducationSection({ education: initialEducation, isEditing, usern
   const handleRemove = async (id: string) => {
     try {
       await portfolioApi.deleteEducation(id)
-      await fetchEducation()
+      await refresh()
       if (onRefresh) await onRefresh()
     } catch (err) {
       console.error('Failed to remove education:', err)

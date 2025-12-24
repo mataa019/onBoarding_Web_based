@@ -3,17 +3,15 @@ import { BriefcaseIcon, PlusIcon, TrashIcon, XMarkIcon, PencilIcon } from '@hero
 import type { Experience } from '../../ApiService/types'
 
 import { portfolioApi } from '../../ApiService/portfolioApi'
+import { usePortfolioResource } from '../../hooks/usePortfolioResource'
 
 interface ExperienceSectionProps {
-  experiences?: Experience[]
   isEditing: boolean
-  username?: string
   onRefresh?: () => Promise<void> | void
 }
 
-export function ExperienceSection({ experiences: initialExperiences, isEditing, username, onRefresh }: ExperienceSectionProps) {
-  const [experiences, setExperiences] = useState<Experience[]>(initialExperiences || [])
-  useEffect(() => setExperiences(initialExperiences || []), [initialExperiences])
+export function ExperienceSection({ isEditing, onRefresh }: ExperienceSectionProps) {
+  const { experiences, isFetching, error: fetchError, refresh } = usePortfolioResource()
 
   const [showForm, setShowForm] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -27,25 +25,6 @@ export function ExperienceSection({ experiences: initialExperiences, isEditing, 
     current: 'false',
     description: ''
   })
-
-  const [isFetching, setIsFetching] = useState(false)
-  const [fetchError, setFetchError] = useState<string | null>(null)
-
-  const fetchExperiences = async () => {
-    setIsFetching(true)
-    setFetchError(null)
-    try {
-      const data = username ? await portfolioApi.getExperiencesByUsername(username) : await portfolioApi.getExperiences()
-      setExperiences(data)
-    } catch (err) {
-      console.error('Failed to fetch experiences:', err)
-      setFetchError((err as any)?.message || 'Failed to load experiences')
-    } finally {
-      setIsFetching(false)
-    }
-  }
-
-  useEffect(() => { fetchExperiences() }, [username])
 
   const formatDate = (dateStr: string | null | undefined) => {
     if (!dateStr) return 'Present'
@@ -79,8 +58,8 @@ export function ExperienceSection({ experiences: initialExperiences, isEditing, 
         await portfolioApi.addExperience(payload as Omit<Experience, 'id'>)
       }
 
-      // Refresh local list and parent
-      await fetchExperiences()
+      // Refresh shared resource and parent
+      await refresh()
       if (onRefresh) await onRefresh()
 
       setForm({ title: '', company: '', location: '', startDate: '', endDate: '', current: 'false', description: '' })
@@ -109,7 +88,7 @@ export function ExperienceSection({ experiences: initialExperiences, isEditing, 
   const handleRemove = async (id: string) => {
     try {
       await portfolioApi.deleteExperience(id)
-      await fetchExperiences()
+      await refresh()
       if (onRefresh) await onRefresh()
     } catch (err) {
       console.error('Failed to remove experience:', err)

@@ -1,45 +1,24 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { SparklesIcon, PlusIcon, XMarkIcon, PencilIcon } from '@heroicons/react/24/outline'
 import type { Skill } from '../../ApiService/types'
 
 type SkillLevel = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'EXPERT'
 
 import { portfolioApi } from '../../ApiService/portfolioApi'
+import { usePortfolioResource } from '../../hooks/usePortfolioResource'
 
 interface SkillsSectionProps {
-  skills?: Skill[]
   isEditing: boolean
-  username?: string
   onRefresh?: () => Promise<void> | void
 }
 
-export function SkillsSection({ skills: initialSkills, isEditing, username, onRefresh }: SkillsSectionProps) {
-  const [skills, setSkills] = useState<Skill[]>(initialSkills || [])
-  useEffect(() => setSkills(initialSkills || []), [initialSkills])
+export function SkillsSection({ isEditing, onRefresh }: SkillsSectionProps) {
+  const { skills, isFetching, error: fetchError, refresh } = usePortfolioResource()
 
   const [showForm, setShowForm] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [form, setForm] = useState<{ name: string; level: SkillLevel }>({ name: '', level: 'INTERMEDIATE' })
-
-  const [isFetching, setIsFetching] = useState(false)
-  const [fetchError, setFetchError] = useState<string | null>(null)
-
-  const fetchSkills = async () => {
-    setIsFetching(true)
-    setFetchError(null)
-    try {
-      const data = username ? await portfolioApi.getSkillsByUsername(username) : await portfolioApi.getSkills()
-      setSkills(data)
-    } catch (err) {
-      console.error('Failed to fetch skills:', err)
-      setFetchError((err as any)?.message || 'Failed to load skills')
-    } finally {
-      setIsFetching(false)
-    }
-  }
-
-  useEffect(() => { fetchSkills() }, [username])
 
 
   const resetForm = () => {
@@ -53,7 +32,7 @@ export function SkillsSection({ skills: initialSkills, isEditing, username, onRe
     setIsLoading(true)
     try {
         await portfolioApi.addSkill({ name: form.name.trim(), level: form.level })
-      await fetchSkills()
+      await refresh()
       if (onRefresh) await onRefresh()
       resetForm()
     } catch (err) {
@@ -68,7 +47,7 @@ export function SkillsSection({ skills: initialSkills, isEditing, username, onRe
     setIsLoading(true)
     try {
       await portfolioApi.updateSkill(editingId, { name: form.name.trim(), level: form.level })
-      await fetchSkills()
+      await refresh()
       if (onRefresh) await onRefresh()
       resetForm()
     } catch (err) {
@@ -81,7 +60,7 @@ export function SkillsSection({ skills: initialSkills, isEditing, username, onRe
   const handleRemove = async (id: string) => {
     try {
       await portfolioApi.deleteSkill(id)
-      await fetchSkills()
+      await refresh()
       if (onRefresh) await onRefresh()
     } catch (err) {
       console.error('Failed to remove skill:', err)
@@ -98,7 +77,7 @@ export function SkillsSection({ skills: initialSkills, isEditing, username, onRe
   }
 
   // Group skills by level
-  const skillsByLevel = skills.reduce<Record<string, Skill[]>>((acc, skill) => {
+  const skillsByLevel = (skills || []).reduce<Record<string, Skill[]>>((acc, skill) => {
     const level = skill.level || 'Other'
     if (!acc[level]) acc[level] = []
     acc[level].push(skill)

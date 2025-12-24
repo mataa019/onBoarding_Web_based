@@ -53,8 +53,8 @@ class PortfolioApiService {
   }
 
   async getExperiencesByUsername(username: string): Promise<Experience[]> {
-    const response = await this.request<{ experiences: Experience[] }>(`/portfolio/${username}/experiences`)
-    return response.experiences || []
+    const portfolio = await this.getByUsername(username)
+    return portfolio.experiences || []
   }
 
   async addExperience(data: Omit<Experience, 'id'>): Promise<Experience> {
@@ -88,8 +88,8 @@ class PortfolioApiService {
     return response.education;
   }
   async getEducationByUsername(username: string): Promise<Education[]> {
-    const response = await this.request<{ education: Education[] }>(`/portfolio/${username}/education`)
-    return response.education || []
+    const portfolio = await this.getByUsername(username)
+    return portfolio.education || []
   }
   async addEducation(data: Omit<Education, 'id'>): Promise<Education> {
     const response = await this.request<{ education: Education }>('/portfolio/education', {
@@ -123,8 +123,8 @@ class PortfolioApiService {
   }
 
   async getSkillsByUsername(username: string): Promise<Skill[]> {
-    const response = await this.request<{ skills: Skill[] }>(`/portfolio/${username}/skills`)
-    return response.skills || []
+    const portfolio = await this.getByUsername(username)
+    return portfolio.skills || []
   }
 
   async addSkill(data: Omit<Skill, 'id'>): Promise<Skill> {
@@ -159,8 +159,8 @@ class PortfolioApiService {
   }
 
   async getReferencesByUsername(username: string): Promise<Reference[]> {
-    const response = await this.request<{ references: Reference[] }>(`/portfolio/${username}/references`)
-    return response.references || []
+    const portfolio = await this.getByUsername(username)
+    return portfolio.references || []
   }
 
   async addReference(data: Omit<Reference, 'id'>): Promise<Reference> {

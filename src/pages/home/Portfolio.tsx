@@ -18,6 +18,7 @@ import {
   SkillsSection,
   ReferencesSection
 } from '../../components/portfolio'
+import { PortfolioResourceProvider } from '../../hooks/usePortfolioResource'
 
 // Default empty portfolio structure
 const defaultPortfolio: PortfolioType = {
@@ -237,13 +238,15 @@ export function Portfolio() {
           onUpdate={(value: string) => updateProfile({ summary: value })}
         />
 
-        <ExperienceSection username={portfolio.username} isEditing={isEditing} onRefresh={refreshPortfolio} />
+        <PortfolioResourceProvider username={portfolio.username}>
+          <ExperienceSection isEditing={isEditing} onRefresh={refreshPortfolio} />
 
-        <EducationSection username={portfolio.username} isEditing={isEditing} onRefresh={refreshPortfolio} />
+          <EducationSection isEditing={isEditing} onRefresh={refreshPortfolio} />
 
-        <SkillsSection username={portfolio.username} isEditing={isEditing} onRefresh={refreshPortfolio} />
+          <SkillsSection isEditing={isEditing} onRefresh={refreshPortfolio} />
 
-        <ReferencesSection username={portfolio.username} isEditing={isEditing} onRefresh={refreshPortfolio} />
+          <ReferencesSection isEditing={isEditing} onRefresh={refreshPortfolio} />
+        </PortfolioResourceProvider>
 
         {/* Projects Link */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">

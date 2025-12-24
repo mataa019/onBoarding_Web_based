@@ -1,19 +1,17 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { UserGroupIcon, PlusIcon, TrashIcon, XMarkIcon, PencilIcon } from '@heroicons/react/24/outline'
 import type { Reference } from '../../ApiService/types'
 
 import { portfolioApi } from '../../ApiService/portfolioApi'
+import { usePortfolioResource } from '../../hooks/usePortfolioResource'
 
 interface ReferencesSectionProps {
-  references?: Reference[]
   isEditing: boolean
-  username?: string
   onRefresh?: () => Promise<void> | void
 }
 
-export function ReferencesSection({ references: initialReferences, isEditing, username, onRefresh }: ReferencesSectionProps) {
-  const [references, setReferences] = useState<Reference[]>(initialReferences || [])
-  useEffect(() => setReferences(initialReferences || []), [initialReferences])
+export function ReferencesSection({ isEditing, onRefresh }: ReferencesSectionProps) {
+  const { references, isFetching, error: fetchError, refresh } = usePortfolioResource()
 
   const [showForm, setShowForm] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -26,25 +24,6 @@ export function ReferencesSection({ references: initialReferences, isEditing, us
     phone: '',
     relationship: ''
   })
-
-  const [isFetching, setIsFetching] = useState(false)
-  const [fetchError, setFetchError] = useState<string | null>(null)
-
-  const fetchReferences = async () => {
-    setIsFetching(true)
-    setFetchError(null)
-    try {
-      const data = username ? await portfolioApi.getReferencesByUsername(username) : await portfolioApi.getReferences()
-      setReferences(data)
-    } catch (err) {
-      console.error('Failed to fetch references:', err)
-      setFetchError((err as any)?.message || 'Failed to load references')
-    } finally {
-      setIsFetching(false)
-    }
-  }
-
-  useEffect(() => { fetchReferences() }, [username])
 
   const resetForm = () => {
     setForm({ name: '', position: '', company: '', email: '', phone: '', relationship: '' })
@@ -64,7 +43,7 @@ export function ReferencesSection({ references: initialReferences, isEditing, us
         phone: form.phone || undefined,
         relationship: form.relationship || ''
       })
-      await fetchReferences()
+      await refresh()
       if (onRefresh) await onRefresh()
       resetForm()
     } catch (err) {
@@ -86,7 +65,7 @@ export function ReferencesSection({ references: initialReferences, isEditing, us
         phone: form.phone || undefined,
         relationship: form.relationship || ''
       })
-      await fetchReferences()
+      await refresh()
       if (onRefresh) await onRefresh()
       resetForm()
     } catch (err) {
@@ -99,7 +78,7 @@ export function ReferencesSection({ references: initialReferences, isEditing, us
   const handleRemove = async (id: string) => {
     try {
       await portfolioApi.deleteReference(id)
-      await fetchReferences()
+      await refresh()
       if (onRefresh) await onRefresh()
     } catch (err) {
       console.error('Failed to remove reference:', err)
