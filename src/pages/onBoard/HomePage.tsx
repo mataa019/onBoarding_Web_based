@@ -29,40 +29,55 @@ export default function HomePage() {
     {
       name: 'Professional Portfolio',
       description: 'Create a stunning profile with your skills, experience, education, and references.',
-      icon: UserCircleIcon
+      icon: UserCircleIcon,
+      color: 'blue'
     },
     {
       name: 'Project Showcase',
       description: 'Display your projects with images, technologies used, and GitHub links.',
-      icon: FolderIcon
+      icon: FolderIcon,
+      color: 'green'
     },
     {
       name: 'Document Management',
       description: 'Upload and organize certificates, resumes, and important documents securely.',
-      icon: DocumentTextIcon
+      icon: DocumentTextIcon,
+      color: 'purple'
     },
     {
       name: 'Progress Dashboard',
       description: 'Track your profile completion and get insights on your portfolio.',
-      icon: ChartBarIcon
+      icon: ChartBarIcon,
+      color: 'orange'
     },
     {
       name: 'Cloud Storage',
       description: 'All your files are securely stored in the cloud and accessible anywhere.',
-      icon: CloudArrowUpIcon
+      icon: CloudArrowUpIcon,
+      color: 'cyan'
     },
     {
       name: 'Secure & Private',
       description: 'Your data is protected with secure authentication and encryption.',
-      icon: ShieldCheckIcon
+      icon: ShieldCheckIcon,
+      color: 'red'
     }
   ]
+
+  const colorClasses: Record<string, { bg: string; text: string }> = {
+    blue: { bg: 'bg-blue-50', text: 'text-blue-600' },
+    green: { bg: 'bg-green-50', text: 'text-green-600' },
+    purple: { bg: 'bg-purple-50', text: 'text-purple-600' },
+    orange: { bg: 'bg-orange-50', text: 'text-orange-600' },
+    cyan: { bg: 'bg-cyan-50', text: 'text-cyan-600' },
+    red: { bg: 'bg-red-50', text: 'text-red-600' }
+  }
 
   // Auto-advance slideshow
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length)
-    }, 5000)
+    }, 6000)
     return () => clearInterval(timer)
   }, [slides.length])
 
@@ -75,14 +90,12 @@ export default function HomePage() {
       <nav className="absolute top-0 left-0 right-0 z-50 bg-transparent">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-2">
+            <a href="/" className="flex items-center space-x-2">
               <div className="w-9 h-9 bg-white rounded-lg flex items-center justify-center shadow-sm">
                 <span className="text-blue-600 font-semibold text-lg">O</span>
               </div>
-              <span className="text-lg font-semibold text-white">
-                OnBoard
-              </span>
-            </div>
+              <span className="text-lg font-semibold text-white">OnBoard</span>
+            </a>
             
             <div className="hidden md:flex items-center space-x-8">
               <a href="#features" className="text-white/90 hover:text-white text-sm transition-colors">Features</a>
@@ -127,13 +140,13 @@ export default function HomePage() {
                     {slide.subtitle}
                   </p>
                   <div className="flex items-center space-x-4">
-                    <button className="bg-blue-600 text-white px-6 py-3 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors flex items-center space-x-2">
+                    <a href="/register" className="bg-blue-600 text-white px-6 py-3 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors flex items-center space-x-2">
                       <span>{slide.cta}</span>
                       <ArrowRightIcon className="w-4 h-4" />
-                    </button>
-                    <button className="border border-white/30 text-white px-6 py-3 rounded-lg text-sm font-medium hover:bg-white/10 transition-colors">
+                    </a>
+                    <a href="#about" className="border border-white/30 text-white px-6 py-3 rounded-lg text-sm font-medium hover:bg-white/10 transition-colors">
                       Learn More
-                    </button>
+                    </a>
                   </div>
                 </div>
               </div>
@@ -173,18 +186,19 @@ export default function HomePage() {
 
       {/* About Section */}
       <section id="about" className="bg-white border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-3xl font-semibold text-gray-900 mb-4">
-                About OnBoard
+              <span className="text-blue-600 font-medium text-sm uppercase tracking-wide">About Us</span>
+              <h2 className="text-3xl font-semibold text-gray-900 mt-2 mb-4">
+                Your Career, Organized
               </h2>
               <p className="text-gray-600 mb-4 leading-relaxed">
                 OnBoard is a modern portfolio management platform designed to help professionals 
                 showcase their skills, projects, and achievements. We make it easy to create 
                 a comprehensive profile that stands out to employers and clients.
               </p>
-              <p className="text-gray-600 mb-6 leading-relaxed">
+              <p className="text-gray-600 mb-8 leading-relaxed">
                 Whether you're a developer, designer, or any professional, OnBoard helps you 
                 organize your career journey — from education and experience to projects and certifications.
               </p>
@@ -243,10 +257,11 @@ export default function HomePage() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-16 bg-gray-50">
+      <section id="features" className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-semibold text-gray-900 mb-3">
+            <span className="text-blue-600 font-medium text-sm uppercase tracking-wide">Features</span>
+            <h2 className="text-3xl font-semibold text-gray-900 mt-2 mb-3">
               Everything You Need to Shine
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
@@ -256,9 +271,9 @@ export default function HomePage() {
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((feature, index) => (
-              <div key={index} className="bg-white rounded-xl p-6 border border-gray-100 hover:border-gray-200 hover:shadow-md transition-all">
-                <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center mb-4">
-                  <feature.icon className="w-6 h-6 text-blue-600" />
+              <div key={index} className="bg-white rounded-xl p-6 border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all group">
+                <div className={`w-12 h-12 ${colorClasses[feature.color].bg} rounded-lg flex items-center justify-center mb-4 group-hover:scale-105 transition-transform`}>
+                  <feature.icon className={`w-6 h-6 ${colorClasses[feature.color].text}`} />
                 </div>
                 <h3 className="text-lg font-medium text-gray-900 mb-2">{feature.name}</h3>
                 <p className="text-gray-500 text-sm leading-relaxed">{feature.description}</p>
@@ -269,10 +284,11 @@ export default function HomePage() {
       </section>
 
       {/* How It Works Section */}
-      <section id="how-it-works" className="py-16 bg-white">
+      <section id="how-it-works" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-semibold text-gray-900 mb-3">
+            <span className="text-blue-600 font-medium text-sm uppercase tracking-wide">Getting Started</span>
+            <h2 className="text-3xl font-semibold text-gray-900 mt-2 mb-3">
               How It Works
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
@@ -280,23 +296,26 @@ export default function HomePage() {
             </p>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="grid md:grid-cols-3 gap-8 relative">
+            {/* Connector line */}
+            <div className="hidden md:block absolute top-6 left-1/4 right-1/4 h-0.5 bg-gray-200"></div>
+            
+            <div className="text-center relative">
+              <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 relative z-10">
                 <span className="text-white font-semibold">1</span>
               </div>
               <h3 className="text-lg font-medium text-gray-900 mb-2">Create Your Account</h3>
               <p className="text-gray-500 text-sm">Sign up for free and set up your profile with your basic information.</p>
             </div>
-            <div className="text-center">
-              <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="text-center relative">
+              <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 relative z-10">
                 <span className="text-white font-semibold">2</span>
               </div>
               <h3 className="text-lg font-medium text-gray-900 mb-2">Build Your Portfolio</h3>
               <p className="text-gray-500 text-sm">Add your skills, experience, education, projects, and upload documents.</p>
             </div>
-            <div className="text-center">
-              <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="text-center relative">
+              <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 relative z-10">
                 <span className="text-white font-semibold">3</span>
               </div>
               <h3 className="text-lg font-medium text-gray-900 mb-2">Share & Succeed</h3>
@@ -307,7 +326,7 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-blue-600">
+      <section className="py-20 bg-gradient-to-r from-blue-600 to-blue-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-semibold text-white mb-4">
             Ready to Build Your Portfolio?
@@ -316,11 +335,11 @@ export default function HomePage() {
             Join professionals who use OnBoard to showcase their skills and manage their career journey.
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
-            <a href="/register" className="bg-white text-blue-600 px-6 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <a href="/register" className="bg-white text-blue-600 px-8 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors">
               Create Free Account
             </a>
-            <a href="/login" className="border border-white/30 text-white px-6 py-3 rounded-lg font-medium hover:bg-white/10 transition-colors">
+            <a href="/login" className="border border-white/40 text-white px-8 py-3 rounded-lg font-medium hover:bg-white/10 transition-colors">
               Sign In
             </a>
           </div>
