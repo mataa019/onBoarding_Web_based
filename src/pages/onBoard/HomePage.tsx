@@ -202,21 +202,33 @@ export default function HomePage() {
                 Whether you're a developer, designer, or any professional, OnBoard helps you 
                 organize your career journey — from education and experience to projects and certifications.
               </p>
-              <div className="grid grid-cols-2 gap-6">
-                <div>
-                  <div className="text-2xl font-semibold text-gray-900">Portfolio</div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 hover:shadow-md transition-shadow">
+                  <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mb-3">
+                    <UserCircleIcon className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="text-lg font-semibold text-gray-900">Portfolio</div>
                   <div className="text-sm text-gray-500">Complete Profile Builder</div>
                 </div>
-                <div>
-                  <div className="text-2xl font-semibold text-gray-900">Projects</div>
+                <div className="bg-green-50 border border-green-100 rounded-xl p-4 hover:shadow-md transition-shadow">
+                  <div className="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center mb-3">
+                    <FolderIcon className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="text-lg font-semibold text-gray-900">Projects</div>
                   <div className="text-sm text-gray-500">Showcase Your Work</div>
                 </div>
-                <div>
-                  <div className="text-2xl font-semibold text-gray-900">Documents</div>
+                <div className="bg-purple-50 border border-purple-100 rounded-xl p-4 hover:shadow-md transition-shadow">
+                  <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center mb-3">
+                    <DocumentTextIcon className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="text-lg font-semibold text-gray-900">Documents</div>
                   <div className="text-sm text-gray-500">Secure Storage</div>
                 </div>
-                <div>
-                  <div className="text-2xl font-semibold text-gray-900">Dashboard</div>
+                <div className="bg-orange-50 border border-orange-100 rounded-xl p-4 hover:shadow-md transition-shadow">
+                  <div className="w-10 h-10 bg-orange-600 rounded-lg flex items-center justify-center mb-3">
+                    <ChartBarIcon className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="text-lg font-semibold text-gray-900">Dashboard</div>
                   <div className="text-sm text-gray-500">Track Progress</div>
                 </div>
               </div>
