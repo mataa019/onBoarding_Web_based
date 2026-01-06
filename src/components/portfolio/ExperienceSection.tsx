@@ -4,6 +4,7 @@ import type { Experience } from '../../ApiService/types'
 
 import { portfolioApi } from '../../ApiService/portfolioApi'
 import { usePortfolioResource } from '../../hooks/usePortfolioResource'
+import { ConfirmDialog } from '../ConfirmDialog'
 
 interface ExperienceSectionProps {
   isEditing: boolean
@@ -16,6 +17,7 @@ export function ExperienceSection({ isEditing, onRefresh }: ExperienceSectionPro
   const [showForm, setShowForm] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
+  const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; id: string | null; title: string }>({ isOpen: false, id: null, title: '' })
   const [form, setForm] = useState({
     title: '',
     company: '',
@@ -92,11 +94,28 @@ export function ExperienceSection({ isEditing, onRefresh }: ExperienceSectionPro
       if (onRefresh) await onRefresh()
     } catch (err) {
       console.error('Failed to remove experience:', err)
+    } finally {
+      setDeleteConfirm({ isOpen: false, id: null, title: '' })
     }
+  }
+
+  const confirmDelete = (exp: Experience) => {
+    setDeleteConfirm({ isOpen: true, id: exp.id, title: exp.title })
   }
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={deleteConfirm.isOpen}
+        title="Delete Experience"
+        message={`Are you sure you want to delete "${deleteConfirm.title}"? This action cannot be undone.`}
+        confirmLabel="Delete"
+        onConfirm={() => deleteConfirm.id && handleRemove(deleteConfirm.id)}
+        onCancel={() => setDeleteConfirm({ isOpen: false, id: null, title: '' })}
+        isDestructive
+      />
+
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-gray-900 flex items-center">
           <BriefcaseIcon className="w-5 h-5 mr-2 text-blue-600" />
