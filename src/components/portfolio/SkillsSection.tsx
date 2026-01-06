@@ -21,24 +21,29 @@ export function SkillsSection({ isEditing, onRefresh }: SkillsSectionProps) {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; id: string | null; name: string }>({ isOpen: false, id: null, name: '' })
   const [form, setForm] = useState<{ name: string; level: SkillLevel }>({ name: '', level: 'INTERMEDIATE' })
-
+  const [error, setError] = useState<string | null>(null)
 
   const resetForm = () => {
     setForm({ name: '', level: 'INTERMEDIATE' })
     setShowForm(false)
     setEditingId(null)
+    setError(null)
   }
 
   const handleAdd = async () => {
     if (!form.name.trim()) return
     setIsLoading(true)
+    setError(null)
     try {
-        await portfolioApi.addSkill({ name: form.name.trim(), level: form.level })
+      console.log('Submitting skill:', { name: form.name.trim(), level: form.level })
+      await portfolioApi.addSkill({ name: form.name.trim(), level: form.level })
       await refresh()
       if (onRefresh) await onRefresh()
       resetForm()
     } catch (err) {
       console.error('Failed to add skill:', err)
+      const apiError = err as { message?: string }
+      setError(apiError.message || 'Failed to add skill. Please try again.')
     } finally {
       setIsLoading(false)
     }
@@ -47,13 +52,17 @@ export function SkillsSection({ isEditing, onRefresh }: SkillsSectionProps) {
   const handleUpdate = async () => {
     if (!editingId || !form.name.trim()) return
     setIsLoading(true)
+    setError(null)
     try {
+      console.log('Updating skill:', editingId, { name: form.name.trim(), level: form.level })
       await portfolioApi.updateSkill(editingId, { name: form.name.trim(), level: form.level })
       await refresh()
       if (onRefresh) await onRefresh()
       resetForm()
     } catch (err) {
       console.error('Failed to update skill:', err)
+      const apiError = err as { message?: string }
+      setError(apiError.message || 'Failed to update skill. Please try again.')
     } finally {
       setIsLoading(false)
     }
@@ -115,6 +124,11 @@ export function SkillsSection({ isEditing, onRefresh }: SkillsSectionProps) {
               <XMarkIcon className="w-5 h-5" />
             </button>
           </div>
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-600 px-3 py-2 rounded-lg text-sm">
+              {error}
+            </div>
+          )}
           <input type="text" placeholder="Skill name *" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
           <select value={form.level} onChange={e => setForm({ ...form, level: e.target.value as SkillLevel })}

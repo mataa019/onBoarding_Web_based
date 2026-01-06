@@ -27,6 +27,7 @@ export function ExperienceSection({ isEditing, onRefresh }: ExperienceSectionPro
     current: 'false',
     description: ''
   })
+  const [error, setError] = useState<string | null>(null)
 
   const formatDate = (dateStr: string | null | undefined) => {
     if (!dateStr) return 'Present'
@@ -40,11 +41,11 @@ export function ExperienceSection({ isEditing, onRefresh }: ExperienceSectionPro
   const handleAdd = async () => {
     if (!form.title || !form.company) return
     setIsLoading(true)
+    setError(null)
     try {
       const payload = {
         title: form.title,
         company: form.company,
-        // API expects string | null for optional fields, use null instead of undefined
         location: form.location || null,
         startDate: form.startDate || null,
         endDate: form.current === 'true' ? null : (form.endDate || null),
@@ -52,6 +53,8 @@ export function ExperienceSection({ isEditing, onRefresh }: ExperienceSectionPro
         description: form.description || null,
         order: experiences.length
       }
+
+      console.log('Submitting experience:', payload)
 
       if (editingId) {
         await portfolioApi.updateExperience(editingId, payload)
@@ -68,6 +71,8 @@ export function ExperienceSection({ isEditing, onRefresh }: ExperienceSectionPro
       setShowForm(false)
     } catch (err) {
       console.error('Failed to save experience:', err)
+      const apiError = err as { message?: string }
+      setError(apiError.message || 'Failed to save experience. Please try again.')
     } finally {
       setIsLoading(false)
     }
@@ -133,10 +138,15 @@ export function ExperienceSection({ isEditing, onRefresh }: ExperienceSectionPro
         <div className="mb-6 p-4 bg-gray-50 rounded-lg space-y-3">
           <div className="flex justify-between items-center">
             <span className="font-medium text-gray-700">{editingId ? 'Edit Experience' : 'Add Experience'}</span>
-            <button onClick={() => { setShowForm(false); setEditingId(null) }} className="text-gray-400 hover:text-gray-600">
+            <button onClick={() => { setShowForm(false); setEditingId(null); setError(null) }} className="text-gray-400 hover:text-gray-600">
               <XMarkIcon className="w-5 h-5" />
             </button>
           </div>
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-600 px-3 py-2 rounded-lg text-sm">
+              {error}
+            </div>
+          )}
           <input type="text" placeholder="Job Title *" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
           <input type="text" placeholder="Company *" value={form.company} onChange={e => setForm({ ...form, company: e.target.value })}
