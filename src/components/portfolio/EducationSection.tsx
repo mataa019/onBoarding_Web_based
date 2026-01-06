@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { AcademicCapIcon, PlusIcon, TrashIcon, XMarkIcon, PencilIcon } from '@heroicons/react/24/outline'
 import type { Education } from '../../ApiService/types'
 
@@ -152,8 +152,8 @@ export function EducationSection({ isEditing, onRefresh }: EducationSectionProps
                   </div>
                   <div>
                     <h4 className="font-medium text-gray-900">{edu.school}</h4>
-                    <p className="text-gray-600">{edu.degree} in {edu.field}</p>
-                    <p className="text-sm text-gray-500 mt-1">{edu.startYear} - {edu.endYear}</p>
+                    <p className="text-gray-600">{edu.degree}{edu.field ? ` in ${edu.field}` : ''}</p>
+                    <p className="text-sm text-gray-500 mt-1">{edu.startYear || 'N/A'} - {edu.current ? 'Present' : (edu.endYear || 'N/A')}</p>
                     {edu.description && <p className="text-gray-600 mt-2">{edu.description}</p>}
                   </div>
                 </div>

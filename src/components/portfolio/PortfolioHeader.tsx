@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import {
   ArrowUpTrayIcon,
   MapPinIcon,
@@ -25,11 +25,47 @@ interface PortfolioHeaderProps {
 
 export function PortfolioHeader({ isEditing, portfolio, onUpdate }: PortfolioHeaderProps) {
   const [isUploading, setIsUploading] = useState(false)
+  const [localFields, setLocalFields] = useState({
+    firstName: portfolio?.user?.firstName || '',
+    lastName: portfolio?.user?.lastName || '',
+    headline: portfolio?.user?.headline || '',
+    location: portfolio?.location || '',
+    website: portfolio?.website || '',
+    linkedinUrl: portfolio?.linkedinUrl || ''
+  })
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  const updateField = (field: string, value: string) => {
+  // Sync local fields when portfolio changes
+  useEffect(() => {
+    setLocalFields({
+      firstName: portfolio?.user?.firstName || '',
+      lastName: portfolio?.user?.lastName || '',
+      headline: portfolio?.user?.headline || '',
+      location: portfolio?.location || '',
+      website: portfolio?.website || '',
+      linkedinUrl: portfolio?.linkedinUrl || ''
+    })
+  }, [portfolio])
+
+  // Cleanup debounce timer on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current)
+    }
+  }, [])
+
+  const updateField = useCallback((field: string, value: string) => {
     if (!portfolio || !onUpdate) return
-    onUpdate({ [field]: value })
-  }
+    
+    // Update local state immediately for responsive UI
+    setLocalFields(prev => ({ ...prev, [field]: value }))
+    
+    // Debounce API call by 500ms
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => {
+      onUpdate({ [field]: value })
+    }, 500)
+  }, [portfolio, onUpdate])
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]

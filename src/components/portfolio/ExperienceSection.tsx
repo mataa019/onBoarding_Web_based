@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { BriefcaseIcon, PlusIcon, TrashIcon, XMarkIcon, PencilIcon } from '@heroicons/react/24/outline'
 import type { Experience } from '../../ApiService/types'
 
@@ -164,7 +164,7 @@ export function ExperienceSection({ isEditing, onRefresh }: ExperienceSectionPro
                     <h4 className="font-medium text-gray-900">{exp.title}</h4>
                     <p className="text-gray-600">{exp.company}</p>
                     <p className="text-sm text-gray-500 mt-1">
-                      {formatDate(exp.startDate)} - {exp.current ? 'Present' : formatDate(exp.endDate)} • {exp.location}
+                      {formatDate(exp.startDate)} - {exp.current ? 'Present' : formatDate(exp.endDate)}{exp.location ? ` • ${exp.location}` : ''}
                     </p>
                     {exp.description && <p className="text-gray-600 mt-2">{exp.description}</p>}
                   </div>
