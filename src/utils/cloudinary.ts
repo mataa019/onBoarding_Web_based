@@ -71,18 +71,21 @@ class CloudinaryService {
       formData.append('folder', folder)
     }
 
-    // Optional: Add transformation for automatic optimization
-    formData.append('transformation', 'q_auto,f_auto')
+    // Note: Don't add 'transformation' param for unsigned uploads - configure in preset instead
 
     try {
+      console.log('Uploading to Cloudinary:', { cloudName: this.cloudName, uploadPreset: this.uploadPreset, folder })
+      
       const response = await fetch(this.uploadUrl, {
         method: 'POST',
         body: formData,
       })
 
       if (!response.ok) {
-        const error: CloudinaryError = await response.json()
-        throw new Error(error.message || 'Failed to upload image')
+        const errorData = await response.json()
+        console.error('Cloudinary error response:', errorData)
+        const errorMessage = errorData.error?.message || errorData.message || 'Failed to upload image'
+        throw new Error(errorMessage)
       }
 
       const data: CloudinaryResponse = await response.json()

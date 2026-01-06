@@ -110,7 +110,6 @@ export class ApiService {
   async getProjects(): Promise<Project[]> {
     const response = await this.request<ProjectsResponse | Project[]>('/projects')
     console.log('getProjects raw response:', response)
-    // Handle both { projects: [...] } and direct array response
     if (Array.isArray(response)) {
       return response
     }
@@ -118,7 +117,6 @@ export class ApiService {
   }
   async getProject(id: string): Promise<Project> {
     const response = await this.request<ProjectResponse | Project>(`/projects/${id}`)
-    // Handle both { project: {...} } and direct object response
     if ('project' in response) {
       return response.project
     }
