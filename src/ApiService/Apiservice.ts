@@ -19,16 +19,16 @@ import type {
 // ApiService Class
 export class ApiService {
   private baseURL: string
-  private accessToken: string | null
 
   constructor(baseURL: string = import.meta.env.VITE_API_URL || 'http://10.36.60.64:3000') {
     this.baseURL = baseURL
-    this.accessToken = getStoredToken()
   }
 
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const url = `${this.baseURL}${endpoint}`
-    return makeRequest<T>(url, options, this.accessToken)
+    // Always get fresh token from storage for each request
+    const accessToken = getStoredToken()
+    return makeRequest<T>(url, options, accessToken)
   }
 
   // ==========================================
@@ -42,7 +42,6 @@ export class ApiService {
     })
     // Store token after successful login
     setStoredToken(response.accessToken)
-    this.accessToken = response.accessToken
 
     return response
   }
@@ -55,7 +54,6 @@ export class ApiService {
 
     // Store token after successful registration
     setStoredToken(response.accessToken)
-    this.accessToken = response.accessToken
 
     return response
   }
@@ -69,7 +67,6 @@ export class ApiService {
       console.error('Logout error:', error)
     } finally {
       removeStoredToken()
-      this.accessToken = null
     }
   }
 
@@ -92,11 +89,11 @@ export class ApiService {
   }
 
   getToken(): string | null {
-    return this.accessToken
+    return getStoredToken()
   }
 
   isAuthenticated(): boolean {
-    return this.accessToken !== null
+    return getStoredToken() !== null
   }
 
   // ==========================================

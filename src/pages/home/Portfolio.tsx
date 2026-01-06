@@ -9,7 +9,7 @@ import {
   ClipboardDocumentCheckIcon
 } from '@heroicons/react/24/outline'
 import { portfolioApi } from '../../ApiService/portfolioApi'
-import type { Portfolio as PortfolioType } from '../../ApiService/types'
+import type { Portfolio as PortfolioType, ApiError } from '../../ApiService/types'
 import {
   PortfolioHeader,
   AboutSection,
@@ -19,6 +19,7 @@ import {
   ReferencesSection
 } from '../../components/portfolio'
 import { PortfolioResourceProvider } from '../../hooks/usePortfolioResource'
+import { useAuth } from '../../context/AuthContext'
 
 // Default empty portfolio structure
 const defaultPortfolio: PortfolioType = {
@@ -54,6 +55,7 @@ const defaultPortfolio: PortfolioType = {
 }
 
 export function Portfolio() {
+  const { logout } = useAuth()
   const [portfolio, setPortfolio] = useState<PortfolioType>(defaultPortfolio)
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
@@ -88,8 +90,17 @@ export function Portfolio() {
         setPortfolio(data || defaultPortfolio)
       }
     } catch (err) {
-      // If loading fails, keep the default empty portfolio so user can still see/edit the layout
+      const apiError = err as ApiError
       console.error('Failed to load portfolio:', err)
+      
+      // Handle 401 Unauthorized - redirect to login
+      if (apiError.statusCode === 401) {
+        setError('Session expired. Please log in again.')
+        logout()
+        return
+      }
+      
+      setError(apiError.message || 'Failed to load portfolio')
     } finally {
       setIsLoading(false)
     }

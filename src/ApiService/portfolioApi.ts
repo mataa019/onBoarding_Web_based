@@ -4,21 +4,16 @@ import type { Portfolio, Experience, Education, Skill, Reference, PortfolioUpdat
 
 class PortfolioApiService {
   private baseURL: string
-  private accessToken: string | null
 
   constructor(baseURL: string = import.meta.env.VITE_API_URL || 'http://10.36.60.64:3000') {
     this.baseURL = baseURL
-    this.accessToken = getStoredToken()
   }
 
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const url = `${this.baseURL}${endpoint}`
-    return makeRequest<T>(url, options, this.accessToken)
-  }
-
-  // Refresh token from storage (call after login)
-  refreshToken(): void {
-    this.accessToken = getStoredToken()
+    // Always get fresh token from storage for each request
+    const accessToken = getStoredToken()
+    return makeRequest<T>(url, options, accessToken)
   }
 
   // ==========================================
