@@ -193,7 +193,7 @@ export function ExperienceSection({ isEditing, onRefresh }: ExperienceSectionPro
                     <button onClick={() => startEdit(exp)} className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg">
                       <PencilIcon className="w-4 h-4" />
                     </button>
-                    <button onClick={() => handleRemove(exp.id)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg">
+                    <button onClick={() => confirmDelete(exp)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg">
                       <TrashIcon className="w-4 h-4" />
                     </button>
                   </div>
