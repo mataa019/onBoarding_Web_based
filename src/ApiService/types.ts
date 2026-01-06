@@ -46,7 +46,6 @@ export interface ProjectImage {
 }
 
 export interface ProjectTag {
-  id: string
   name: string
 }
 
@@ -54,11 +53,11 @@ export interface Project {
   id: string
   name: string
   description: string
-  githubUrl: string
+  githubLink: string
   images: ProjectImage[]
   tags: ProjectTag[]
-  createdAt: string
-  updatedAt: string
+  createdAt?: string
+  updatedAt?: string
 }
 
 export interface CreateProjectRequest {

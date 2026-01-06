@@ -108,28 +108,47 @@ export class ApiService {
   // ==========================================
 
   async getProjects(): Promise<Project[]> {
-    const response = await this.request<ProjectsResponse>('/projects')
-    return response.projects
+    const response = await this.request<ProjectsResponse | Project[]>('/projects')
+    console.log('getProjects raw response:', response)
+    // Handle both { projects: [...] } and direct array response
+    if (Array.isArray(response)) {
+      return response
+    }
+    return response.projects || []
   }
   async getProject(id: string): Promise<Project> {
-    const response = await this.request<ProjectResponse>(`/projects/${id}`)
-    return response.project
+    const response = await this.request<ProjectResponse | Project>(`/projects/${id}`)
+    // Handle both { project: {...} } and direct object response
+    if ('project' in response) {
+      return response.project
+    }
+    return response as Project
   }
 
   async createProject(data: CreateProjectRequest): Promise<Project> {
-    const response = await this.request<ProjectResponse>('/projects', {
+    const response = await this.request<ProjectResponse | Project>('/projects', {
       method: 'POST',
       body: JSON.stringify(data),
     })
-    return response.project
+    console.log('createProject raw response:', response)
+    // Handle both { project: {...} } and direct object response
+    if ('project' in response) {
+      return response.project
+    }
+    return response as Project
   }
   
   async updateProject(id: string, data: UpdateProjectRequest): Promise<Project> {
-    const response = await this.request<ProjectResponse>(`/projects/${id}`, {
+    const response = await this.request<ProjectResponse | Project>(`/projects/${id}`, {
       method: 'PATCH',
       body: JSON.stringify(data),
     })
-    return response.project
+    console.log('updateProject raw response:', response)
+    // Handle both { project: {...} } and direct object response
+    if ('project' in response) {
+      return response.project
+    }
+    return response as Project
   }
 
   async deleteProject(id: string): Promise<void> {

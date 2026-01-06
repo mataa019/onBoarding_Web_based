@@ -39,10 +39,10 @@ export function Project() {
         id: project.id,
         name: project.name,
         description: project.description,
-        githubUrl: project.githubUrl,
-        images: project.images.map(img => img.url),
-        tags: project.tags.map(tag => tag.name),
-        createdAt: new Date(project.createdAt)
+        githubUrl: project.githubLink,
+        images: (project.images || []).map(img => img.url),
+        tags: (project.tags || []).map(tag => tag.name),
+        createdAt: project.createdAt ? new Date(project.createdAt) : new Date()
       }))
       setProjects(transformedProjects)
     } catch (err) {
