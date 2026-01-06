@@ -95,25 +95,25 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
+    <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
       {/* Welcome Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-500 rounded-2xl p-6 text-white">
-        <div className="flex items-center justify-between">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-500 rounded-xl sm:rounded-2xl p-4 sm:p-6 text-white">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-semibold">Welcome back, John! 👋</h1>
-            <p className="text-blue-100 mt-1">Your portfolio is {completionPercentage}% complete. Keep going!</p>
+            <h1 className="text-xl sm:text-2xl font-semibold">Welcome back, John! 👋</h1>
+            <p className="text-blue-100 mt-1 text-sm sm:text-base">Your portfolio is {completionPercentage}% complete. Keep going!</p>
           </div>
-          <div className="hidden md:flex items-center space-x-3">
+          <div className="flex items-center space-x-3">
             <a
               href="/portfolio"
-              className="inline-flex items-center px-4 py-2 bg-white/20 backdrop-blur-sm text-white rounded-lg hover:bg-white/30 transition-colors"
+              className="inline-flex items-center px-3 sm:px-4 py-2 bg-white/20 backdrop-blur-sm text-white text-sm rounded-lg hover:bg-white/30 transition-colors"
             >
               <EyeIcon className="w-4 h-4 mr-2" />
               View Portfolio
             </a>
             <button
               onClick={copyShareLink}
-              className="inline-flex items-center px-4 py-2 bg-white text-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
+              className="inline-flex items-center px-3 sm:px-4 py-2 bg-white text-blue-600 text-sm rounded-lg hover:bg-blue-50 transition-colors"
             >
               <ShareIcon className="w-4 h-4 mr-2" />
               Share
@@ -123,7 +123,7 @@ export default function Dashboard() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
           <div className="flex items-center justify-between">
             <div>

@@ -8,7 +8,8 @@ import {
   DocumentTextIcon,
   FolderIcon,
   ChevronLeftIcon,
-  ChevronRightIcon
+  ChevronRightIcon,
+  XMarkIcon
 } from '@heroicons/react/24/outline'
 import { useAuth } from '../../context/AuthContext'
 
@@ -34,9 +35,10 @@ function classNames(...classes: (string | boolean | undefined)[]) {
 interface SidebarProps {
   isCollapsed?: boolean
   onToggleCollapse?: () => void
+  onMobileClose?: () => void
 }
 
-export default function Sidebar({ isCollapsed = false, onToggleCollapse }: SidebarProps) {
+export default function Sidebar({ isCollapsed = false, onToggleCollapse, onMobileClose }: SidebarProps) {
   const { user } = useAuth()
   
   // Get user initials from first and last name
@@ -54,25 +56,35 @@ export default function Sidebar({ isCollapsed = false, onToggleCollapse }: Sideb
 
   return (
     <div className={classNames(
-      'flex flex-col bg-white border-r border-gray-200 transition-all duration-300',
+      'flex flex-col bg-white border-r border-gray-200 transition-all duration-300 h-full',
       isCollapsed ? 'w-16' : 'w-64'
     )}>
       {/* Logo/Brand Section */}
       <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200">
+        {/* Mobile Close Button */}
+        {onMobileClose && (
+          <button
+            onClick={onMobileClose}
+            className="lg:hidden p-1.5 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+          >
+            <XMarkIcon className="w-5 h-5" />
+          </button>
+        )}
+        
         {!isCollapsed && (
-          <div className="flex items-center">
-            <img src="/Onboardingflow_logo.png" alt="OnBoard" className="h-[140px] w-auto" />
+          <div className="flex items-center flex-1 justify-center lg:justify-start">
+            <img src="/Onboardingflow_logo.png" alt="OnBoard" className="h-10 w-auto" />
           </div>
         )}
 
         {isCollapsed && (
-          <img src="/Onboardingflow_logo.png" alt="OnBoard" className="h-[140px] w-auto mx-auto" />
+          <img src="/Onboardingflow_logo.png" alt="OnBoard" className="h-10 w-auto mx-auto" />
         )}
         
         {onToggleCollapse && (
           <button
             onClick={onToggleCollapse}
-            className="p-1.5 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+            className="hidden lg:block p-1.5 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100"
           >
             {isCollapsed ? (
               <ChevronRightIcon className="w-5 h-5" />
@@ -89,6 +101,7 @@ export default function Sidebar({ isCollapsed = false, onToggleCollapse }: Sideb
           <NavLink
             key={item.name}
             to={item.href}
+            onClick={onMobileClose}
             className={({ isActive }) => classNames(
               isActive
                 ? 'bg-blue-50 border-r-2 border-blue-600 text-blue-700'

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { CogIcon, ArrowRightOnRectangleIcon } from '@heroicons/react/24/outline'
+import { CogIcon, ArrowRightOnRectangleIcon, Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import Sidebar from './Sidebar'
 import { useAuth } from '../../context/AuthContext'
 
@@ -10,6 +10,7 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [showFooter, setShowFooter] = useState(false)
   const [showProfileDropdown, setShowProfileDropdown] = useState(false)
   const mainRef = useRef<HTMLElement>(null)
@@ -30,6 +31,15 @@ export default function Layout({ children }: LayoutProps) {
   const toggleSidebar = () => {
     setSidebarCollapsed(!sidebarCollapsed)
   }
+
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen)
+  }
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMobileMenuOpen(false)
+  }, [navigate])
 
   const handleSettingsClick = () => {
     setShowProfileDropdown(false)
@@ -76,19 +86,46 @@ export default function Layout({ children }: LayoutProps) {
 
   return (
     <div className="flex h-screen bg-gray-50">
-      {/* Sidebar */}
-      <Sidebar 
-        isCollapsed={sidebarCollapsed} 
-        onToggleCollapse={toggleSidebar} 
-      />
+      {/* Mobile Menu Overlay */}
+      {mobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Sidebar - Hidden on mobile, shown on desktop */}
+      <div className={`
+        fixed inset-y-0 left-0 z-50 lg:relative lg:z-0
+        transform transition-transform duration-300 ease-in-out
+        ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+      `}>
+        <Sidebar 
+          isCollapsed={sidebarCollapsed} 
+          onToggleCollapse={toggleSidebar}
+          onMobileClose={() => setMobileMenuOpen(false)}
+        />
+      </div>
       
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden relative">
         {/* Header */}
-        <header className="bg-white border-b border-gray-200 px-6 py-4">
+        <header className="bg-white border-b border-gray-200 px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-semibold text-gray-900"></h1>
-            <div className="flex items-center space-x-4">
+            {/* Mobile Menu Button */}
+            <button
+              onClick={toggleMobileMenu}
+              className="lg:hidden p-2 -ml-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+            >
+              {mobileMenuOpen ? (
+                <XMarkIcon className="w-6 h-6" />
+              ) : (
+                <Bars3Icon className="w-6 h-6" />
+              )}
+            </button>
+            
+            <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 lg:ml-0"></h1>
+            <div className="flex items-center space-x-2 sm:space-x-4">
               {/* Profile Dropdown */}
               <div ref={dropdownRef} className="relative">
                 <button
@@ -137,7 +174,7 @@ export default function Layout({ children }: LayoutProps) {
         </header>
         
         {/* Page Content */}
-        <main ref={mainRef} className="flex-1 overflow-y-auto p-6">
+        <main ref={mainRef} className="flex-1 overflow-y-auto p-4 sm:p-6">
           {children}
         </main>
 
