@@ -177,33 +177,33 @@ export default function HomePage() {
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-3xl font-semibold text-gray-900 mb-4">
-                About OnboardFlow
+                About OnBoard
               </h2>
               <p className="text-gray-600 mb-4 leading-relaxed">
-                OnboardFlow is a modern project onboarding platform designed to help development teams 
-                streamline their workflow. We make it easy to connect GitHub repositories, set up 
-                automated processes, and collaborate effectively.
+                OnBoard is a modern portfolio management platform designed to help professionals 
+                showcase their skills, projects, and achievements. We make it easy to create 
+                a comprehensive profile that stands out to employers and clients.
               </p>
               <p className="text-gray-600 mb-6 leading-relaxed">
-                Our mission is to eliminate the friction in project setup and team onboarding, 
-                allowing developers to focus on what they do best — building great software.
+                Whether you're a developer, designer, or any professional, OnBoard helps you 
+                organize your career journey — from education and experience to projects and certifications.
               </p>
               <div className="grid grid-cols-2 gap-6">
                 <div>
-                  <div className="text-2xl font-semibold text-gray-900">2,400+</div>
-                  <div className="text-sm text-gray-500">Projects Onboarded</div>
+                  <div className="text-2xl font-semibold text-gray-900">Portfolio</div>
+                  <div className="text-sm text-gray-500">Complete Profile Builder</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-semibold text-gray-900">850+</div>
-                  <div className="text-sm text-gray-500">Active Teams</div>
+                  <div className="text-2xl font-semibold text-gray-900">Projects</div>
+                  <div className="text-sm text-gray-500">Showcase Your Work</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-semibold text-gray-900">12,000+</div>
-                  <div className="text-sm text-gray-500">GitHub Repos</div>
+                  <div className="text-2xl font-semibold text-gray-900">Documents</div>
+                  <div className="text-sm text-gray-500">Secure Storage</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-semibold text-gray-900">99.9%</div>
-                  <div className="text-sm text-gray-500">Uptime</div>
+                  <div className="text-2xl font-semibold text-gray-900">Dashboard</div>
+                  <div className="text-sm text-gray-500">Track Progress</div>
                 </div>
               </div>
             </div>
@@ -211,29 +211,29 @@ export default function HomePage() {
               <div className="space-y-4">
                 <div className="flex items-start space-x-3">
                   <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <CodeBracketIcon className="w-4 h-4 text-blue-600" />
+                    <UserCircleIcon className="w-4 h-4 text-blue-600" />
                   </div>
                   <div>
-                    <h4 className="font-medium text-gray-900">Developer First</h4>
-                    <p className="text-sm text-gray-500">Built by developers, for developers.</p>
+                    <h4 className="font-medium text-gray-900">Complete Profile</h4>
+                    <p className="text-sm text-gray-500">Add skills, experience, education & references.</p>
                   </div>
                 </div>
                 <div className="flex items-start space-x-3">
                   <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <UsersIcon className="w-4 h-4 text-green-600" />
+                    <FolderIcon className="w-4 h-4 text-green-600" />
                   </div>
                   <div>
-                    <h4 className="font-medium text-gray-900">Team Focused</h4>
-                    <p className="text-sm text-gray-500">Collaboration tools that actually work.</p>
+                    <h4 className="font-medium text-gray-900">Project Gallery</h4>
+                    <p className="text-sm text-gray-500">Showcase your best work with images & links.</p>
                   </div>
                 </div>
                 <div className="flex items-start space-x-3">
                   <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <CogIcon className="w-4 h-4 text-purple-600" />
+                    <DocumentTextIcon className="w-4 h-4 text-purple-600" />
                   </div>
                   <div>
-                    <h4 className="font-medium text-gray-900">Automation Ready</h4>
-                    <p className="text-sm text-gray-500">Automate repetitive onboarding tasks.</p>
+                    <h4 className="font-medium text-gray-900">Document Vault</h4>
+                    <p className="text-sm text-gray-500">Store certificates, resumes & important files.</p>
                   </div>
                 </div>
               </div>
