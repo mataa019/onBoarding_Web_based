@@ -96,6 +96,7 @@ export interface UploadImagesResponse {
 
 export interface Experience {
   id: string
+  portfolioId?: string
   title: string
   company: string
   location: string | null
@@ -103,10 +104,14 @@ export interface Experience {
   endDate: string | null
   current: boolean
   description: string | null
+  order?: number
+  createdAt?: string
+  updatedAt?: string
 }
 
 export interface Education {
   id: string
+  portfolioId?: string
   school: string
   degree: string
   field: string | null
@@ -114,13 +119,19 @@ export interface Education {
   endYear: number | null
   current: boolean
   description: string | null
+  order?: number
+  createdAt?: string
+  updatedAt?: string
 }
 
 export interface Skill {
   id: string
+  portfolioId?: string
   name: string
   level?: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'EXPERT'
-  category?: string
+  order?: number
+  createdAt?: string
+  updatedAt?: string
 }
 
 export interface Reference {
