@@ -151,14 +151,14 @@ export function PortfolioHeader({ isEditing, portfolio, onUpdate }: PortfolioHea
               <div className="grid grid-cols-2 gap-4">
                 <input
                   type="text"
-                  value={user.firstName || ''}
+                  value={localFields.firstName}
                   onChange={(e) => updateField('firstName', e.target.value)}
                   className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                   placeholder="First Name"
                 />
                 <input
                   type="text"
-                  value={user.lastName || ''}
+                  value={localFields.lastName}
                   onChange={(e) => updateField('lastName', e.target.value)}
                   className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                   placeholder="Last Name"
@@ -166,7 +166,7 @@ export function PortfolioHeader({ isEditing, portfolio, onUpdate }: PortfolioHea
               </div>
               <input
                 type="text"
-                value={user.headline || ''}
+                value={localFields.headline}
                 onChange={(e) => updateField('headline', e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                 placeholder="Professional Headline"
@@ -186,7 +186,7 @@ export function PortfolioHeader({ isEditing, portfolio, onUpdate }: PortfolioHea
               {isEditing ? (
                 <input
                   type="text"
-                  value={location || ''}
+                  value={localFields.location}
                   onChange={(e) => updateField('location', e.target.value)}
                   className="px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none text-sm"
                   placeholder="Location"
@@ -217,7 +217,7 @@ export function PortfolioHeader({ isEditing, portfolio, onUpdate }: PortfolioHea
                 {isEditing ? (
                   <input
                     type="url"
-                    value={website || ''}
+                    value={localFields.website}
                     onChange={(e) => updateField('website', e.target.value)}
                     className="px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none text-sm"
                     placeholder="Website URL"
@@ -235,7 +235,7 @@ export function PortfolioHeader({ isEditing, portfolio, onUpdate }: PortfolioHea
                 {isEditing ? (
                   <input
                     type="url"
-                    value={linkedinUrl || ''}
+                    value={localFields.linkedinUrl}
                     onChange={(e) => updateField('linkedinUrl', e.target.value)}
                     className="px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none text-sm"
                     placeholder="LinkedIn URL"
