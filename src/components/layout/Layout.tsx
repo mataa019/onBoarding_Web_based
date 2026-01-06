@@ -37,6 +37,21 @@ export default function Layout({ children }: LayoutProps) {
         <main className="flex-1 overflow-y-auto p-6">
           {children}
         </main>
+
+        {/* Footer */}
+        <footer className="bg-white border-t border-gray-200 px-6 py-3">
+          <div className="flex items-center justify-center text-sm text-gray-500">
+            <span>Developed by</span>
+            <a 
+              href="https://github.com/mataa019" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="ml-1 text-blue-600 hover:text-blue-800 hover:underline font-medium"
+            >
+              John Mataa
+            </a>
+          </div>
+        </footer>
       </div>
     </div>
   )
