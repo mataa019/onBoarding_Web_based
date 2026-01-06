@@ -112,9 +112,8 @@ function Register() {
 
         {/* Content overlay */}
         <div className="relative z-10 p-10 flex flex-col justify-between w-full">
-          <div className="flex items-center space-x-2">
-            <img src="/Onboardingflow_logo.png" alt="OnBoard" className="w-10 h-10 object-contain" />
-            <span className="text-lg font-semibold text-white">OnBoard</span>
+          <div className="flex items-center">
+            <img src="/Onboardingflow_logo.png" alt="OnBoard" className="h-12 object-contain" />
           </div>
           
           <div>
@@ -188,9 +187,8 @@ function Register() {
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 bg-gray-50">
         <div className="w-full max-w-sm">
           {/* Mobile Logo */}
-          <div className="lg:hidden flex items-center justify-center space-x-2 mb-6">
-            <img src="/Onboardingflow_logo.png" alt="OnBoard" className="w-10 h-10 object-contain" />
-            <span className="text-lg font-semibold text-gray-900">OnBoard</span>
+          <div className="lg:hidden flex items-center justify-center mb-6">
+            <img src="/Onboardingflow_logo.png" alt="OnBoard" className="h-12 object-contain" />
           </div>
 
           <div className="text-center mb-5">

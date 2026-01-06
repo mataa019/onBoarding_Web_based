@@ -60,14 +60,13 @@ export default function Sidebar({ isCollapsed = false, onToggleCollapse }: Sideb
       {/* Logo/Brand Section */}
       <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200">
         {!isCollapsed && (
-          <div className="flex items-center space-x-3">
-            <img src="/Onboardingflow_logo.png" alt="OnBoard" className="w-10 h-10 object-contain" />
-            <span className="text-lg font-semibold text-gray-900">OnBoard</span>
+          <div className="flex items-center">
+            <img src="/Onboardingflow_logo.png" alt="OnBoard" className="h-10 object-contain" />
           </div>
         )}
 
         {isCollapsed && (
-          <img src="/Onboardingflow_logo.png" alt="OnBoard" className="w-10 h-10 object-contain mx-auto" />
+          <img src="/Onboardingflow_logo.png" alt="OnBoard" className="h-10 object-contain mx-auto" />
         )}
         
         {onToggleCollapse && (

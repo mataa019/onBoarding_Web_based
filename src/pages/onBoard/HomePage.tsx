@@ -90,9 +90,8 @@ export default function HomePage() {
       <nav className="absolute top-0 left-0 right-0 z-50 bg-transparent">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <a href="/" className="flex items-center space-x-2">
-              <img src="/Onboardingflow_logo.png" alt="OnBoard" className="w-10 h-10 object-contain" />
-              <span className="text-lg font-semibold text-white">OnBoard</span>
+            <a href="/" className="flex items-center">
+              <img src="/Onboardingflow_logo.png" alt="OnBoard" className="h-12 object-contain" />
             </a>
             
             <div className="hidden md:flex items-center space-x-8">
@@ -360,9 +359,8 @@ export default function HomePage() {
       <footer className="bg-gray-950 text-white py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between">
-            <div className="flex items-center space-x-2 mb-4 md:mb-0">
-              <img src="/Onboardingflow_logo.png" alt="OnBoard" className="w-10 h-10 object-contain" />
-              <span className="font-semibold">OnBoard</span>
+            <div className="flex items-center mb-4 md:mb-0">
+              <img src="/Onboardingflow_logo.png" alt="OnBoard" className="h-12 object-contain" />
             </div>
             
             <div className="flex items-center space-x-6 text-sm text-gray-400">
