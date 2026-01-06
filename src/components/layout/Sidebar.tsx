@@ -64,7 +64,7 @@ export default function Sidebar({ isCollapsed = false, onToggleCollapse }: Sideb
             <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">O</span>
             </div>
-            <span className="text-lg font-semibold text-gray-900">onBoarding App</span>
+            <span className="text-lg font-semibold text-gray-900">OnBoard</span>
           </div>
         )}
 
