@@ -202,3 +202,38 @@ export interface PortfolioResponse {
   message: string
   portfolio: Portfolio
 }
+
+// ==========================================
+// Document Types
+// ==========================================
+
+export interface Document {
+  id: string
+  name: string
+  type: string
+  category: string
+  fileUrl: string
+  fileName: string
+  fileSize: string
+  uploadedAt: string
+  expiryDate?: string | null
+}
+
+export interface CreateDocumentRequest {
+  name: string
+  type: string
+  category: string
+  fileUrl: string
+  fileName: string
+  fileSize: string
+  expiryDate?: string | null
+}
+
+export interface DocumentsResponse {
+  documents: Document[]
+}
+
+export interface DocumentResponse {
+  message: string
+  document: Document
+}

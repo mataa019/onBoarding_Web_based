@@ -13,7 +13,11 @@ import type {
   PortfolioResponse,
   Experience,
   Education,
-  Skill
+  Skill,
+  Document,
+  CreateDocumentRequest,
+  DocumentsResponse,
+  DocumentResponse
 } from './types'
 
 // ApiService Class
@@ -251,6 +255,46 @@ export class ApiService {
 
   async deleteSkill(id: string): Promise<void> {
     await this.request(`/portfolio/skills/${id}`, {
+      method: 'DELETE',
+    })
+  }
+
+  // ==========================================
+  // 📄 DOCUMENTS
+  // ==========================================
+
+  async getDocuments(): Promise<Document[]> {
+    const response = await this.request<DocumentsResponse | Document[]>('/documents')
+    console.log('getDocuments raw response:', response)
+    // Handle both { documents: [...] } and direct array response
+    if (Array.isArray(response)) {
+      return response
+    }
+    return response.documents || []
+  }
+
+  async getDocument(id: string): Promise<Document> {
+    const response = await this.request<DocumentResponse | Document>(`/documents/${id}`)
+    if ('document' in response) {
+      return response.document
+    }
+    return response as Document
+  }
+
+  async createDocument(data: CreateDocumentRequest): Promise<Document> {
+    const response = await this.request<DocumentResponse | Document>('/documents', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+    console.log('createDocument raw response:', response)
+    if ('document' in response) {
+      return response.document
+    }
+    return response as Document
+  }
+
+  async deleteDocument(id: string): Promise<void> {
+    await this.request(`/documents/${id}`, {
       method: 'DELETE',
     })
   }

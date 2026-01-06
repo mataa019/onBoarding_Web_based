@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { 
   PlusIcon, 
   DocumentIcon, 
@@ -8,7 +8,12 @@ import {
 } from '@heroicons/react/24/outline'
 import { SearchInput, SelectFilter } from '../../components/FormComponents'
 import { Modal, FileUpload, EmptyState, type UploadedFile } from '../../components/UIComponents'
+import { useAuth } from '../../context/AuthContext'
+import { cloudinaryService } from '../../utils/cloudinary'
+import { ConfirmDialog } from '../../components/ConfirmDialog'
+import type { Document as ApiDocument } from '../../ApiService/types'
 
+// Local interface for UI (with Date object instead of string)
 interface Document {
   id: string
   name: string
@@ -41,43 +46,15 @@ const documentTypes: Record<string, string[]> = {
 }
 
 export function Document() {
-  const [documents, setDocuments] = useState<Document[]>([
-    {
-      id: '1',
-      name: 'National Registration Card',
-      type: 'National ID (NRC)',
-      category: 'Identification',
-      file: '',
-      fileName: 'nrc_front.pdf',
-      fileSize: '2.4 MB',
-      uploadedAt: new Date('2024-01-15'),
-      expiryDate: '2030-01-15'
-    },
-    {
-      id: '2',
-      name: 'Driving License',
-      type: 'Driving License',
-      category: 'Licenses',
-      file: '',
-      fileName: 'driving_license.pdf',
-      fileSize: '1.8 MB',
-      uploadedAt: new Date('2024-02-20'),
-      expiryDate: '2026-02-20'
-    },
-    {
-      id: '3',
-      name: 'Bachelor Degree Certificate',
-      type: 'Degree',
-      category: 'Education',
-      file: '',
-      fileName: 'bsc_certificate.pdf',
-      fileSize: '3.1 MB',
-      uploadedAt: new Date('2024-03-10')
-    }
-  ])
+  const { api } = useAuth()
+  const [documents, setDocuments] = useState<Document[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
+  const [error, setError] = useState('')
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [viewDocument, setViewDocument] = useState<Document | null>(null)
+  const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; id: string | null; name: string }>({ isOpen: false, id: null, name: '' })
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('All Documents')
   const [formData, setFormData] = useState({
@@ -88,9 +65,40 @@ export function Document() {
   })
   const [uploadedFile, setUploadedFile] = useState<UploadedFile | null>(null)
 
+  // Fetch documents on mount
+  useEffect(() => {
+    fetchDocuments()
+  }, [])
+
+  const fetchDocuments = async () => {
+    setIsLoading(true)
+    try {
+      const data = await api.getDocuments()
+      // Transform API Document to local Document (date string -> Date object)
+      const transformedDocs: Document[] = data.map((doc: ApiDocument) => ({
+        id: doc.id,
+        name: doc.name,
+        type: doc.type,
+        category: doc.category,
+        file: doc.fileUrl,
+        fileName: doc.fileName,
+        fileSize: doc.fileSize,
+        uploadedAt: new Date(doc.uploadedAt),
+        expiryDate: doc.expiryDate || undefined
+      }))
+      setDocuments(transformedDocs)
+    } catch (err) {
+      console.error('Failed to fetch documents:', err)
+      setError('Failed to load documents')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const openModal = () => {
     setFormData({ name: '', type: '', category: 'Identification', expiryDate: '' })
     setUploadedFile(null)
+    setError('')
     setIsModalOpen(true)
   }
 
@@ -98,31 +106,73 @@ export function Document() {
     setIsModalOpen(false)
     setFormData({ name: '', type: '', category: 'Identification', expiryDate: '' })
     setUploadedFile(null)
+    setError('')
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!uploadedFile) return
+    
+    setIsUploading(true)
+    setError('')
 
-    const newDocument: Document = {
-      id: Date.now().toString(),
-      name: formData.name,
-      type: formData.type,
-      category: formData.category,
-      file: uploadedFile.file,
-      fileName: uploadedFile.fileName,
-      fileSize: uploadedFile.fileSize,
-      uploadedAt: new Date(),
-      expiryDate: formData.expiryDate || undefined
+    try {
+      // Check if Cloudinary is configured
+      if (!cloudinaryService.isConfigured()) {
+        setError('File upload service is not configured. Please contact administrator.')
+        setIsUploading(false)
+        return
+      }
+
+      // Upload file to Cloudinary
+      let fileUrl = ''
+      if (uploadedFile.rawFile) {
+        try {
+          fileUrl = await cloudinaryService.uploadImage(uploadedFile.rawFile, 'documents')
+        } catch (uploadError) {
+          const message = uploadError instanceof Error ? uploadError.message : 'Failed to upload file'
+          setError(message)
+          setIsUploading(false)
+          return
+        }
+      }
+
+      // Create document via API
+      await api.createDocument({
+        name: formData.name,
+        type: formData.type,
+        category: formData.category,
+        fileUrl: fileUrl,
+        fileName: uploadedFile.fileName,
+        fileSize: uploadedFile.fileSize,
+        expiryDate: formData.expiryDate || null
+      })
+
+      // Refresh documents list
+      await fetchDocuments()
+      closeModal()
+    } catch (err) {
+      console.error('Failed to create document:', err)
+      setError(err instanceof Error ? err.message : 'Failed to create document')
+    } finally {
+      setIsUploading(false)
     }
-    setDocuments([...documents, newDocument])
-    closeModal()
   }
 
-  const deleteDocument = (id: string) => {
-    if (confirm('Are you sure you want to delete this document?')) {
-      setDocuments(documents.filter(d => d.id !== id))
+  const deleteDocument = async (id: string) => {
+    try {
+      await api.deleteDocument(id)
+      await fetchDocuments()
+    } catch (err) {
+      console.error('Failed to delete document:', err)
+      setError('Failed to delete document')
+    } finally {
+      setDeleteConfirm({ isOpen: false, id: null, name: '' })
     }
+  }
+
+  const confirmDelete = (doc: Document) => {
+    setDeleteConfirm({ isOpen: true, id: doc.id, name: doc.name })
   }
 
   const filteredDocuments = documents.filter(doc => {
@@ -156,6 +206,17 @@ export function Document() {
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={deleteConfirm.isOpen}
+        title="Delete Document"
+        message={`Are you sure you want to delete "${deleteConfirm.name}"? This action cannot be undone.`}
+        confirmLabel="Delete"
+        onConfirm={() => deleteConfirm.id && deleteDocument(deleteConfirm.id)}
+        onCancel={() => setDeleteConfirm({ isOpen: false, id: null, name: '' })}
+        isDestructive
+      />
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
         <div>
@@ -285,7 +346,7 @@ export function Document() {
                           <ArrowDownTrayIcon className="w-4 h-4" />
                         </a>
                         <button
-                          onClick={() => deleteDocument(doc.id)}
+                          onClick={() => confirmDelete(doc)}
                           className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                           title="Delete document"
                         >
@@ -319,6 +380,13 @@ export function Document() {
         maxWidth="lg"
       >
         <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Error Message */}
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
+              {error}
+            </div>
+          )}
+
           {/* File Upload */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -402,16 +470,27 @@ export function Document() {
             <button
               type="button"
               onClick={closeModal}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+              disabled={isUploading}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Cancel
             </button>
             <button
               type="submit"
-              disabled={!uploadedFile}
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={!uploadedFile || isUploading}
+              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
             >
-              Upload Document
+              {isUploading ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  Uploading...
+                </>
+              ) : (
+                'Upload Document'
+              )}
             </button>
           </div>
         </form>

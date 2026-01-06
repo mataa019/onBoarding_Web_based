@@ -105,6 +105,7 @@ export interface UploadedFile {
   file: string
   fileName: string
   fileSize: string
+  rawFile?: File  // Raw File object for upload to external services
 }
 
 interface FileUploadProps {
