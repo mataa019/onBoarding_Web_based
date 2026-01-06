@@ -45,32 +45,32 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-10 bg-blue-600 relative overflow-hidden">
+    <div className="min-h-screen flex flex-col justify-center px-4 py-8 sm:py-12 sm:px-6 lg:px-10 bg-blue-600 relative overflow-hidden">
       {/* Triangle Shapes Background */}
       <TriangleBackground />
 
       {/* Content */}
-      <div className="relative z-10">
-        <div className="sm:mx-auto sm:w-full sm:max-w-md">
+      <div className="relative z-10 w-full">
+        <div className="mx-auto w-full max-w-[90%] sm:max-w-md">
           {/* Logo Section */}
           <div className="flex justify-center">
-            <img src="/Onboardingflow_logo.png" alt="OnBoard" className="h-[140px] w-auto" />
+            <img src="/Onboardingflow_logo.png" alt="OnBoard" className="h-20 sm:h-28 md:h-[140px] w-auto" />
           </div>
           
-          <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-white">
+          <h2 className="mt-4 sm:mt-6 text-center text-2xl sm:text-3xl font-bold tracking-tight text-white">
             Sign in to your account
           </h2>
-          <p className="mt-2 text-center text-sm text-blue-100">
+          <p className="mt-2 text-center text-xs sm:text-sm text-blue-100 px-2">
             Welcome back! Please enter your credentials to access your dashboard.
           </p>
         </div>
 
-        <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-          <div className="bg-white py-8 px-4 shadow-lg sm:rounded-lg sm:px-10">
-            <form className="space-y-6" onSubmit={LoginSubmit}>
+        <div className="mt-6 sm:mt-8 mx-auto w-full max-w-[90%] sm:max-w-md">
+          <div className="bg-white py-6 sm:py-8 px-4 sm:px-10 shadow-lg rounded-lg sm:rounded-lg">
+            <form className="space-y-4 sm:space-y-6" onSubmit={LoginSubmit}>
               {/* Error Message */}
               {error && (
-                <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
+                <div className="bg-red-50 border border-red-200 text-red-600 px-3 sm:px-4 py-2 sm:py-3 rounded-lg text-xs sm:text-sm">
                   {error}
                 </div>
               )}
@@ -105,7 +105,7 @@ export default function Login() {
               />
 
               {/* Remember Me & Forgot Password */}
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
                 <div className="flex items-center">
                   <input
                     id="remember-me"
@@ -113,12 +113,12 @@ export default function Login() {
                     type="checkbox"
                     className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                   />
-                  <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
+                  <label htmlFor="remember-me" className="ml-2 block text-xs sm:text-sm text-gray-700">
                     Remember me
                   </label>
                 </div>
 
-                <div className="text-sm">
+                <div className="text-xs sm:text-sm">
                   <a href="#" className="font-medium text-blue-600 hover:text-blue-500">
                     Forgot your password?
                   </a>
@@ -130,7 +130,7 @@ export default function Login() {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="flex w-full justify-center items-center rounded-lg border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex w-full justify-center items-center rounded-lg border border-transparent bg-blue-600 py-2.5 sm:py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
                 >
                   {isLoading ? (
                     <>
@@ -148,7 +148,7 @@ export default function Login() {
 
               {/* Sign Up Link */}
               <div className="text-center">
-                <span className="text-sm text-gray-600">
+                <span className="text-xs sm:text-sm text-gray-600">
                   Don't have an account?{' '}
                   <a href="/register" className="font-medium text-blue-600 hover:text-blue-500">
                     Sign up here
