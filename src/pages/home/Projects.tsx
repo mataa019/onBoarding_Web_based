@@ -3,6 +3,7 @@ import { PlusIcon, XMarkIcon, PhotoIcon } from '@heroicons/react/24/outline'
 import ProjectCard, { type Project as ProjectCardType } from '../../components/ProjectCard'
 import { useAuth } from '../../context/AuthContext'
 import { cloudinaryService } from '../../utils/cloudinary'
+import { ConfirmDialog } from '../../components/ConfirmDialog'
 
 export function Project() {
   const { api } = useAuth()
@@ -13,6 +14,7 @@ export function Project() {
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingProject, setEditingProject] = useState<ProjectCardType | null>(null)
+  const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; id: string | null; name: string }>({ isOpen: false, id: null, name: '' })
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -204,21 +206,36 @@ export function Project() {
   }
 
   const deleteProject = async (id: string) => {
-    if (confirm('Are you sure you want to delete this project?')) {
-      try {
-        console.log('Deleting project:', id)
-        await api.deleteProject(id)
-        console.log('Project deleted successfully')
-        await fetchProjects()
-      } catch (err) {
-        console.error('Failed to delete project:', err)
-        setError('Failed to delete project')
-      }
+    try {
+      console.log('Deleting project:', id)
+      await api.deleteProject(id)
+      console.log('Project deleted successfully')
+      await fetchProjects()
+    } catch (err) {
+      console.error('Failed to delete project:', err)
+      setError('Failed to delete project')
+    } finally {
+      setDeleteConfirm({ isOpen: false, id: null, name: '' })
     }
+  }
+
+  const confirmDelete = (project: ProjectCardType) => {
+    setDeleteConfirm({ isOpen: true, id: project.id, name: project.name })
   }
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={deleteConfirm.isOpen}
+        title="Delete Project"
+        message={`Are you sure you want to delete "${deleteConfirm.name}"? This action cannot be undone.`}
+        confirmLabel="Delete"
+        onConfirm={() => deleteConfirm.id && deleteProject(deleteConfirm.id)}
+        onCancel={() => setDeleteConfirm({ isOpen: false, id: null, name: '' })}
+        isDestructive
+      />
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
         <div>
@@ -263,7 +280,10 @@ export function Project() {
               key={project.id}
               project={project}
               onEdit={openModal}
-              onDelete={deleteProject}
+              onDelete={(id) => {
+                const proj = projects.find(p => p.id === id)
+                if (proj) confirmDelete(proj)
+              }}
             />
           ))}
         </div>
