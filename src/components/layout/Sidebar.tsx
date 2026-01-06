@@ -10,6 +10,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon
 } from '@heroicons/react/24/outline'
+import { useAuth } from '../../context/AuthContext'
 
 interface SidebarItem {
   name: string
@@ -36,6 +37,21 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ isCollapsed = false, onToggleCollapse }: SidebarProps) {
+  const { user } = useAuth()
+  
+  // Get user initials from first and last name
+  const getInitials = () => {
+    if (!user) return '?'
+    const first = user.firstName?.charAt(0) || ''
+    const last = user.lastName?.charAt(0) || ''
+    return (first + last).toUpperCase() || '?'
+  }
+
+  const getFullName = () => {
+    if (!user) return 'Guest'
+    return `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'User'
+  }
+
   return (
     <div className={classNames(
       'flex flex-col bg-white border-r border-gray-200 transition-all duration-300',
@@ -104,13 +120,21 @@ export default function Sidebar({ isCollapsed = false, onToggleCollapse }: Sideb
           'flex items-center',
           isCollapsed ? 'justify-center' : 'space-x-3'
         )}>
-          <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-            <span className="text-gray-600 text-sm font-medium">JM</span>
-          </div>
+          {user?.avatar ? (
+            <img 
+              src={user.avatar} 
+              alt={getFullName()} 
+              className="w-8 h-8 rounded-full object-cover"
+            />
+          ) : (
+            <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+              <span className="text-gray-600 text-sm font-medium">{getInitials()}</span>
+            </div>
+          )}
           {!isCollapsed && (
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900 truncate">John Mataa</p>
-              <p className="text-xs text-gray-500 truncate">johnmataa@gmail.com</p>
+              <p className="text-sm font-medium text-gray-900 truncate">{getFullName()}</p>
+              <p className="text-xs text-gray-500 truncate">{user?.email || ''}</p>
             </div>
           )}
         </div>
