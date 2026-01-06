@@ -2,22 +2,23 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import TextField from '../../components/TextField'
 import { useAuth } from '../../context/AuthContext'
+import { UserCircleIcon, FolderIcon, DocumentTextIcon, ChartBarIcon } from '@heroicons/react/24/outline'
 
 const slides = [
   {
-    image: '/slide1.png',
-    title: 'Start your journey with us',
-    description: 'Join thousands of teams using OnboardFlow to streamline project onboarding.'
+    image: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=1200&h=1600&fit=crop',
+    title: 'Build Your Professional Portfolio',
+    description: 'Showcase your skills, experience, and achievements in one beautiful profile.'
   },
   {
-    image: '/slide2.png',
-    title: 'Collaborate seamlessly',
-    description: 'Work together with your team in real-time and boost productivity.'
+    image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1200&h=1600&fit=crop',
+    title: 'Showcase Your Best Work',
+    description: 'Display your projects with images, descriptions, and links to impress employers.'
   },
   {
-    image: '/slide3.png',
-    title: 'Track your progress',
-    description: 'Monitor your projects and stay on top of every milestone.'
+    image: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=1200&h=1600&fit=crop',
+    title: 'Manage Documents Securely',
+    description: 'Upload and organize certificates, resumes, and important files all in one place.'
   }
 ]
 
@@ -115,19 +116,51 @@ function Register() {
             <div className="w-9 h-9 bg-white rounded-lg flex items-center justify-center">
               <span className="text-blue-600 font-semibold text-lg">O</span>
             </div>
-            <span className="text-lg font-semibold text-white">OnboardFlow</span>
+            <span className="text-lg font-semibold text-white">OnBoard</span>
           </div>
           
           <div>
             <h1 className="text-3xl font-semibold text-white mb-3">
               {slides[currentSlide].title}
             </h1>
-            <p className="text-blue-100 leading-relaxed">
+            <p className="text-blue-100 leading-relaxed mb-6">
               {slides[currentSlide].description}
             </p>
 
+            {/* Feature Containers */}
+            <div className="grid grid-cols-2 gap-3 mb-6">
+              <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-3">
+                <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center mb-2">
+                  <UserCircleIcon className="w-4 h-4 text-white" />
+                </div>
+                <div className="text-sm font-medium text-white">Portfolio</div>
+                <div className="text-xs text-blue-100">Profile Builder</div>
+              </div>
+              <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-3">
+                <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center mb-2">
+                  <FolderIcon className="w-4 h-4 text-white" />
+                </div>
+                <div className="text-sm font-medium text-white">Projects</div>
+                <div className="text-xs text-blue-100">Showcase Work</div>
+              </div>
+              <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-3">
+                <div className="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center mb-2">
+                  <DocumentTextIcon className="w-4 h-4 text-white" />
+                </div>
+                <div className="text-sm font-medium text-white">Documents</div>
+                <div className="text-xs text-blue-100">Secure Storage</div>
+              </div>
+              <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-3">
+                <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center mb-2">
+                  <ChartBarIcon className="w-4 h-4 text-white" />
+                </div>
+                <div className="text-sm font-medium text-white">Dashboard</div>
+                <div className="text-xs text-blue-100">Track Progress</div>
+              </div>
+            </div>
+
             {/* Slide indicators */}
-            <div className="flex space-x-2 mt-6">
+            <div className="flex space-x-2">
               {slides.map((_, index) => (
                 <button
                   key={index}
@@ -144,11 +177,11 @@ function Register() {
 
           <div className="flex items-center space-x-3">
             <div className="flex -space-x-2">
-              <div className="w-8 h-8 rounded-full bg-blue-400 border-2 border-white/30"></div>
-              <div className="w-8 h-8 rounded-full bg-blue-300 border-2 border-white/30"></div>
-              <div className="w-8 h-8 rounded-full bg-blue-200 border-2 border-white/30"></div>
+              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face" className="w-8 h-8 rounded-full border-2 border-white/30 object-cover" alt="" />
+              <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face" className="w-8 h-8 rounded-full border-2 border-white/30 object-cover" alt="" />
+              <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face" className="w-8 h-8 rounded-full border-2 border-white/30 object-cover" alt="" />
             </div>
-            <p className="text-blue-100 text-sm">Trusted by 850+ teams</p>
+            <p className="text-blue-100 text-sm">Join professionals building their careers</p>
           </div>
         </div>
       </div>
@@ -161,7 +194,7 @@ function Register() {
             <div className="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-semibold text-lg">O</span>
             </div>
-            <span className="text-lg font-semibold text-gray-900">OnboardFlow</span>
+            <span className="text-lg font-semibold text-gray-900">OnBoard</span>
           </div>
 
           <div className="text-center mb-5">
