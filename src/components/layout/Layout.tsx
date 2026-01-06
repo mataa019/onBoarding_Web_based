@@ -1,5 +1,8 @@
 import { useState, useEffect, useRef, type ReactNode } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { CogIcon, ArrowRightOnRectangleIcon } from '@heroicons/react/24/outline'
 import Sidebar from './Sidebar'
+import { useAuth } from '../../context/AuthContext'
 
 interface LayoutProps {
   children: ReactNode
@@ -8,12 +11,47 @@ interface LayoutProps {
 export default function Layout({ children }: LayoutProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [showFooter, setShowFooter] = useState(false)
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false)
   const mainRef = useRef<HTMLElement>(null)
   const lastScrollTop = useRef(0)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+  
+  const { user, logout } = useAuth()
+  const navigate = useNavigate()
+
+  // Get user initials
+  const getInitials = () => {
+    if (!user) return '?'
+    const first = user.firstName?.charAt(0) || ''
+    const last = user.lastName?.charAt(0) || ''
+    return (first + last).toUpperCase() || '?'
+  }
 
   const toggleSidebar = () => {
     setSidebarCollapsed(!sidebarCollapsed)
   }
+
+  const handleSettingsClick = () => {
+    setShowProfileDropdown(false)
+    navigate('/settings')
+  }
+
+  const handleLogoutClick = () => {
+    setShowProfileDropdown(false)
+    logout()
+  }
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowProfileDropdown(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   useEffect(() => {
     const mainElement = mainRef.current
@@ -51,8 +89,49 @@ export default function Layout({ children }: LayoutProps) {
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-semibold text-gray-900"></h1>
             <div className="flex items-center space-x-4">
-              {/* You can add header actions here like search, notifications, user menu */}
-              <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
+              {/* Profile Dropdown */}
+              <div ref={dropdownRef} className="relative">
+                <button
+                  onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+                  className="w-9 h-9 bg-blue-600 rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                >
+                  {user?.avatar ? (
+                    <img 
+                      src={user.avatar} 
+                      alt="Profile" 
+                      className="w-9 h-9 rounded-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-white text-sm font-medium">{getInitials()}</span>
+                  )}
+                </button>
+
+                {/* Dropdown Menu */}
+                {showProfileDropdown && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+                    <div className="px-4 py-2 border-b border-gray-100">
+                      <p className="text-sm font-medium text-gray-900 truncate">
+                        {user?.firstName} {user?.lastName}
+                      </p>
+                      <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                    </div>
+                    <button
+                      onClick={handleSettingsClick}
+                      className="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                      <CogIcon className="w-4 h-4 mr-3 text-gray-400" />
+                      Settings
+                    </button>
+                    <button
+                      onClick={handleLogoutClick}
+                      className="w-full flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                    >
+                      <ArrowRightOnRectangleIcon className="w-4 h-4 mr-3 text-red-400" />
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </header>
@@ -74,7 +153,7 @@ export default function Layout({ children }: LayoutProps) {
               href="https://github.com/mataa019" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="ml-1 text-blue-600 hover:text-blue-800 hover:underline font-medium"
+              className="ml-1 text-blue-600 hover:text-blue-800 hover:underline font-small"
             >
               John Mataa
             </a>
