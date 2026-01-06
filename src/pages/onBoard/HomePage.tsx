@@ -91,7 +91,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <a href="/" className="flex items-center space-x-2">
-              <img src="/Onboardingflow_logo.png" alt="OnBoard" className="w-9 h-9 rounded-lg shadow-sm" />
+              <img src="/Onboardingflow_logo.png" alt="OnBoard" className="w-10 h-10 object-contain" />
               <span className="text-lg font-semibold text-white">OnBoard</span>
             </a>
             
@@ -361,7 +361,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between">
             <div className="flex items-center space-x-2 mb-4 md:mb-0">
-              <img src="/Onboardingflow_logo.png" alt="OnBoard" className="w-8 h-8 rounded-lg" />
+              <img src="/Onboardingflow_logo.png" alt="OnBoard" className="w-10 h-10 object-contain" />
               <span className="font-semibold">OnBoard</span>
             </div>
             
