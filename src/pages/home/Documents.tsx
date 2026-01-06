@@ -138,15 +138,17 @@ export function Document() {
       }
 
       // Create document via API
-      await api.createDocument({
+      const documentData = {
         name: formData.name,
         type: formData.type,
         category: formData.category,
         fileUrl: fileUrl,
         fileName: uploadedFile.fileName,
         fileSize: uploadedFile.fileSize,
-        expiryDate: formData.expiryDate || null
-      })
+        expiryDate: formData.expiryDate || undefined
+      }
+      console.log('Creating document with data:', documentData)
+      await api.createDocument(documentData)
 
       // Refresh documents list
       await fetchDocuments()
