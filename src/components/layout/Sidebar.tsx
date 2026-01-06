@@ -61,12 +61,12 @@ export default function Sidebar({ isCollapsed = false, onToggleCollapse }: Sideb
       <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200">
         {!isCollapsed && (
           <div className="flex items-center">
-            <img src="/Onboardingflow_logo.png" alt="OnBoard" className="h-[100px] w-auto" />
+            <img src="/Onboardingflow_logo.png" alt="OnBoard" className="h-[140px] w-auto" />
           </div>
         )}
 
         {isCollapsed && (
-          <img src="/Onboardingflow_logo.png" alt="OnBoard" className="h-[100px] w-auto mx-auto" />
+          <img src="/Onboardingflow_logo.png" alt="OnBoard" className="h-[140px] w-auto mx-auto" />
         )}
         
         {onToggleCollapse && (
