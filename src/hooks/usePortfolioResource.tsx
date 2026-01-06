@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react'
+import React, { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import { portfolioApi } from '../ApiService/portfolioApi'
 import type { Portfolio, Experience, Education, Skill, Reference } from '../ApiService/types'
 
@@ -21,13 +21,16 @@ export function PortfolioResourceProvider({ username, children }: { username?: s
   const [error, setError] = useState<string | null>(null)
 
   const fetchPortfolio = async () => {
+    console.debug('[usePortfolioResource] fetchPortfolio, username=', username)
     setIsFetching(true)
     setError(null)
     try {
       const data = username ? await portfolioApi.getByUsername(username) : await portfolioApi.get()
+      console.debug('[usePortfolioResource] fetched portfolio:', data)
       setPortfolio(data)
     } catch (err) {
       console.error('Failed to fetch portfolio resource:', err)
+      setPortfolio(null)
       setError((err as any)?.message || 'Failed to load portfolio')
     } finally {
       setIsFetching(false)
