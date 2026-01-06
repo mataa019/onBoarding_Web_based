@@ -28,7 +28,8 @@ export class ApiService {
     const url = `${this.baseURL}${endpoint}`
     // Always get fresh token from storage for each request
     const accessToken = getStoredToken()
-    return makeRequest<T>(url, options, accessToken)
+    console.log(`API Request: ${options.method || 'GET'} ${endpoint}`, { hasToken: !!accessToken })
+    return makeRequest<T>(url, options, accessToken, this.baseURL)
   }
 
   // ==========================================

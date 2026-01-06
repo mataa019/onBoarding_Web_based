@@ -30,8 +30,10 @@ export function Project() {
 
   const fetchProjects = async () => {
     setIsLoading(true)
+    console.log('Fetching projects...')
     try {
       const data = await api.getProjects()
+      console.log('Projects fetched:', data)
       // Transform API Project to ProjectCard Project (images: ProjectImage[] -> string[])
       const transformedProjects: ProjectCardType[] = data.map(project => ({
         id: project.id,
@@ -157,6 +159,14 @@ export function Project() {
 
         const allImageUrls = [...existingImages, ...imageUrls]
 
+        console.log('Updating project:', editingProject.id, {
+          name: formData.name,
+          description: formData.description,
+          githubUrl: formData.githubUrl,
+          tags: tagsArray,
+          imageUrls: allImageUrls
+        })
+
         await api.updateProject(editingProject.id, {
           name: formData.name,
           description: formData.description,
@@ -165,6 +175,14 @@ export function Project() {
           imageUrls: allImageUrls
         })
       } else {
+        console.log('Creating project:', {
+          name: formData.name,
+          description: formData.description,
+          githubUrl: formData.githubUrl,
+          tags: tagsArray,
+          imageUrls: imageUrls
+        })
+
         await api.createProject({
           name: formData.name,
           description: formData.description,
@@ -188,7 +206,9 @@ export function Project() {
   const deleteProject = async (id: string) => {
     if (confirm('Are you sure you want to delete this project?')) {
       try {
+        console.log('Deleting project:', id)
         await api.deleteProject(id)
+        console.log('Project deleted successfully')
         await fetchProjects()
       } catch (err) {
         console.error('Failed to delete project:', err)
