@@ -220,14 +220,14 @@ export function Document() {
       />
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">My Documents</h1>
-          <p className="text-gray-500 mt-1">Store and manage your important documents</p>
+          <h1 className="text-xl sm:text-2xl font-semibold text-gray-900">My Documents</h1>
+          <p className="text-gray-500 mt-1 text-sm sm:text-base">Store and manage your important documents</p>
         </div>
         <button
           onClick={openModal}
-          className="mt-4 sm:mt-0 inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+          className="mt-4 sm:mt-0 inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
         >
           <PlusIcon className="w-5 h-5 mr-2" />
           Upload Document
@@ -235,8 +235,8 @@ export function Document() {
       </div>
 
       {/* Filters & Search */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-6">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-3 sm:p-4 mb-4 sm:mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
           <SearchInput
             value={searchQuery}
             onChange={setSearchQuery}

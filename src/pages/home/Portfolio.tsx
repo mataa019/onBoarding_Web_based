@@ -200,20 +200,20 @@ export function Portfolio() {
 
       {/* Action Bar */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+        <div className="max-w-5xl mx-auto px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <h1 className="text-lg font-semibold text-gray-900">My Portfolio</h1>
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-2 sm:space-x-3">
             <button
               onClick={() => setShowShareModal(true)}
               className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
             >
-              <ShareIcon className="w-4 h-4 mr-2" />
-              Share
+              <ShareIcon className="w-4 h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Share</span>
             </button>
             <button
               onClick={() => isEditing ? savePortfolio() : setIsEditing(true)}
               disabled={isSaving}
-              className={`inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-colors disabled:opacity-50 ${
+              className={`inline-flex items-center px-3 sm:px-4 py-2 text-sm font-medium rounded-lg transition-colors disabled:opacity-50 ${
                 isEditing
                   ? 'bg-green-600 text-white hover:bg-green-700'
                   : 'bg-blue-600 text-white hover:bg-blue-700'
@@ -221,13 +221,15 @@ export function Portfolio() {
             >
               {isEditing ? (
                 <>
-                  <CheckCircleIcon className="w-4 h-4 mr-2" />
-                  {isSaving ? 'Saving...' : 'Save Changes'}
+                  <CheckCircleIcon className="w-4 h-4 sm:mr-2" />
+                  <span className="hidden sm:inline">{isSaving ? 'Saving...' : 'Save Changes'}</span>
+                  <span className="sm:hidden">{isSaving ? 'Saving...' : 'Save'}</span>
                 </>
               ) : (
                 <>
-                  <PencilIcon className="w-4 h-4 mr-2" />
-                  Edit Portfolio
+                  <PencilIcon className="w-4 h-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Edit Portfolio</span>
+                  <span className="sm:hidden">Edit</span>
                 </>
               )}
             </button>
@@ -236,7 +238,7 @@ export function Portfolio() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-5xl mx-auto px-4 py-8">
+      <div className="max-w-5xl mx-auto px-4 py-4 sm:py-8">
         <PortfolioHeader
           isEditing={isEditing}
           portfolio={portfolio}

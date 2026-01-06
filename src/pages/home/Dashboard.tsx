@@ -124,53 +124,53 @@ export default function Dashboard() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">Projects</p>
-              <p className="text-2xl font-semibold text-gray-900 mt-1">5</p>
+              <p className="text-xs sm:text-sm text-gray-500">Projects</p>
+              <p className="text-xl sm:text-2xl font-semibold text-gray-900 mt-1">5</p>
             </div>
-            <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-              <FolderIcon className="w-6 h-6 text-blue-600" />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+              <FolderIcon className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
             </div>
           </div>
           <p className="text-xs text-green-600 mt-2">+2 this month</p>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">Documents</p>
-              <p className="text-2xl font-semibold text-gray-900 mt-1">8</p>
+              <p className="text-xs sm:text-sm text-gray-500">Documents</p>
+              <p className="text-xl sm:text-2xl font-semibold text-gray-900 mt-1">8</p>
             </div>
-            <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-              <DocumentTextIcon className="w-6 h-6 text-green-600" />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-xl flex items-center justify-center">
+              <DocumentTextIcon className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
             </div>
           </div>
           <p className="text-xs text-gray-500 mt-2">2 expiring soon</p>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">Profile Views</p>
-              <p className="text-2xl font-semibold text-gray-900 mt-1">124</p>
+              <p className="text-xs sm:text-sm text-gray-500">Profile Views</p>
+              <p className="text-xl sm:text-2xl font-semibold text-gray-900 mt-1">124</p>
             </div>
-            <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-              <EyeIcon className="w-6 h-6 text-purple-600" />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+              <EyeIcon className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" />
             </div>
           </div>
           <p className="text-xs text-green-600 mt-2">+18% this week</p>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">Completion</p>
-              <p className="text-2xl font-semibold text-gray-900 mt-1">{completionPercentage}%</p>
+              <p className="text-xs sm:text-sm text-gray-500">Completion</p>
+              <p className="text-xl sm:text-2xl font-semibold text-gray-900 mt-1">{completionPercentage}%</p>
             </div>
-            <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
-              <CheckCircleIcon className="w-6 h-6 text-orange-600" />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-orange-100 rounded-xl flex items-center justify-center">
+              <CheckCircleIcon className="w-5 h-5 sm:w-6 sm:h-6 text-orange-600" />
             </div>
           </div>
           <p className="text-xs text-gray-500 mt-2">{completionItems.length - completedCount} items left</p>
@@ -178,13 +178,13 @@ export default function Dashboard() {
       </div>
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Left Column - 2/3 width */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-4 sm:space-y-6">
           {/* Quick Actions */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
               <a
                 href="/projects"
                 className="flex flex-col items-center p-4 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors group"

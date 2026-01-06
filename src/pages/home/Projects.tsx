@@ -224,7 +224,7 @@ export function Project() {
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className="max-w-7xl mx-auto">
       {/* Delete Confirmation Dialog */}
       <ConfirmDialog
         isOpen={deleteConfirm.isOpen}
@@ -237,14 +237,14 @@ export function Project() {
       />
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">My Projects</h1>
-          <p className="text-gray-500 mt-1">Manage and showcase your portfolio projects</p>
+          <h1 className="text-xl sm:text-2xl font-semibold text-gray-900">My Projects</h1>
+          <p className="text-gray-500 mt-1 text-sm sm:text-base">Manage and showcase your portfolio projects</p>
         </div>
         <button
           onClick={() => openModal()}
-          className="mt-4 sm:mt-0 inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+          className="mt-4 sm:mt-0 inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
         >
           <PlusIcon className="w-5 h-5 mr-2" />
           Add Project
@@ -253,18 +253,18 @@ export function Project() {
 
       {/* Loading State */}
       {isLoading ? (
-        <div className="text-center py-16">
-          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+        <div className="text-center py-12 sm:py-16">
+          <div className="w-12 h-12 sm:w-16 sm:h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">Loading projects...</p>
         </div>
       ) : /* Projects Grid */
       projects.length === 0 ? (
-        <div className="text-center py-16 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
-          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <PlusIcon className="w-8 h-8 text-gray-400" />
+        <div className="text-center py-12 sm:py-16 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
+          <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <PlusIcon className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" />
           </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No projects yet</h3>
-          <p className="text-gray-500 mb-4">Get started by adding your first project</p>
+          <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2">No projects yet</h3>
+          <p className="text-gray-500 mb-4 text-sm sm:text-base">Get started by adding your first project</p>
           <button
             onClick={() => openModal()}
             className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700"
@@ -274,7 +274,7 @@ export function Project() {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {projects.map((project) => (
             <ProjectCard
               key={project.id}

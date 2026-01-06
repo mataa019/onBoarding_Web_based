@@ -117,37 +117,39 @@ export function Settings() {
   )
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
+    <div className="max-w-6xl mx-auto">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-semibold text-gray-900">Settings</h1>
-        <p className="text-gray-500 mt-1">Manage your account settings and preferences</p>
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-xl sm:text-2xl font-semibold text-gray-900">Settings</h1>
+        <p className="text-gray-500 mt-1 text-sm sm:text-base">Manage your account settings and preferences</p>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-8">
+      <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-8">
         {/* Sidebar Tabs */}
         <div className="lg:w-64 flex-shrink-0">
           <nav className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-            {settingsTabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`w-full flex items-center px-4 py-3 text-sm font-medium transition-colors ${
-                  activeTab === tab.id
-                    ? 'bg-blue-50 text-blue-600 border-l-4 border-blue-600'
-                    : 'text-gray-600 hover:bg-gray-50 border-l-4 border-transparent'
-                }`}
-              >
-                <tab.icon className="w-5 h-5 mr-3" />
-                {tab.label}
-              </button>
-            ))}
+            <div className="flex lg:flex-col overflow-x-auto lg:overflow-x-visible">
+              {settingsTabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex-shrink-0 lg:w-full flex items-center px-4 py-3 text-sm font-medium transition-colors whitespace-nowrap ${
+                    activeTab === tab.id
+                      ? 'bg-blue-50 text-blue-600 border-b-2 lg:border-b-0 lg:border-l-4 border-blue-600'
+                      : 'text-gray-600 hover:bg-gray-50 border-b-2 lg:border-b-0 lg:border-l-4 border-transparent'
+                  }`}
+                >
+                  <tab.icon className="w-5 h-5 mr-2 lg:mr-3" />
+                  <span className="hidden sm:inline">{tab.label}</span>
+                </button>
+              ))}
+            </div>
           </nav>
         </div>
 
         {/* Content Area */}
         <div className="flex-1">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
             {/* Profile Tab */}
             {activeTab === 'profile' && (
               <div className="space-y-6">
