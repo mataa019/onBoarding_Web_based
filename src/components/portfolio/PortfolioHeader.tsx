@@ -28,7 +28,7 @@ export function PortfolioHeader({ isEditing, portfolio, onUpdate }: PortfolioHea
   const [localFields, setLocalFields] = useState({
     firstName: portfolio?.user?.firstName || '',
     lastName: portfolio?.user?.lastName || '',
-    headline: portfolio?.user?.headline || '',
+    headline: portfolio?.headline || '',
     location: portfolio?.location || '',
     website: portfolio?.website || '',
     linkedinUrl: portfolio?.linkedinUrl || ''
@@ -40,7 +40,7 @@ export function PortfolioHeader({ isEditing, portfolio, onUpdate }: PortfolioHea
     setLocalFields({
       firstName: portfolio?.user?.firstName || '',
       lastName: portfolio?.user?.lastName || '',
-      headline: portfolio?.user?.headline || '',
+      headline: portfolio?.headline || '',
       location: portfolio?.location || '',
       website: portfolio?.website || '',
       linkedinUrl: portfolio?.linkedinUrl || ''
@@ -175,7 +175,7 @@ export function PortfolioHeader({ isEditing, portfolio, onUpdate }: PortfolioHea
           ) : (
             <>
               <h2 className="text-2xl font-semibold text-gray-900">{user.firstName} {user.lastName}</h2>
-              <p className="text-gray-600 mt-1">{user.headline || 'No headline set'}</p>
+              <p className="text-gray-600 mt-1">{portfolio?.headline || 'No headline set'}</p>
             </>
           )}
 

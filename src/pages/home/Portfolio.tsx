@@ -25,6 +25,8 @@ const defaultPortfolio: PortfolioType = {
   id: '',
   userId: '',
   username: '',
+  headline: null,
+  summary: null,
   location: null,
   website: null,
   linkedinUrl: null,
@@ -43,9 +45,7 @@ const defaultPortfolio: PortfolioType = {
     dateOfBirth: null,
     country: null,
     city: null,
-    avatar: null,
-    headline: null,
-    summary: null
+    avatar: null
   },
   experiences: [],
   education: [],
@@ -102,8 +102,8 @@ export function Portfolio() {
       await portfolioApi.update({
         firstName: portfolio.user.firstName,
         lastName: portfolio.user.lastName,
-        headline: portfolio.user.headline,
-        summary: portfolio.user.summary,
+        headline: portfolio.headline,
+        summary: portfolio.summary,
         location: portfolio.location,
         website: portfolio.website,
         linkedinUrl: portfolio.linkedinUrl,
@@ -233,7 +233,7 @@ export function Portfolio() {
         />
 
         <AboutSection
-          summary={portfolio.user?.summary || ''}
+          summary={portfolio.summary || ''}
           isEditing={isEditing}
           onUpdate={(value: string) => updateProfile({ summary: value })}
         />
