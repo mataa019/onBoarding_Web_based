@@ -91,9 +91,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <a href="/" className="flex items-center space-x-2">
-              <div className="w-9 h-9 bg-white rounded-lg flex items-center justify-center shadow-sm">
-                <span className="text-blue-600 font-semibold text-lg">O</span>
-              </div>
+              <img src="/Onboardingflow_logo.png" alt="OnBoard" className="w-9 h-9 rounded-lg shadow-sm" />
               <span className="text-lg font-semibold text-white">OnBoard</span>
             </a>
             
@@ -363,9 +361,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between">
             <div className="flex items-center space-x-2 mb-4 md:mb-0">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-semibold text-sm">O</span>
-              </div>
+              <img src="/Onboardingflow_logo.png" alt="OnBoard" className="w-8 h-8 rounded-lg" />
               <span className="font-semibold">OnBoard</span>
             </div>
             

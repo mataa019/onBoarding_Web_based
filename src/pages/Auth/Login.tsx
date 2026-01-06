@@ -54,9 +54,7 @@ export default function Login() {
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
           {/* Logo Section */}
           <div className="flex justify-center">
-            <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center shadow-lg">
-              <span className="text-blue-600 font-bold text-2xl">O</span>
-            </div>
+            <img src="/Onboardingflow_logo.png" alt="OnBoard" className="w-16 h-16 rounded-xl shadow-lg" />
           </div>
           
           <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-white">
