@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom'
 import TextField from '../../components/TextField'
 import { TriangleBackground } from '../../components/backgrounds'
 import { useAuth } from '../../context/AuthContext'
-import { portfolioApi } from '../../ApiService/portfolioApi'
 import type { ApiError } from '../../ApiService/types'
 
 export default function Login() {
@@ -33,9 +32,6 @@ export default function Login() {
       // Fetch user data after login
       const userData = await api.getCurrentUser()
       setUser(userData)
-      
-      // Refresh portfolio API token
-      portfolioApi.refreshToken()
       
       // Redirect to dashboard after successful login
       navigate('/dashboard')

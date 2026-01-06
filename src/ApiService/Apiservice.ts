@@ -1,4 +1,4 @@
-import { getStoredToken, setStoredToken, removeStoredToken, makeRequest } from './helpers'
+import { getStoredToken, setStoredToken, setStoredRefreshToken, clearAllTokens, makeRequest } from './helpers'
 import type { 
   LoginRequest, 
   LoginResponse, 
@@ -40,8 +40,11 @@ export class ApiService {
       method: 'POST',
       body: JSON.stringify(credentials),
     })
-    // Store token after successful login
+    // Store tokens after successful login
     setStoredToken(response.accessToken)
+    if (response.refreshToken) {
+      setStoredRefreshToken(response.refreshToken)
+    }
 
     return response
   }
@@ -52,8 +55,11 @@ export class ApiService {
       body: JSON.stringify(data),
     })
 
-    // Store token after successful registration
+    // Store tokens after successful registration
     setStoredToken(response.accessToken)
+    if (response.refreshToken) {
+      setStoredRefreshToken(response.refreshToken)
+    }
 
     return response
   }
@@ -66,7 +72,7 @@ export class ApiService {
     } catch (error) {
       console.error('Logout error:', error)
     } finally {
-      removeStoredToken()
+      clearAllTokens()
     }
   }
 
