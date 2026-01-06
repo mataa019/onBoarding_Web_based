@@ -238,7 +238,7 @@ export function Portfolio() {
           onUpdate={(value: string) => updateProfile({ summary: value })}
         />
 
-        <PortfolioResourceProvider username={portfolio.username}>
+        <PortfolioResourceProvider initialPortfolio={portfolio}>
           <ExperienceSection isEditing={isEditing} onRefresh={refreshPortfolio} />
 
           <EducationSection isEditing={isEditing} onRefresh={refreshPortfolio} />

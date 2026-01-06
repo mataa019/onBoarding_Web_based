@@ -15,31 +15,39 @@ type PortfolioResourceValue = {
 
 const PortfolioResourceContext = createContext<PortfolioResourceValue | undefined>(undefined)
 
-export function PortfolioResourceProvider({ username, children }: { username?: string; children: ReactNode }) {
-  const [portfolio, setPortfolio] = useState<Portfolio | null>(null)
+interface PortfolioResourceProviderProps {
+  children: ReactNode
+  initialPortfolio?: Portfolio | null  // Pass existing portfolio to avoid re-fetching
+}
+
+export function PortfolioResourceProvider({ initialPortfolio, children }: PortfolioResourceProviderProps) {
+  const [portfolio, setPortfolio] = useState<Portfolio | null>(initialPortfolio || null)
   const [isFetching, setIsFetching] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  // Sync with initialPortfolio when it changes
+  useEffect(() => {
+    if (initialPortfolio) {
+      setPortfolio(initialPortfolio)
+    }
+  }, [initialPortfolio])
+
   const fetchPortfolio = async () => {
-    console.debug('[usePortfolioResource] fetchPortfolio, username=', username)
+    console.debug('[usePortfolioResource] fetchPortfolio')
     setIsFetching(true)
     setError(null)
     try {
-      const data = username ? await portfolioApi.getByUsername(username) : await portfolioApi.get()
+      // Always use the current user's portfolio endpoint (no username needed)
+      const data = await portfolioApi.get()
       console.debug('[usePortfolioResource] fetched portfolio:', data)
       setPortfolio(data)
     } catch (err) {
       console.error('Failed to fetch portfolio resource:', err)
-      setPortfolio(null)
       setError((err as any)?.message || 'Failed to load portfolio')
     } finally {
       setIsFetching(false)
     }
   }
-
-  useEffect(() => {
-    fetchPortfolio()
-  }, [username])
 
   const refresh = async () => {
     await fetchPortfolio()
