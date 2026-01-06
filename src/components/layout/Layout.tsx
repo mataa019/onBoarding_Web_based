@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react'
+import { useState, useEffect, useRef, type ReactNode } from 'react'
 import Sidebar from './Sidebar'
 
 interface LayoutProps {
@@ -7,10 +7,34 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [showFooter, setShowFooter] = useState(false)
+  const mainRef = useRef<HTMLElement>(null)
+  const lastScrollTop = useRef(0)
 
   const toggleSidebar = () => {
     setSidebarCollapsed(!sidebarCollapsed)
   }
+
+  useEffect(() => {
+    const mainElement = mainRef.current
+    if (!mainElement) return
+
+    const handleScroll = () => {
+      const scrollTop = mainElement.scrollTop
+      
+      // Show footer when scrolling down, hide when scrolling up
+      if (scrollTop > lastScrollTop.current && scrollTop > 50) {
+        setShowFooter(true)
+      } else {
+        setShowFooter(false)
+      }
+      
+      lastScrollTop.current = scrollTop
+    }
+
+    mainElement.addEventListener('scroll', handleScroll)
+    return () => mainElement.removeEventListener('scroll', handleScroll)
+  }, [])
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -21,7 +45,7 @@ export default function Layout({ children }: LayoutProps) {
       />
       
       {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden relative">
         {/* Header */}
         <header className="bg-white border-b border-gray-200 px-6 py-4">
           <div className="flex items-center justify-between">
@@ -34,12 +58,16 @@ export default function Layout({ children }: LayoutProps) {
         </header>
         
         {/* Page Content */}
-        <main className="flex-1 overflow-y-auto p-6">
+        <main ref={mainRef} className="flex-1 overflow-y-auto p-6">
           {children}
         </main>
 
-        {/* Footer */}
-        <footer className="bg-white border-t border-gray-200 px-6 py-3">
+        {/* Footer - appears on scroll down, disappears on scroll up */}
+        <footer 
+          className={`absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-3 transition-transform duration-300 ${
+            showFooter ? 'translate-y-0' : 'translate-y-full'
+          }`}
+        >
           <div className="flex items-center justify-center text-sm text-gray-500">
             <span>Developed by</span>
             <a 
