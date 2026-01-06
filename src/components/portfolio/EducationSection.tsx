@@ -5,6 +5,7 @@ import type { Education } from '../../ApiService/types'
 import { portfolioApi } from '../../ApiService/portfolioApi'
 
 import { usePortfolioResource } from '../../hooks/usePortfolioResource'
+import { ConfirmDialog } from '../ConfirmDialog'
 
 interface EducationSectionProps {
   isEditing: boolean
@@ -17,6 +18,7 @@ export function EducationSection({ isEditing, onRefresh }: EducationSectionProps
   const [showForm, setShowForm] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
+  const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; id: string | null; title: string }>({ isOpen: false, id: null, title: '' })
   const [form, setForm] = useState({
     school: '',
     degree: '',
@@ -68,7 +70,13 @@ export function EducationSection({ isEditing, onRefresh }: EducationSectionProps
       if (onRefresh) await onRefresh()
     } catch (err) {
       console.error('Failed to remove education:', err)
+    } finally {
+      setDeleteConfirm({ isOpen: false, id: null, title: '' })
     }
+  }
+
+  const confirmDelete = (edu: Education) => {
+    setDeleteConfirm({ isOpen: true, id: edu.id, title: edu.school })
   }
 
   const startEdit = (edu: Education) => {
@@ -87,6 +95,17 @@ export function EducationSection({ isEditing, onRefresh }: EducationSectionProps
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={deleteConfirm.isOpen}
+        title="Delete Education"
+        message={`Are you sure you want to delete "${deleteConfirm.title}"? This action cannot be undone.`}
+        confirmLabel="Delete"
+        onConfirm={() => deleteConfirm.id && handleRemove(deleteConfirm.id)}
+        onCancel={() => setDeleteConfirm({ isOpen: false, id: null, title: '' })}
+        isDestructive
+      />
+
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-gray-900 flex items-center">
           <AcademicCapIcon className="w-5 h-5 mr-2 text-blue-600" />
@@ -162,7 +181,7 @@ export function EducationSection({ isEditing, onRefresh }: EducationSectionProps
                     <button onClick={() => startEdit(edu)} className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg">
                       <PencilIcon className="w-4 h-4" />
                     </button>
-                    <button onClick={() => handleRemove(edu.id)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg">
+                    <button onClick={() => confirmDelete(edu)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg">
                       <TrashIcon className="w-4 h-4" />
                     </button>
                   </div>

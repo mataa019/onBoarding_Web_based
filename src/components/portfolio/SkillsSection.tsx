@@ -6,6 +6,7 @@ type SkillLevel = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'EXPERT'
 
 import { portfolioApi } from '../../ApiService/portfolioApi'
 import { usePortfolioResource } from '../../hooks/usePortfolioResource'
+import { ConfirmDialog } from '../ConfirmDialog'
 
 interface SkillsSectionProps {
   isEditing: boolean
@@ -18,6 +19,7 @@ export function SkillsSection({ isEditing, onRefresh }: SkillsSectionProps) {
   const [showForm, setShowForm] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
+  const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; id: string | null; name: string }>({ isOpen: false, id: null, name: '' })
   const [form, setForm] = useState<{ name: string; level: SkillLevel }>({ name: '', level: 'INTERMEDIATE' })
 
 
@@ -64,7 +66,13 @@ export function SkillsSection({ isEditing, onRefresh }: SkillsSectionProps) {
       if (onRefresh) await onRefresh()
     } catch (err) {
       console.error('Failed to remove skill:', err)
+    } finally {
+      setDeleteConfirm({ isOpen: false, id: null, name: '' })
     }
+  }
+
+  const confirmDelete = (skill: Skill) => {
+    setDeleteConfirm({ isOpen: true, id: skill.id, name: skill.name })
   }
 
   const startEdit = (skill: Skill) => {
@@ -125,6 +133,17 @@ export function SkillsSection({ isEditing, onRefresh }: SkillsSectionProps) {
 
       {/* Skills by Level */}
       <div className="space-y-4">
+        {/* Delete Confirmation Dialog */}
+        <ConfirmDialog
+          isOpen={deleteConfirm.isOpen}
+          title="Delete Skill"
+          message={`Are you sure you want to delete "${deleteConfirm.name}"? This action cannot be undone.`}
+          confirmLabel="Delete"
+          onConfirm={() => deleteConfirm.id && handleRemove(deleteConfirm.id)}
+          onCancel={() => setDeleteConfirm({ isOpen: false, id: null, name: '' })}
+          isDestructive
+        />
+
         {isFetching ? (
           <p className="text-gray-500 text-center py-4">Loading skills…</p>
         ) : fetchError ? (
@@ -144,7 +163,7 @@ export function SkillsSection({ isEditing, onRefresh }: SkillsSectionProps) {
                         <button onClick={() => startEdit(skill)} className="ml-2 text-blue-400 hover:text-blue-600">
                           <PencilIcon className="w-4 h-4" />
                         </button>
-                        <button onClick={() => handleRemove(skill.id)} className="ml-1 text-blue-400 hover:text-red-600">
+                        <button onClick={() => confirmDelete(skill)} className="ml-1 text-blue-400 hover:text-red-600">
                           <XMarkIcon className="w-4 h-4" />
                         </button>
                       </>
