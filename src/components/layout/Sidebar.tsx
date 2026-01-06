@@ -1,10 +1,8 @@
 import { NavLink } from 'react-router-dom'
 import {
   HomeIcon,
-  ChartBarIcon,
   UserCircleIcon,
   CogIcon,
-  BellIcon,
   DocumentTextIcon,
   FolderIcon,
   ChevronLeftIcon,

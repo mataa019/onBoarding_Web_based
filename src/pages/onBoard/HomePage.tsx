@@ -367,12 +367,12 @@ export default function HomePage() {
               <a href="#" className="hover:text-white transition-colors">Privacy</a>
               <a href="#" className="hover:text-white transition-colors">Terms</a>
               <a href="#" className="hover:text-white transition-colors">Support</a>
-              <a href="https://github.com/mataa019" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">GitHub</a>
+              <a href="https://mataadev.vercel.app/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">LinkedIn</a>
             </div>
             
             <p className="text-gray-500 text-sm mt-4 md:mt-0">
               © 2026 OnBoard. Developed by{' '}
-              <a href="https://github.com/mataa019" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300">
+              <a href="https://mataadev.vercel.app/" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300">
                 John Mataa
               </a>
             </p>

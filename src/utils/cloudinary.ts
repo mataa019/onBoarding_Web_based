@@ -21,11 +21,6 @@ interface CloudinaryResponse {
   created_at: string
 }
 
-interface CloudinaryError {
-  message: string
-  http_code: number
-}
-
 // Allowed file types for documents
 const ALLOWED_DOCUMENT_TYPES = [
   'application/pdf',

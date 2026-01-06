@@ -187,7 +187,7 @@ export default function Layout({ children }: LayoutProps) {
           <div className="flex items-center justify-center text-sm text-gray-500">
             <span>Developed by</span>
             <a 
-              href="https://github.com/mataa019" 
+              href="https://mataadev.vercel.app/" 
               target="_blank" 
               rel="noopener noreferrer"
               className="ml-1 text-blue-600 hover:text-blue-800 hover:underline font-small"
