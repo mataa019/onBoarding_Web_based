@@ -4,6 +4,7 @@ import type { Reference } from '../../ApiService/types'
 
 import { portfolioApi } from '../../ApiService/portfolioApi'
 import { usePortfolioResource } from '../../hooks/usePortfolioResource'
+import { ConfirmDialog } from '../ConfirmDialog'
 
 interface ReferencesSectionProps {
   isEditing: boolean
@@ -16,6 +17,7 @@ export function ReferencesSection({ isEditing, onRefresh }: ReferencesSectionPro
   const [showForm, setShowForm] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
+  const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; id: string | null; name: string }>({ isOpen: false, id: null, name: '' })
   const [form, setForm] = useState({
     name: '',
     position: '',
@@ -82,7 +84,13 @@ export function ReferencesSection({ isEditing, onRefresh }: ReferencesSectionPro
       if (onRefresh) await onRefresh()
     } catch (err) {
       console.error('Failed to remove reference:', err)
+    } finally {
+      setDeleteConfirm({ isOpen: false, id: null, name: '' })
     }
+  }
+
+  const confirmDelete = (ref: Reference) => {
+    setDeleteConfirm({ isOpen: true, id: ref.id, name: ref.name })
   }
 
   const startEdit = (ref: Reference) => {
@@ -142,6 +150,17 @@ export function ReferencesSection({ isEditing, onRefresh }: ReferencesSectionPro
 
       {/* References List */}
       <div className="space-y-4">
+        {/* Delete Confirmation Dialog */}
+        <ConfirmDialog
+          isOpen={deleteConfirm.isOpen}
+          title="Delete Reference"
+          message={`Are you sure you want to delete "${deleteConfirm.name}"? This action cannot be undone.`}
+          confirmLabel="Delete"
+          onConfirm={() => deleteConfirm.id && handleRemove(deleteConfirm.id)}
+          onCancel={() => setDeleteConfirm({ isOpen: false, id: null, name: '' })}
+          isDestructive
+        />
+
         {isFetching ? (
           <p className="text-gray-500 text-center py-4">Loading references…</p>
         ) : fetchError ? (
@@ -171,7 +190,7 @@ export function ReferencesSection({ isEditing, onRefresh }: ReferencesSectionPro
                     <button onClick={() => startEdit(ref)} className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg">
                       <PencilIcon className="w-4 h-4" />
                     </button>
-                    <button onClick={() => handleRemove(ref.id)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg">
+                    <button onClick={() => confirmDelete(ref)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg">
                       <TrashIcon className="w-4 h-4" />
                     </button>
                   </div>
