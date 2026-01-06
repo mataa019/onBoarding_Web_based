@@ -124,11 +124,11 @@ export function Document() {
         return
       }
 
-      // Upload file to Cloudinary
+      // Upload file to Cloudinary (supports images and documents like PDF)
       let fileUrl = ''
       if (uploadedFile.rawFile) {
         try {
-          fileUrl = await cloudinaryService.uploadImage(uploadedFile.rawFile, 'documents')
+          fileUrl = await cloudinaryService.uploadFile(uploadedFile.rawFile, 'documents')
         } catch (uploadError) {
           const message = uploadError instanceof Error ? uploadError.message : 'Failed to upload file'
           setError(message)
@@ -251,7 +251,12 @@ export function Document() {
 
       {/* Documents Table */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        {filteredDocuments.length === 0 ? (
+        {isLoading ? (
+          <div className="flex items-center justify-center py-16">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <span className="ml-3 text-gray-500">Loading documents...</span>
+          </div>
+        ) : filteredDocuments.length === 0 ? (
           <EmptyState
             icon={<DocumentIcon className="w-16 h-16 text-gray-300" />}
             title="No documents found"

@@ -143,7 +143,8 @@ export function FileUpload({
         onFileSelect({
           file: reader.result as string,
           fileName: file.name,
-          fileSize: formatFileSize(file.size)
+          fileSize: formatFileSize(file.size),
+          rawFile: file  // Include raw file for external uploads
         })
       }
       reader.readAsDataURL(file)

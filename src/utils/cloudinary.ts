@@ -26,19 +26,36 @@ interface CloudinaryError {
   http_code: number
 }
 
+// Allowed file types for documents
+const ALLOWED_DOCUMENT_TYPES = [
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.ms-excel',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  'application/vnd.ms-powerpoint',
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  'text/plain',
+]
+
 class CloudinaryService {
   private cloudName: string
   private uploadPreset: string
-  private uploadUrl: string
 
   constructor() {
     this.cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || ''
     this.uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || ''
-    this.uploadUrl = `https://api.cloudinary.com/v1_1/${this.cloudName}/image/upload`
 
     if (!this.cloudName || !this.uploadPreset) {
       console.warn('Cloudinary credentials not configured. Add VITE_CLOUDINARY_CLOUD_NAME and VITE_CLOUDINARY_UPLOAD_PRESET to .env')
     }
+  }
+
+  /**
+   * Get the upload URL for a specific resource type
+   */
+  private getUploadUrl(resourceType: 'image' | 'raw' | 'auto' = 'auto'): string {
+    return `https://api.cloudinary.com/v1_1/${this.cloudName}/${resourceType}/upload`
   }
 
   /**
@@ -76,7 +93,7 @@ class CloudinaryService {
     try {
       console.log('Uploading to Cloudinary:', { cloudName: this.cloudName, uploadPreset: this.uploadPreset, folder })
       
-      const response = await fetch(this.uploadUrl, {
+      const response = await fetch(this.getUploadUrl('image'), {
         method: 'POST',
         body: formData,
       })
@@ -85,6 +102,73 @@ class CloudinaryService {
         const errorData = await response.json()
         console.error('Cloudinary error response:', errorData)
         const errorMessage = errorData.error?.message || errorData.message || 'Failed to upload image'
+        throw new Error(errorMessage)
+      }
+
+      const data: CloudinaryResponse = await response.json()
+      return data.secure_url
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(`Cloudinary upload failed: ${error.message}`)
+      }
+      throw new Error('Cloudinary upload failed: Unknown error')
+    }
+  }
+
+  /**
+   * Upload a document file (PDF, Word, Excel, etc.) to Cloudinary
+   * @param file - The document file to upload
+   * @param folder - Optional folder name in Cloudinary (e.g., 'documents')
+   * @returns Promise with the uploaded file URL
+   */
+  async uploadFile(file: File, folder?: string): Promise<string> {
+    if (!this.cloudName || !this.uploadPreset) {
+      throw new Error('Cloudinary is not configured. Please add credentials to .env')
+    }
+
+    // Validate file type - allow images and documents
+    const isImage = file.type.startsWith('image/')
+    const isDocument = ALLOWED_DOCUMENT_TYPES.includes(file.type)
+    
+    if (!isImage && !isDocument) {
+      throw new Error('File type not allowed. Allowed types: images, PDF, Word, Excel, PowerPoint, text files')
+    }
+
+    // Validate file size (20MB limit for documents)
+    const maxSize = 20 * 1024 * 1024 // 20MB
+    if (file.size > maxSize) {
+      throw new Error('File size must be less than 20MB')
+    }
+
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('upload_preset', this.uploadPreset)
+    
+    if (folder) {
+      formData.append('folder', folder)
+    }
+
+    // Use 'raw' for documents, 'image' for images
+    const resourceType = isImage ? 'image' : 'raw'
+
+    try {
+      console.log('Uploading file to Cloudinary:', { 
+        cloudName: this.cloudName, 
+        uploadPreset: this.uploadPreset, 
+        folder,
+        fileType: file.type,
+        resourceType 
+      })
+      
+      const response = await fetch(this.getUploadUrl(resourceType), {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        console.error('Cloudinary error response:', errorData)
+        const errorMessage = errorData.error?.message || errorData.message || 'Failed to upload file'
         throw new Error(errorMessage)
       }
 
