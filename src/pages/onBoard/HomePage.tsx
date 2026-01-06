@@ -1,60 +1,60 @@
 import { useState, useEffect } from 'react'
-import { ArrowRightIcon, CodeBracketIcon, CloudArrowUpIcon, CogIcon, ChartBarIcon, UsersIcon, DeviceTabletIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
+import { ArrowRightIcon, UserCircleIcon, DocumentTextIcon, FolderIcon, ChartBarIcon, CloudArrowUpIcon, ShieldCheckIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
 
 export default function HomePage() {
   const [currentSlide, setCurrentSlide] = useState(0)
 
   const slides = [
     {
-      title: 'Streamline Project Onboarding',
-      subtitle: 'Connect GitHub repositories and automate your workflow with intelligent project setup.',
-      image: 'https://images.unsplash.com/photo-1551434678-e076c223a692?w=1200&h=600&fit=crop',
+      title: 'Build Your Professional Portfolio',
+      subtitle: 'Showcase your skills, experience, and projects in one beautiful, organized profile.',
+      image: 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=1200&h=600&fit=crop',
       cta: 'Get Started'
     },
     {
-      title: 'Seamless GitHub Integration',
-      subtitle: 'Import repositories, track commits, and manage deployments from a single dashboard.',
-      image: 'https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?w=1200&h=600&fit=crop',
-      cta: 'Connect GitHub'
+      title: 'Showcase Your Best Projects',
+      subtitle: 'Display your work with images, descriptions, and links to live demos or GitHub repositories.',
+      image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&h=600&fit=crop',
+      cta: 'Start Building'
     },
     {
-      title: 'Team Collaboration Made Easy',
-      subtitle: 'Invite members, assign roles, and collaborate effectively across all your projects.',
-      image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200&h=600&fit=crop',
-      cta: 'Start Collaborating'
+      title: 'Manage Your Documents Securely',
+      subtitle: 'Upload and organize certificates, resumes, and important documents all in one place.',
+      image: 'https://images.unsplash.com/photo-1568992687947-868a62a9f521?w=1200&h=600&fit=crop',
+      cta: 'Upload Documents'
     }
   ]
 
   const features = [
     {
-      name: 'GitHub Integration',
-      description: 'Connect repositories and start onboarding projects with one click.',
-      icon: CodeBracketIcon
+      name: 'Professional Portfolio',
+      description: 'Create a stunning profile with your skills, experience, education, and references.',
+      icon: UserCircleIcon
     },
     {
-      name: 'Smart Analytics',
-      description: 'Track project progress and team performance in real-time.',
+      name: 'Project Showcase',
+      description: 'Display your projects with images, technologies used, and GitHub links.',
+      icon: FolderIcon
+    },
+    {
+      name: 'Document Management',
+      description: 'Upload and organize certificates, resumes, and important documents securely.',
+      icon: DocumentTextIcon
+    },
+    {
+      name: 'Progress Dashboard',
+      description: 'Track your profile completion and get insights on your portfolio.',
       icon: ChartBarIcon
     },
     {
-      name: 'Team Collaboration',
-      description: 'Invite members, assign roles, and collaborate effectively.',
-      icon: UsersIcon
-    },
-    {
-      name: 'Automated Workflows',
-      description: 'Set up custom workflows to automate repetitive tasks.',
-      icon: CogIcon
-    },
-    {
-      name: 'Cloud Deployment',
-      description: 'Deploy projects to cloud platforms directly from the pipeline.',
+      name: 'Cloud Storage',
+      description: 'All your files are securely stored in the cloud and accessible anywhere.',
       icon: CloudArrowUpIcon
     },
     {
-      name: 'Mobile Access',
-      description: 'Monitor progress from anywhere with our mobile app.',
-      icon: DeviceTabletIcon
+      name: 'Secure & Private',
+      description: 'Your data is protected with secure authentication and encryption.',
+      icon: ShieldCheckIcon
     }
   ]
 
@@ -80,14 +80,14 @@ export default function HomePage() {
                 <span className="text-blue-600 font-semibold text-lg">O</span>
               </div>
               <span className="text-lg font-semibold text-white">
-                OnboardFlow
+                OnBoard
               </span>
             </div>
             
             <div className="hidden md:flex items-center space-x-8">
               <a href="#features" className="text-white/90 hover:text-white text-sm transition-colors">Features</a>
               <a href="#about" className="text-white/90 hover:text-white text-sm transition-colors">About</a>
-              <a href="#pricing" className="text-white/90 hover:text-white text-sm transition-colors">Pricing</a>
+              <a href="#how-it-works" className="text-white/90 hover:text-white text-sm transition-colors">How It Works</a>
             </div>
 
             <div className="flex items-center space-x-3">
